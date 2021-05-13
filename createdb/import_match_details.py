@@ -15,14 +15,14 @@ def int_or_default(value):
     try:
         return int(value)
     except ValueError:
-        return 0
+        return "NULL"
 
 
 def float_or_default(value):
     try:
         return float(value)
     except ValueError:
-        return 0
+        return "NULL"
 
 
 def get_record_id(table, value):
@@ -59,6 +59,22 @@ def import_match_details():
 
                 match_number = row[19].replace("ODI No. ", "", 1)
 
+                batting_session_time = int_or_default(row[12].replace(":",".",1).split(".", 1)[0])
+                if batting_session_time == "NULL":
+                    batting_session_label = ""
+                elif batting_session_time >= 18:
+                    batting_session_label = "night"
+                else:
+                    batting_session_label = "day"
+
+                bowling_session_time = int_or_default(row[13].replace(":",".",1).split(".", 1)[0])
+                if bowling_session_time == "NULL":
+                    bowling_session_label = ""
+                elif bowling_session_time >= 18:
+                    bowling_session_label = "night"
+                else:
+                    bowling_session_label = "day"
+
                 print(line_count)
                 db_cursor.execute(f'INSERT INTO match_details SET'
                                   f' score={int_or_default(row[0])},'
@@ -67,13 +83,13 @@ def import_match_details():
                                   f' balls={int_or_default(row[3])},'
                                   f' rpo={float_or_default(row[4])},'
                                   f' target={int_or_default(row[5])},'
-                                  f' inning={int_or_default(row[6])},'
+                                  f' inning="{"inning"+row[6]}",'
                                   f' result="{row[7]}",'
                                   f' opposition_id={oppositionId},'
                                   f' date="{row[9]}",'
                                   f' match_id={int(row[10])},'
-                                  f' batting_session="{row[12]}",'
-                                  f' bowling_session="{row[13]}",'
+                                  f' batting_session="{batting_session_label}",'
+                                  f' bowling_session="{bowling_session_label}",'
                                   f' venue_id="{venueId}",'
                                   f' extras={int_or_default(row[16])},'
                                   f' toss={toss},'
@@ -184,8 +200,8 @@ def import_bowling_data():
         print(f'Processed {line_count} lines.')
 
 
-# import_match_details()
-# import_weather_data('data/weather_data-batting.csv', "batting")
-# import_weather_data('data/weather_data-bowling.csv', "bowling")
-# import_batting_data()
-# import_bowling_data()
+import_match_details()
+import_weather_data('data/weather_data-batting.csv', "batting")
+import_weather_data('data/weather_data-bowling.csv', "bowling")
+import_batting_data()
+import_bowling_data()
