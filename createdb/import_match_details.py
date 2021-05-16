@@ -1,5 +1,6 @@
 import csv
 import mysql.connector
+from datetime import datetime
 
 db_connection = mysql.connector.connect(
     host="localhost",
@@ -50,16 +51,19 @@ def import_match_details():
                 venue = row[14]
                 venueId = get_record_id("venue", venue)
 
+                date_value = datetime.strptime(row[9], '%d-%b-%y')
+                print(date_value)
+
                 season = row[18]
                 seasonId = get_record_id("season", season)
 
-                toss = 0
+                toss = "lost"
                 if row[17] == "TRUE":
-                    toss = 1
+                    toss = "won"
 
                 match_number = row[19].replace("ODI No. ", "", 1)
 
-                batting_session_time = int_or_default(row[12].replace(":",".",1).split(".", 1)[0])
+                batting_session_time = int_or_default(row[12].replace(":", ".", 1).split(".", 1)[0])
                 if batting_session_time == "NULL":
                     batting_session_label = ""
                 elif batting_session_time >= 18:
@@ -67,7 +71,7 @@ def import_match_details():
                 else:
                     batting_session_label = "day"
 
-                bowling_session_time = int_or_default(row[13].replace(":",".",1).split(".", 1)[0])
+                bowling_session_time = int_or_default(row[13].replace(":", ".", 1).split(".", 1)[0])
                 if bowling_session_time == "NULL":
                     bowling_session_label = ""
                 elif bowling_session_time >= 18:
@@ -75,7 +79,6 @@ def import_match_details():
                 else:
                     bowling_session_label = "day"
 
-                print(line_count)
                 db_cursor.execute(f'INSERT INTO match_details SET'
                                   f' score={int_or_default(row[0])},'
                                   f' wickets={int_or_default(row[1])},'
@@ -86,13 +89,13 @@ def import_match_details():
                                   f' inning="{"inning"+row[6]}",'
                                   f' result="{row[7]}",'
                                   f' opposition_id={oppositionId},'
-                                  f' date="{row[9]}",'
+                                  f' date="{date_value}",'
                                   f' match_id={int(row[10])},'
                                   f' batting_session="{batting_session_label}",'
                                   f' bowling_session="{bowling_session_label}",'
                                   f' venue_id="{venueId}",'
                                   f' extras={int_or_default(row[16])},'
-                                  f' toss={toss},'
+                                  f' toss="{toss}",'
                                   f' season_id={seasonId}, '
                                   f' match_number={int(match_number)}'
                                   f'')
@@ -201,7 +204,7 @@ def import_bowling_data():
 
 
 import_match_details()
-import_weather_data('data/weather_data-batting.csv', "batting")
-import_weather_data('data/weather_data-bowling.csv', "bowling")
-import_batting_data()
-import_bowling_data()
+# import_weather_data('data/weather_data-batting.csv', "batting")
+# import_weather_data('data/weather_data-bowling.csv', "bowling")
+# import_batting_data()
+# import_bowling_data()

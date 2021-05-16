@@ -1,7 +1,7 @@
 import mysql.connector
 
 create_match_details = "CREATE  TABLE match_details (id INT NOT NULL AUTO_INCREMENT, score INT, wickets INT, overs FLOAT, balls INT, rpo FLOAT, " \
-                       "target INT, inning VARCHAR(100), result VARCHAR(20),opposition_id INT, date VARCHAR(100), match_id INT, " \
+                       "target INT, inning VARCHAR(100), result VARCHAR(20),opposition_id INT, date DATE, match_id INT, " \
                        "batting_session VARCHAR(100), bowling_session VARCHAR(100), venue_id INT, extras INT, toss INT, " \
                        "season_id INT, match_number INT, PRIMARY KEY (id))"
 create_opposition = "CREATE  TABLE opposition (id INT NOT NULL AUTO_INCREMENT, opposition_name VARCHAR(100), PRIMARY KEY (id))"
