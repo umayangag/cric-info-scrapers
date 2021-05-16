@@ -52,7 +52,6 @@ def import_match_details():
                 venueId = get_record_id("venue", venue)
 
                 date_value = datetime.strptime(row[9], '%d-%b-%y')
-                print(date_value)
 
                 season = row[18]
                 seasonId = get_record_id("season", season)
@@ -78,6 +77,8 @@ def import_match_details():
                     bowling_session_label = "night"
                 else:
                     bowling_session_label = "day"
+
+                print(toss)
 
                 db_cursor.execute(f'INSERT INTO match_details SET'
                                   f' score={int_or_default(row[0])},'
@@ -204,7 +205,7 @@ def import_bowling_data():
 
 
 import_match_details()
-# import_weather_data('data/weather_data-batting.csv', "batting")
-# import_weather_data('data/weather_data-bowling.csv', "bowling")
-# import_batting_data()
-# import_bowling_data()
+import_weather_data('data/weather_data-batting.csv', "batting")
+import_weather_data('data/weather_data-bowling.csv', "bowling")
+import_batting_data()
+import_bowling_data()
