@@ -10,6 +10,7 @@ db_connection = mysql.connector.connect(
 db_cursor = db_connection.cursor()
 db_cursor.execute("drop table batting_data")
 db_cursor.execute("drop table bowling_data")
+db_cursor.execute("drop table fielding_data")
 db_cursor.execute("drop table match_details")
 db_cursor.execute("drop table opposition")
 db_cursor.execute("drop table venue")

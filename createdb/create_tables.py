@@ -8,7 +8,7 @@ create_match_details = "CREATE  TABLE match_details (id INT NOT NULL AUTO_INCREM
 create_opposition = "CREATE  TABLE opposition (id INT NOT NULL AUTO_INCREMENT, opposition_name VARCHAR(100), PRIMARY KEY (id))"
 create_venue = "CREATE  TABLE venue (id INT NOT NULL AUTO_INCREMENT, venue_name VARCHAR(100), PRIMARY KEY (id))"
 create_season = "CREATE  TABLE season (id INT NOT NULL AUTO_INCREMENT, season_name VARCHAR(100), PRIMARY KEY (id))"
-create_player = "CREATE  TABLE player (id INT NOT NULL AUTO_INCREMENT, player_name VARCHAR(250), PRIMARY KEY (id))"
+create_player = "CREATE  TABLE player (id INT NOT NULL AUTO_INCREMENT, player_name VARCHAR(250), is_wicket_keeper INT, is_retired INT, PRIMARY KEY (id))"
 create_weather_data = "CREATE  TABLE weather_data (id INT NOT NULL AUTO_INCREMENT, match_id INT, session VARCHAR(100), temp INT, feels INT, " \
                       "wind INT, gust INT, rain INT, humidity INT, cloud INT, pressure INT, viscosity VARCHAR(100), " \
                       "PRIMARY KEY (id))"
@@ -18,6 +18,8 @@ create_batting_data = "CREATE  TABLE batting_data (id INT NOT NULL AUTO_INCREMEN
 create_bowling_data = "CREATE  TABLE bowling_data (id INT NOT NULL AUTO_INCREMENT, match_id INT, player_id INT, " \
                       "overs FLOAT, balls INT, maidens INT , runs INT, wickets INT, dots INT, fours INT, sixes INT, econ float, " \
                       "wides INT, no_balls INT, PRIMARY KEY (id), FOREIGN KEY (player_id) REFERENCES player(id))"
+create_fielding_data = "CREATE TABLE fielding_data (id INT NOT NULL AUTO_INCREMENT, match_id INT, player_id INT, " \
+                      "catches INT, run_outs INT, dropped_catches INT, missed_run_outs INT, PRIMARY KEY (id), FOREIGN KEY (player_id) REFERENCES player(id))"
 
 db_connection = mysql.connector.connect(
     host="localhost",
@@ -35,3 +37,4 @@ db_cursor.execute(create_match_details)
 db_cursor.execute(create_weather_data)
 db_cursor.execute(create_batting_data)
 db_cursor.execute(create_bowling_data)
+db_cursor.execute(create_fielding_data)
