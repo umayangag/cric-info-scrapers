@@ -1,0 +1,1 @@
+create_db_query = "CREATE DATABASE cricket_data"

@@ -1,12 +1,6 @@
-import mysql.connector
+from .config import get_mysql_connection
+from .queries import create_db
 
-create_db = "CREATE DATABASE cricket_data"
-
-db_connection = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    passwd="root",
-    auth_plugin='mysql_native_password',
-)
+db_connection = get_mysql_connection()
 db_cursor = db_connection.cursor()
-db_cursor.execute(create_db)
+db_cursor.execute(create_db.create_db_query)
