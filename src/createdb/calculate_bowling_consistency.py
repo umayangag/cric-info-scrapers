@@ -15,8 +15,8 @@ def calculate_bowling_consistency(db_connection):
         if inning_count > 5:
             df = pd.DataFrame(player_data)
             total_overs = df[0].sum() / 6
-            strike_rate = df[1].sum() / df[2].sum()
-            average = df[1].sum()*6 / df[0].sum()
+            strike_rate = df[0].sum() / df[2].sum()
+            average = df[1].sum() / df[2].sum()
             ff = len(df[df[2] >= 5])
 
             consistency = 0.4174 * total_overs + 0.2634 * inning_count + 0.1602 * strike_rate + 0.0975 * average + 0.0615 * ff

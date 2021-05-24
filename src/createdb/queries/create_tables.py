@@ -27,3 +27,7 @@ create_bowling_data = "CREATE TABLE bowling_data (id INT NOT NULL AUTO_INCREMENT
 
 create_fielding_data = "CREATE TABLE fielding_data (id INT NOT NULL AUTO_INCREMENT, match_id INT, player_id INT, " \
                        "catches INT, run_outs INT, dropped_catches INT, missed_run_outs INT, PRIMARY KEY (id), FOREIGN KEY (player_id) REFERENCES player(id))"
+
+create_player_form_data = "CREATE TABLE player_form_data (id INT NOT NULL AUTO_INCREMENT, player_id INT, " \
+                      "season_id INT, batting_form FLOAT, bowling_form FLOAT, PRIMARY KEY (id), FOREIGN KEY (player_id) REFERENCES player(id)" \
+                          ", FOREIGN KEY (season_id) REFERENCES season(id))"
