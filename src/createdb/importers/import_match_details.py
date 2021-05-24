@@ -27,6 +27,10 @@ def import_match_details(db_connection, filename):
                 if row[17] == "TRUE":
                     toss = 1
 
+                result = 0
+                if row[7] == "won":
+                    result = 1
+
                 match_number = row[19].replace("ODI No. ", "", 1)
 
                 batting_session_time = int_or_default(
@@ -56,14 +60,14 @@ def import_match_details(db_connection, filename):
                                   f' balls={int_or_default(row[3])},'
                                   f' rpo={float_or_default(row[4])},'
                                   f' target={int_or_default(row[5])},'
-                                  f' inning="{"inning"+row[6]}",'
-                                  f' result="{row[7]}",'
+                                  f' inning={int_or_default(row[6])},'
+                                  f' result={int_or_default(result)},'
                                   f' opposition_id={oppositionId},'
                                   f' date="{date_value}",'
                                   f' match_id={int(row[10])},'
                                   f' batting_session="{batting_session_label}",'
                                   f' bowling_session="{bowling_session_label}",'
-                                  f' venue_id="{venueId}",'
+                                  f' venue_id={venueId},'
                                   f' extras={int_or_default(row[16])},'
                                   f' toss="{toss}",'
                                   f' season_id={seasonId}, '
