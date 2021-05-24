@@ -15,12 +15,12 @@ batting_performance_data = pd.read_csv(filename)
 print(batting_performance_data)
 print(batting_performance_data.isna().sum())
 
-distortions = []
-K = range(1,10)
-for k in K:
-    kmeanModel = KMeans(n_clusters=k)
-    kmeanModel.fit(batting_performance_data)
-    distortions.append(kmeanModel.inertia_)
+# distortions = []
+# K = range(1,10)
+# for k in K:
+#     kmeanModel = KMeans(n_clusters=k)
+#     kmeanModel.fit(batting_performance_data)
+#     distortions.append(kmeanModel.inertia_)
 
 # plt.figure(figsize=(16,8))
 # plt.plot(K, distortions, 'bx-')
