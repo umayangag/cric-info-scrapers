@@ -1,5 +1,5 @@
-from .config import get_db_connection
-from .queries import create_tables
+from config import get_db_connection
+from queries import create_tables
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
 db_cursor.execute(create_tables.create_opposition)
