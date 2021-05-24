@@ -29,5 +29,14 @@ create_fielding_data = "CREATE TABLE fielding_data (id INT NOT NULL AUTO_INCREME
                        "catches INT, run_outs INT, dropped_catches INT, missed_run_outs INT, PRIMARY KEY (id), FOREIGN KEY (player_id) REFERENCES player(id))"
 
 create_player_form_data = "CREATE TABLE player_form_data (id INT NOT NULL AUTO_INCREMENT, player_id INT, " \
-                      "season_id INT, batting_form FLOAT, bowling_form FLOAT, PRIMARY KEY (id), FOREIGN KEY (player_id) REFERENCES player(id)" \
+                          "season_id INT, batting_form FLOAT, bowling_form FLOAT, PRIMARY KEY (id), FOREIGN KEY (player_id) REFERENCES player(id)" \
                           ", FOREIGN KEY (season_id) REFERENCES season(id))"
+
+create_player_venue_data = "CREATE TABLE player_venue_data (id INT NOT NULL AUTO_INCREMENT, player_id INT, " \
+                           "venue_id INT, batting_venue FLOAT, bowling_venue FLOAT, PRIMARY KEY (id), FOREIGN KEY (player_id) REFERENCES player(id)" \
+                           ", FOREIGN KEY (venue_id) REFERENCES venue(id))"
+
+create_player_opposition_data = "CREATE TABLE player_opposition_data (id INT NOT NULL AUTO_INCREMENT, player_id INT, " \
+                          "opposition_id INT, batting_opposition FLOAT, bowling_opposition FLOAT, PRIMARY KEY (id), " \
+                                "FOREIGN KEY (player_id) REFERENCES player(id)" \
+                          ", FOREIGN KEY (opposition_id) REFERENCES opposition(id))"
