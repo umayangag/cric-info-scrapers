@@ -1,15 +1,10 @@
 import csv
 
-from mysql.connector import utils
-from ..config import get_db_connection
-from datetime import datetime
-from ..shared.utils import *
-
-db_connection = get_db_connection()
-db_cursor = db_connection.cursor()
+from shared.utils import *
 
 
-def import_bowling_data(filename):
+def import_bowling_data(db_connection, filename):
+    db_cursor = db_connection.cursor()
     with open(filename) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
@@ -18,7 +13,7 @@ def import_bowling_data(filename):
                 print(f'{", ".join(row)}')
             else:
                 player = row[0]
-                playerId = get_record_id("player", player)
+                playerId = get_record_id(db_connection, "player", player)
 
                 print(line_count)
                 db_cursor.execute(f'INSERT INTO bowling_data SET'

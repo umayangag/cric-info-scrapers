@@ -1,4 +1,4 @@
-from config import get_db_connection
+from config.mysql import get_db_connection
 from queries import create_tables
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()

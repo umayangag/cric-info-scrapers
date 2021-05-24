@@ -1,15 +1,9 @@
 import csv
-
-from mysql.connector import utils
-from ..config import get_db_connection
-from datetime import datetime
-from ..shared.utils import *
-
-db_connection = get_db_connection()
-db_cursor = db_connection.cursor()
+from shared.utils import *
 
 
-def import_weather_data(filename, session):
+def import_weather_data(db_connection, filename, session):
+    db_cursor = db_connection.cursor()
     with open(filename) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0

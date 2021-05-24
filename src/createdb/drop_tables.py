@@ -1,4 +1,4 @@
-from config import get_db_connection
+from config.mysql import get_db_connection
 db_connection = db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
 db_cursor.execute("drop table batting_data")

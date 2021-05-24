@@ -1,4 +1,4 @@
-from config import get_mysql_connection
+from config.mysql import get_mysql_connection
 from queries import create_db
 
 db_connection = get_mysql_connection()

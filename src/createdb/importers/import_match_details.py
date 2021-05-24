@@ -1,15 +1,10 @@
 import csv
 
-from mysql.connector import utils
-from ..config import get_db_connection
 from datetime import datetime
-from ..shared.utils import *
+from shared.utils import *
 
-db_connection = get_db_connection()
-db_cursor = db_connection.cursor()
-
-
-def import_match_details(filename):
+def import_match_details(db_connection, filename):
+    db_cursor = db_connection.cursor()
     with open(filename) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
@@ -18,19 +13,19 @@ def import_match_details(filename):
                 print(f'{", ".join(row)}')
             else:
                 opposition = row[8]
-                oppositionId = get_record_id("opposition", opposition)
+                oppositionId = get_record_id(db_connection, "opposition", opposition)
 
                 venue = row[14]
-                venueId = get_record_id("venue", venue)
+                venueId = get_record_id(db_connection, "venue", venue)
 
                 date_value = datetime.strptime(row[9], '%d-%b-%y')
 
                 season = row[18]
-                seasonId = get_record_id("season", season)
+                seasonId = get_record_id(db_connection, "season", season)
 
-                toss = "lost"
+                toss =0
                 if row[17] == "TRUE":
-                    toss = "won"
+                    toss = 1
 
                 match_number = row[19].replace("ODI No. ", "", 1)
 
