@@ -31,7 +31,7 @@ print(batting_performance_data.isna().sum())
 # plt.title('The Elbow Method showing the optimal k for batting performance')
 # plt.show()
 
-def classify_batting_performance(dataset):
+def cluster_batting_performance(dataset):
     kmeanModel = KMeans(n_clusters=3)
     kmeanModel.fit(dataset)
 
