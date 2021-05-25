@@ -2,15 +2,15 @@ import pandas as pd
 import os
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
+from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
 from imblearn.over_sampling import SMOTE
 
 RF = RandomForestClassifier(n_estimators=100)
-LR = LogisticRegression(random_state=0, solver='lbfgs', multi_class='ovr')
-NN = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)
+gnb = GaussianNB()
+clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(4, 3), random_state=1)
 
 predictor = RF
 
@@ -43,7 +43,6 @@ def batting_predict():
 
     oversample = SMOTE()
     X, y = oversample.fit_resample(X, y)
-
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
