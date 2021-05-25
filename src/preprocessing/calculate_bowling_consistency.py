@@ -22,6 +22,8 @@ def calculate_bowling_consistency(db_connection):
             consistency = 0.4174 * total_overs + 0.2634 * inning_count + 0.1602 * strike_rate + 0.0975 * average + 0.0615 * ff
             print(player[1], consistency)
             db_cursor.execute(f'UPDATE player SET bowling_consistency = {consistency} WHERE player.id = {player[0]}')
+        else:
+            db_cursor.execute(f'UPDATE player SET bowling_consistency = {0} WHERE player.id = {player[0]}')
     db_connection.commit()
 
 

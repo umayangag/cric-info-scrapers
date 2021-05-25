@@ -9,10 +9,13 @@ def calculate_batting_form(db_connection):
     db_cursor.execute("SELECT id, season_name FROM season")
     season_list = db_cursor.fetchall()
 
-    # for season in season_list:
-    #     for player in players_list:
-    #         db_cursor.execute(f'INSERT INTO player_form_data SET player_id={player[0]}, season_id={season[0]}')
-    # db_connection.commit()
+    for season in season_list:
+        for player in players_list:
+            db_cursor.execute(f'SELECT id FROM player_form_data WHERE player_id={player[0]} AND season_id={season[0]}')
+            record_exist = len(db_cursor.fetchall())
+            if record_exist == 0:
+                db_cursor.execute(f'INSERT INTO player_form_data SET player_id={player[0]}, season_id={season[0]}, batting_form=0, bowling_form=0')
+    db_connection.commit()
 
     for season in season_list:
         for player in players_list:

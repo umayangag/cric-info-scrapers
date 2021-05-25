@@ -9,10 +9,14 @@ def calculate_batting_opposition(db_connection):
     db_cursor.execute("SELECT id, opposition_name FROM opposition")
     opposition_list = db_cursor.fetchall()
 
-    # for opposition in opposition_list:
-    #     for player in players_list:
-    #         db_cursor.execute(f'INSERT INTO player_opposition_data SET player_id={player[0]}, opposition_id={opposition[0]}')
-    # db_connection.commit()
+    for opposition in opposition_list:
+        for player in players_list:
+            db_cursor.execute(f'SELECT id FROM player_opposition_data WHERE player_id={player[0]} AND opposition_id={opposition[0]}')
+            record_exist = len(db_cursor.fetchall())
+            if record_exist == 0:
+                db_cursor.execute(
+                    f'INSERT INTO player_opposition_data SET player_id={player[0]}, opposition_id={opposition[0]}, batting_opposition=0, bowling_opposition=0')
+    db_connection.commit()
 
     for opposition in opposition_list:
         for player in players_list:

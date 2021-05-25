@@ -1,5 +1,4 @@
 from config.mysql import get_db_connection
-from shared.utils import *
 from importers.import_match_details import import_match_details
 from importers.import_weather_data import import_weather_data
 from importers.import_batting_data import import_batting_data

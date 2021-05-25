@@ -11,7 +11,11 @@ def calculate_batting_venue(db_connection):
 
     for venue in venue_list:
         for player in players_list:
-            db_cursor.execute(f'INSERT INTO player_venue_data SET player_id={player[0]}, venue_id={venue[0]}')
+            db_cursor.execute(f'SELECT id FROM player_venue_data WHERE player_id={player[0]} AND venue_id={venue[0]}')
+            record_exist = len(db_cursor.fetchall())
+            if record_exist == 0:
+                db_cursor.execute(
+                    f'INSERT INTO player_venue_data SET player_id={player[0]}, venue_id={venue[0]}, batting_venue=0, bowling_venue=0')
     db_connection.commit()
 
     for venue in venue_list:

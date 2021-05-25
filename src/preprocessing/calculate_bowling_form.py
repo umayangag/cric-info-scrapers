@@ -11,6 +11,15 @@ def calculate_bowling_form(db_connection):
 
     for season in season_list:
         for player in players_list:
+            db_cursor.execute(f'SELECT id FROM player_form_data WHERE player_id={player[0]} AND season_id={season[0]}')
+            record_exist = len(db_cursor.fetchall())
+            if record_exist == 0:
+                db_cursor.execute(
+                    f'INSERT INTO player_form_data SET player_id={player[0]}, season_id={season[0]}, batting_form=0, bowling_form=0')
+    db_connection.commit()
+
+    for season in season_list:
+        for player in players_list:
             db_cursor.execute(
                 f'SELECT bowling_data.balls, runs, bowling_data.wickets, econ, '
                 f'match_details.season_id FROM bowling_data left join match_details '

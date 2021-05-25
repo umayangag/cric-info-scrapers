@@ -26,6 +26,8 @@ def calculate_batting_consistency(db_connection):
             consistency = 0.4262 * average_score + 0.2566 * inning_count + 0.1510 * average_strike_rate + 0.0787 * centuries + 0.0556 * fifties - 0.0328 * zeros
             print(player[1], consistency)
             db_cursor.execute(f'UPDATE player SET batting_consistency = {consistency} WHERE player.id = {player[0]}')
+        else:
+            db_cursor.execute(f'UPDATE player SET batting_consistency = 0 WHERE player.id = {player[0]}')
     db_connection.commit()
 
 

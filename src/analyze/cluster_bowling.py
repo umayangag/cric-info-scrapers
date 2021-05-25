@@ -21,7 +21,7 @@ print(bowling_performance_data.isna().sum())
 #     kmeanModel = KMeans(n_clusters=k)
 #     kmeanModel.fit(bowling_performance_data)
 #     distortions.append(kmeanModel.inertia_)
-
+#
 # plt.figure(figsize=(16,8))
 # plt.plot(K, distortions, 'bx-')
 # plt.xlabel('k')
@@ -29,7 +29,7 @@ print(bowling_performance_data.isna().sum())
 # plt.title('The Elbow Method showing the optimal k for bowling performance')
 # plt.show()
 
-kmeanModel = KMeans(n_clusters=3)
+kmeanModel = KMeans(n_clusters=4)
 kmeanModel.fit(bowling_performance_data)
 
 bowling_performance_data['bowling_performance']=kmeanModel.predict(bowling_performance_data)
