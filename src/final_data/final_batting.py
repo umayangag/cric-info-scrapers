@@ -3,6 +3,7 @@ import pandas as pd
 from final_data.queries import batting_dataset_query
 import os
 from analyze.cluster_batting import classify_batting_performance
+from analyze.normalize_batting import normalize_batting_dataset
 from sklearn.cluster import KMeans
 
 columns = [
@@ -71,7 +72,7 @@ def cluster_batting_performance(dataset):
     batting_performance = classify_batting_performance(batting_performance)
     print(batting_performance)
     dataset["performance"] = batting_performance["batting_performance"]
-    dataset["performance_index"] = batting_performance["performance_index"]
+    # dataset["performance_index"] = batting_performance["performance_index"]
     return dataset
 
 
@@ -84,8 +85,13 @@ def final_batting_dataset(conn):
     df_encoded["batting_session"] = df_encoded["batting_session"].apply(encode_session)
     df_encoded["viscosity"] = df_encoded["viscosity"].apply(encode_viscosity)
     # df_encoded["performance"] = df_encoded["runs"].apply(encode_runs)
+
     df_encoded = cluster_batting_performance(df_encoded)
     df_encoded = df_encoded.loc[:, df_encoded.columns != "player_name"]
+    # df_encoded = normalize_batting_dataset(df_encoded)
+    df_encoded = df_encoded.loc[:, df_encoded.columns != 'runs']
+    df_encoded = df_encoded.loc[:, df_encoded.columns != 'strike_rate']
+    df_encoded = df_encoded.loc[:, df_encoded.columns != 'match_id']
 
     if os.path.exists(output_file_encoded):
         print("existing file deleted")

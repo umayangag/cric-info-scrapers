@@ -21,7 +21,6 @@ dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
 def batting_predict():
     input_data = pd.read_csv(dataset_source)
     X = input_data[[
-        # "match_id",
         "batting_position",
         "player_consistency",
         "player_form",
