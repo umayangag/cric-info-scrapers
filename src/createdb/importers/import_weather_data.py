@@ -22,7 +22,6 @@ def import_weather_data(db_connection, filename, session):
                 pressure = row[12].split(" ", 1)[0]
                 viscosity = row[13].replace("°c", "", 1)
 
-                print(line_count)
                 db_cursor.execute(f'INSERT INTO weather_data SET'
                                   f' match_id={int(row[1])},'
                                   f' session="{session}",'
