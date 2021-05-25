@@ -3,7 +3,7 @@ import pandas as pd
 from final_data.queries import bowling_dataset_query
 import os
 from analyze.cluster_bowling import cluster_bowling_performance
-# from analyze.normalize_bowling import normalize_bowling_dataset
+from analyze.normalize_bowling import normalize_bowling_dataset
 from sklearn.cluster import KMeans
 from final_data.encoders import *
 
@@ -55,7 +55,7 @@ def final_bowling_dataset(conn):
 
     df_encoded = categorize_bowling_performance(df_encoded)
     df_encoded = df_encoded.loc[:, df_encoded.columns != "player_name"]
-    # df_encoded = normalize_bowling_dataset(df_encoded)
+    df_encoded = normalize_bowling_dataset(df_encoded)
     df_encoded = df_encoded.loc[:, df_encoded.columns != 'econ']
     df_encoded = df_encoded.loc[:, df_encoded.columns != 'wickets']
     df_encoded = df_encoded.loc[:, df_encoded.columns != 'match_id']
