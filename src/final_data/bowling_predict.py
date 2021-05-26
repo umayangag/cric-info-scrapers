@@ -42,7 +42,7 @@ def bowling_predict():
     oversample = SMOTE()
     X, y = oversample.fit_resample(X, y)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 
     predictor.fit(X_train, y_train)
     y_pred = predictor.predict(X_test)

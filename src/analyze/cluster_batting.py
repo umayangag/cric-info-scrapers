@@ -39,14 +39,14 @@ def cluster_batting_performance(dataset):
     return dataset
 
 
-# classify_batting_performance(batting_performance_data)
-#
-# output_file = os.path.join(dirname, 'output\\batting_cluster.csv')
-# batting_performance_data.to_csv(output_file)
-#
-# plt.scatter(batting_performance_data["runs"], batting_performance_data["performance"],
-#             c=batting_performance_data['batting_performance'])
-# plt.title("cluster visualization")
-# plt.xlabel('strike rate')
-# plt.ylabel('runs scored')
-# plt.show()
+cluster_batting_performance(batting_performance_data)
+
+output_file = os.path.join(dirname, 'output\\batting_cluster.csv')
+batting_performance_data.to_csv(output_file)
+
+plt.scatter(batting_performance_data["strike_rate"], batting_performance_data["runs"],
+            c=batting_performance_data['batting_performance'])
+plt.title("cluster visualization")
+plt.xlabel('strike rate')
+plt.ylabel('runs scored')
+plt.show()

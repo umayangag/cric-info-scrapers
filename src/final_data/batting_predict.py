@@ -52,5 +52,7 @@ def batting_predict():
     print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
     print(confusion_matrix(y_test, y_pred, labels=[0, 1, 2]))
 
+    print(predictor.get_params())
+
 
 batting_predict()
