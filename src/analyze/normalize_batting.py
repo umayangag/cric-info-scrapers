@@ -13,7 +13,7 @@ filename = os.path.join(dirname, 'data\\batting_data_performance.csv')
 # normalize the data attributes
 def normalize_batting_dataset(dataset):
     numeric_columns = ['temp', 'wind', 'rain', 'humidity', 'cloud', 'pressure', 'venue', 'opposition',
-                       'player_consistency', 'player_form', "inning", "batting_position", 'viscosity', 'season']
+                       'player_consistency', 'player_form', 'viscosity']
     normalized = preprocessing.normalize(dataset[numeric_columns])
     df_normalized = pd.DataFrame(normalized, columns=numeric_columns)
     for column in numeric_columns:
