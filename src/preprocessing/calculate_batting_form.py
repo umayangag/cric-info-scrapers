@@ -14,16 +14,20 @@ def calculate_batting_form(db_connection):
             db_cursor.execute(f'SELECT id FROM player_form_data WHERE player_id={player[0]} AND season_id={season[0]}')
             record_exist = len(db_cursor.fetchall())
             if record_exist == 0:
-                db_cursor.execute(f'INSERT INTO player_form_data SET player_id={player[0]}, season_id={season[0]}, batting_form=0, bowling_form=0')
+                db_cursor.execute(
+                    f'INSERT INTO player_form_data SET player_id={player[0]}, season_id={season[0]}, batting_form=0, bowling_form=0')
     db_connection.commit()
 
     for season in season_list:
         for player in players_list:
+            season_id = season[0]
+            if season_id > 1:
+                season_id = season_id - 1
             db_cursor.execute(
                 f'SELECT description, runs, batting_data.balls, minutes, fours, sixes, strike_rate, '
                 f'match_details.season_id FROM batting_data left join match_details '
                 f'on batting_data.match_id=match_details.match_id where player_id = {player[0]} '
-                f'and season_id = {season[0]};')
+                f'and season_id = {season_id};')
             player_data = db_cursor.fetchall()
             inning_count = len(player_data)
             if inning_count > 0:

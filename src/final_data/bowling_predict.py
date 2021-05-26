@@ -7,6 +7,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
 from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import cross_val_score
 
 RF = RandomForestClassifier(n_estimators=100)
 gnb = GaussianNB()
@@ -48,7 +49,9 @@ def bowling_predict():
     y_pred = predictor.predict(X_test)
 
     # for classifiers
+    print("Score:", predictor.score(X_test, y_test))
     print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).mean())
     print(confusion_matrix(y_test, y_pred, labels=[0, 1, 2]))
 
 

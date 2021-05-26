@@ -7,11 +7,13 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
 from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import cross_val_score
+from sklearn import svm
 
 RF = RandomForestClassifier(n_estimators=100)
 gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(4, 3), random_state=1)
-
+SVM = svm.SVC(kernel='linear', C=1)
 predictor = RF
 
 dirname = os.path.dirname(__file__)
@@ -36,7 +38,7 @@ def batting_predict():
         "toss",
         "venue",
         "opposition",
-        "season",
+        # "season",
     ]]  # Features
     y = input_data["performance"]  # Labels
 
@@ -49,7 +51,9 @@ def batting_predict():
     y_pred = predictor.predict(X_test)
 
     # for classifiers
+    print("Score:", predictor.score(X_test, y_test))
     print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).mean())
     print(confusion_matrix(y_test, y_pred, labels=[0, 1, 2]))
 
     print(predictor.get_params())

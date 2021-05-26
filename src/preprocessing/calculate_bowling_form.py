@@ -20,11 +20,14 @@ def calculate_bowling_form(db_connection):
 
     for season in season_list:
         for player in players_list:
+            season_id = season[0]
+            if season_id > 1:
+                season_id = season_id - 1
             db_cursor.execute(
                 f'SELECT bowling_data.balls, runs, bowling_data.wickets, econ, '
                 f'match_details.season_id FROM bowling_data left join match_details '
                 f'on bowling_data.match_id=match_details.match_id where player_id = {player[0]} '
-                f'and season_id = {season[0]};')
+                f'and season_id = {season_id};')
             player_data = db_cursor.fetchall()
             inning_count = len(player_data)
             if inning_count > 0:
