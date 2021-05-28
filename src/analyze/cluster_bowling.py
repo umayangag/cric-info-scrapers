@@ -9,12 +9,13 @@ import matplotlib.pyplot as plt
 import os
 
 dirname = os.path.dirname(__file__)
-filename = os.path.join(dirname, 'cluster_data\\bowling_performance.csv')
+filename = os.path.join(dirname, 'data\\bowling_data_cluster.csv')
 
 bowling_performance_data = pd.read_csv(filename)
 
 print(bowling_performance_data)
 print(bowling_performance_data.isna().sum())
+
 
 # distortions = []
 # K = range(1, 10)
@@ -39,14 +40,16 @@ def cluster_bowling_performance(dataset):
     return dataset
 
 
-cluster_bowling_performance(bowling_performance_data)
-
-output_file = os.path.join(dirname, 'output\\bowling_cluster.csv')
-bowling_performance_data.to_csv(output_file)
-
-plt.scatter(bowling_performance_data["wickets"], bowling_performance_data["econ"],
-            c=bowling_performance_data['bowling_performance'])
-plt.title("cluster visualization")
-plt.xlabel('wickets')
-plt.ylabel('econ')
-plt.show()
+# cluster_bowling_performance(bowling_performance_data)
+#
+# output_file = os.path.join(dirname, 'output\\bowling_cluster.csv')
+# bowling_performance_data.to_csv(output_file)
+#
+# x = "wickets"
+# y = "runs"
+# plt.scatter(bowling_performance_data[x], bowling_performance_data[y],
+#             c=bowling_performance_data['bowling_performance'])
+# plt.title("cluster visualization")
+# plt.xlabel(x)
+# plt.ylabel(y)
+# plt.show()

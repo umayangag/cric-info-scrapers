@@ -15,7 +15,7 @@ gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 5), random_state=1, max_iter=5000)
 SVM = svm.SVC(kernel='linear', C=1)
 
-predictor = clf
+predictor = RF
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
@@ -38,7 +38,7 @@ def bowling_predict():
         "toss",
         "venue",
         "opposition",
-        # "season",
+        "season",
     ]]  # Features
     y = input_data["performance"]  # Labels
 
@@ -53,7 +53,7 @@ def bowling_predict():
     # for classifiers
     print("Score:", predictor.score(X_test, y_test))
     print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
-    # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).min())
+    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).min())
     print(confusion_matrix(y_test, y_pred, labels=[0, 1, 2]))
 
 

@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 import os
 
 dirname = os.path.dirname(__file__)
-filename = os.path.join(dirname, 'cluster_data\\batting_performance.csv')
+# filename = os.path.join(dirname, 'cluster_data\\batting_performance.csv')
+filename = os.path.join(dirname, 'data\\batting_data_cluster.csv')
 
 batting_performance_data = pd.read_csv(filename)
 
@@ -30,7 +31,7 @@ print(batting_performance_data.isna().sum())
 # plt.ylabel('Distortion')
 # plt.title('The Elbow Method showing the optimal k for batting performance')
 # plt.show()
-#
+
 def cluster_batting_performance(dataset):
     kmeanModel = KMeans(n_clusters=3)
     kmeanModel.fit(dataset)
@@ -43,10 +44,12 @@ cluster_batting_performance(batting_performance_data)
 
 output_file = os.path.join(dirname, 'output\\batting_cluster.csv')
 batting_performance_data.to_csv(output_file)
+x = "strike_rate"
+y = "runs"
 
-plt.scatter(batting_performance_data["strike_rate"], batting_performance_data["runs"],
+plt.scatter(batting_performance_data[x], batting_performance_data[y],
             c=batting_performance_data['batting_performance'])
 plt.title("cluster visualization")
-plt.xlabel('strike rate')
-plt.ylabel('runs scored')
+plt.xlabel(x)
+plt.ylabel(y)
 plt.show()
