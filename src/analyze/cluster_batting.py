@@ -23,14 +23,14 @@ print(batting_performance_data.isna().sum())
 #     kmeanModel = KMeans(n_clusters=k)
 #     kmeanModel.fit(batting_performance_data)
 #     distortions.append(kmeanModel.inertia_)
-
+#
 # plt.figure(figsize=(16,8))
 # plt.plot(K, distortions, 'bx-')
 # plt.xlabel('k')
 # plt.ylabel('Distortion')
 # plt.title('The Elbow Method showing the optimal k for batting performance')
 # plt.show()
-
+#
 def cluster_batting_performance(dataset):
     kmeanModel = KMeans(n_clusters=3)
     kmeanModel.fit(dataset)

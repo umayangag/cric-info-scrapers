@@ -39,14 +39,14 @@ def cluster_bowling_performance(dataset):
     return dataset
 
 
-# cluster_bowling_performance(bowling_performance_data)
-#
-# output_file = os.path.join(dirname, 'output\\bowling_cluster.csv')
-# bowling_performance_data.to_csv(output_file)
-#
-# plt.scatter(bowling_performance_data["wickets"], bowling_performance_data["econ"],
-#             c=bowling_performance_data['bowling_performance'])
-# plt.title("cluster visualization")
-# plt.xlabel('wickets')
-# plt.ylabel('econ')
-# plt.show()
+cluster_bowling_performance(bowling_performance_data)
+
+output_file = os.path.join(dirname, 'output\\bowling_cluster.csv')
+bowling_performance_data.to_csv(output_file)
+
+plt.scatter(bowling_performance_data["wickets"], bowling_performance_data["econ"],
+            c=bowling_performance_data['bowling_performance'])
+plt.title("cluster visualization")
+plt.xlabel('wickets')
+plt.ylabel('econ')
+plt.show()

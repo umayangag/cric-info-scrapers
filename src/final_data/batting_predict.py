@@ -14,7 +14,7 @@ RF = RandomForestClassifier(n_estimators=100)
 gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(4, 3), random_state=1)
 SVM = svm.SVC(kernel='linear', C=1)
-predictor = RF
+predictor = clf
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
@@ -53,7 +53,7 @@ def batting_predict():
     # for classifiers
     print("Score:", predictor.score(X_test, y_test))
     print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
-    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).min())
+    # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).min())
     print(confusion_matrix(y_test, y_pred, labels=[0, 1, 2]))
 
     print(predictor.get_params())
