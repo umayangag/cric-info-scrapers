@@ -11,7 +11,7 @@ find_k = False
 
 
 def cluster_batting_performance(dataset):
-    kmeanModel = KMeans(n_clusters=5)
+    kmeanModel = KMeans(n_clusters=3)
     kmeanModel.fit(dataset)
 
     dataset['batting_performance'] = kmeanModel.predict(dataset)
