@@ -22,8 +22,16 @@ dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\overall.csv")
 
 
+
 def batting_predict(predictor):
     input_data = pd.read_csv(dataset_source)
+
+    scaler = preprocessing.StandardScaler().fit(input_data)
+    data_scaled = scaler.transform(input_data)
+    final_df = pd.DataFrame(data=data_scaled, columns=input_data.columns)
+    # input_data.reset_index(drop=True, inplace=True)
+    final_df["result"] = input_data["result"]
+    input_data=final_df
 
     X = input_data.loc[:, input_data.columns != 'result']
     # X = input_data[[
@@ -79,7 +87,7 @@ def batting_predict(predictor):
     # print("Score:", predictor.score(X_test, y_test))
     accuracy = metrics.accuracy_score(y_test, y_pred)
     print("Accuracy:", accuracy)
-    # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=5).min())
+    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=5).min())
     print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
     # print(predictor.coefs_)

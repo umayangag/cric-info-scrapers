@@ -38,8 +38,25 @@ for column in df.columns:
     player_columns.append(column)
 player_df = pd.DataFrame(columns=player_columns)
 
+
+def calculate_batting_contribution(rowitem):
+    if rowitem["runs_scored"] == 0 or rowitem["score"] == 0:
+        return 0
+    return rowitem["runs_scored"] / rowitem["score"]
+
+
+def calculate_bowling_contribution(rowitem):
+    if rowitem["runs_conceded"] == 0 or rowitem["score"] == 0:
+        return 0
+    return rowitem["runs_conceded"] / rowitem["score"]
+
+
+if os.path.exists(output_file_encoded):
+    print("existing file deleted")
+    os.remove(output_file_encoded)
+
 for i, row in df.iterrows():
-    if row["match_number"] != 4052:
+    if row["match_number"] not in [4052, 3092, 3274, 3580, 3718, 3807]:
         match_id = row["match_id"]
         player_list = {}
         db_cursor.execute(
@@ -106,6 +123,8 @@ for i, row in df.iterrows():
                 row["no_balls"] = player_list[index]["bowling"][11]
             player_df = player_df.append(row)
 
+player_df["batting_contribution"] = player_df.apply(lambda item: calculate_batting_contribution(item), axis=1)
+player_df["bowling_contribution"] = player_df.apply(lambda item: calculate_bowling_contribution(item), axis=1)
 player_df = player_df.loc[:, player_df.columns != "description"]
 player_df = player_df.loc[:, player_df.columns != "date"]
 player_df = player_df.loc[:, player_df.columns != "match_id"]
@@ -115,18 +134,9 @@ player_df = player_df.loc[:, player_df.columns != "bowling_session"]
 player_df = player_df.loc[:, player_df.columns != "batting_viscosity"]
 player_df = player_df.loc[:, player_df.columns != "bowling_viscosity"]
 player_df = player_df.loc[:, player_df.columns != "minutes_batted"]
-player_df = player_df.loc[:, player_df.columns != "score"]
+# player_df = player_df.loc[:, player_df.columns != "score"]
 player_df = player_df.loc[:, player_df.columns != "rpo"]
 player_df = player_df.loc[:, player_df.columns != "target"]
 player_df = player_df.loc[:, player_df.columns != "extras"]
 
-scaler = preprocessing.StandardScaler().fit(player_df)
-data_scaled = scaler.transform(player_df)
-final_df = pd.DataFrame(data=data_scaled, columns=player_df.columns)
-# final_df["result"] = player_df["result"]
-
-if os.path.exists(output_file_encoded):
-    print("existing file deleted")
-    os.remove(output_file_encoded)
-
-final_df.to_csv(output_file_encoded, index=False)
+player_df.to_csv(output_file_encoded, index=False)
