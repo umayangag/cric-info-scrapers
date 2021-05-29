@@ -9,45 +9,49 @@ from sklearn.metrics import confusion_matrix
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import cross_val_score
 from sklearn import svm
+from sklearn import preprocessing
 
 RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=False, max_depth=100,
                             class_weight={0: 1, 1: 1})
 gnb = GaussianNB()
-clf = MLPClassifier(solver='lbfgs', activation='relu', alpha=1e-5, hidden_layer_sizes=(5, 6), random_state=1, max_iter=10000)
+clf = MLPClassifier(solver='lbfgs', activation='relu', alpha=1e-5, hidden_layer_sizes=(5, 6), random_state=1,
+                    max_iter=10000)
 SVM = svm.SVC(kernel='linear', C=1)
 
 dirname = os.path.dirname(__file__)
-dataset_source = os.path.join(dirname, "output\\batting_win_predict_encoded.csv")
+dataset_source = os.path.join(dirname, "output\overall.csv")
 
 
 def batting_predict(predictor):
     input_data = pd.read_csv(dataset_source)
-    X = input_data[[
-        "contribution",
-        "total_score",
-        "total_balls",
-        "batting_position",
-        "player_consistency",
-        "player_form",
-        "runs",
-        "balls",
-        "fours",
-        "sixes",
-        "strike_rate",
-        "temp",
-        "wind",
-        "rain",
-        "humidity",
-        "cloud",
-        "pressure",
-        "viscosity",
-        "inning",
-        "batting_session",
-        "toss",
-        "venue",
-        "opposition",
-        "season",
-    ]]  # Features
+
+    X = input_data.loc[:, input_data.columns != 'result']
+    # X = input_data[[
+    #     "contribution",
+    #     "total_score",
+    #     "total_balls",
+    #     "batting_position",
+    #     "player_consistency",
+    #     "player_form",
+    #     "runs",
+    #     "balls",
+    #     "fours",
+    #     "sixes",
+    #     "strike_rate",
+    #     "temp",
+    #     "wind",
+    #     "rain",
+    #     "humidity",
+    #     "cloud",
+    #     "pressure",
+    #     "viscosity",
+    #     "inning",
+    #     "batting_session",
+    #     "toss",
+    #     "venue",
+    #     "opposition",
+    #     "season",
+    # ]]  # Features
     y = input_data["result"]  # Labels
 
     oversample = SMOTE()
@@ -78,12 +82,12 @@ def batting_predict(predictor):
     # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=5).min())
     print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
-    print(predictor.coefs_)
+    # print(predictor.coefs_)
     # print(predictor.get_params())
     return accuracy
 
 
-batting_predict(clf)
+batting_predict(RF)
 # values = []
 # for i in range(1, 20):
 #     for j in range(1, 20):
