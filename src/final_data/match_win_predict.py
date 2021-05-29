@@ -22,7 +22,6 @@ dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\overall.csv")
 
 
-
 def batting_predict(predictor):
     input_data = pd.read_csv(dataset_source)
 
@@ -31,37 +30,59 @@ def batting_predict(predictor):
     final_df = pd.DataFrame(data=data_scaled, columns=input_data.columns)
     # input_data.reset_index(drop=True, inplace=True)
     final_df["result"] = input_data["result"]
-    input_data=final_df
+    input_data = final_df
 
-    X = input_data.loc[:, input_data.columns != 'result']
-    # X = input_data[[
-    #     "contribution",
-    #     "total_score",
-    #     "total_balls",
-    #     "batting_position",
-    #     "player_consistency",
-    #     "player_form",
-    #     "runs",
-    #     "balls",
-    #     "fours",
-    #     "sixes",
-    #     "strike_rate",
-    #     "temp",
-    #     "wind",
-    #     "rain",
-    #     "humidity",
-    #     "cloud",
-    #     "pressure",
-    #     "viscosity",
-    #     "inning",
-    #     "batting_session",
-    #     "toss",
-    #     "venue",
-    #     "opposition",
-    #     "season",
-    # ]]  # Features
+    # X = input_data.loc[:, input_data.columns != 'result']
+    X = input_data[[
+        # 'player_id',
+        'runs_scored',
+        'balls_faced',
+        'fours_scored',
+        'sixes_scored',
+        'strike_rate',
+        'batting_position',
+        'overs_bowled',
+        'deliveries',
+        'maidens',
+        'runs_conceded',
+        'wickets_taken',
+        'dots',
+        'fours_given',
+        'sixes_given',
+        'econ',
+        'wides',
+        'no_balls',
+        'score',
+        'wickets',
+        'overs',
+        'balls',
+        'inning',
+        'opposition_id',
+        'venue_id',
+        'toss',
+        # 'season_id',
+        # 'match_number',
+        'batting_temp',
+        'batting_feels',
+        'batting_wind',
+        'batting_gust',
+        'batting_rain',
+        'batting_humidity',
+        'batting_cloud',
+        'batting_pressure',
+        'bowling_temp',
+        'bowling_feels',
+        'bowling_wind',
+        'bowling_gust',
+        'bowling_rain',
+        'bowling_humidity',
+        'bowling_cloud',
+        'bowling_pressure',
+        'batting_contribution',
+        'bowling_contribution'
+    ]]  # Features
     y = input_data["result"]  # Labels
-
+    print(X.columns)
     oversample = SMOTE()
     X, y = oversample.fit_resample(X, y)
     print(X)
@@ -87,7 +108,7 @@ def batting_predict(predictor):
     # print("Score:", predictor.score(X_test, y_test))
     accuracy = metrics.accuracy_score(y_test, y_pred)
     print("Accuracy:", accuracy)
-    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=5).min())
+    # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=5).min())
     print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
     # print(predictor.coefs_)
@@ -95,7 +116,7 @@ def batting_predict(predictor):
     return accuracy
 
 
-batting_predict(RF)
+batting_predict(clf)
 # values = []
 # for i in range(1, 20):
 #     for j in range(1, 20):
