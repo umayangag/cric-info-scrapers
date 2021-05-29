@@ -13,7 +13,7 @@ from sklearn import svm
 RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=False, max_depth=100,
                             class_weight={0: 1, 1: 1})
 gnb = GaussianNB()
-clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 6), random_state=1, max_iter=10000)
+clf = MLPClassifier(solver='lbfgs', activation='relu', alpha=1e-5, hidden_layer_sizes=(5, 6), random_state=1, max_iter=10000)
 SVM = svm.SVC(kernel='linear', C=1)
 
 dirname = os.path.dirname(__file__)
@@ -78,6 +78,7 @@ def batting_predict(predictor):
     # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=5).min())
     print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
+    print(predictor.coefs_)
     # print(predictor.get_params())
     return accuracy
 
