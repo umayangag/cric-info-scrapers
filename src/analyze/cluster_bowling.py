@@ -7,11 +7,12 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 
+# find_k = True
 find_k = False
 
 
 def cluster_bowling_performance(dataset):
-    kmeanModel = KMeans(n_clusters=5)
+    kmeanModel = KMeans(n_clusters=4)
     kmeanModel.fit(dataset)
 
     dataset['bowling_performance'] = kmeanModel.predict(dataset)
@@ -25,7 +26,6 @@ if __name__ == "__main__":
     bowling_performance_data = pd.read_csv(filename)
 
     print(bowling_performance_data)
-    print(bowling_performance_data.isna().sum())
 
     if find_k:
         distortions = []
