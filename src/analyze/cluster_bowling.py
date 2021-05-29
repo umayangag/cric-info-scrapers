@@ -7,7 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 
-# find_k = True
+find_k = True
 find_k = False
 
 
