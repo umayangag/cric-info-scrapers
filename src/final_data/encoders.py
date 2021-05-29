@@ -22,3 +22,13 @@ def encode_runs(value):
     if value < 75:
         return 2
     return 3
+
+
+def encode_econ(value):
+    if value < 4:
+        return 0
+    if value < 8:
+        return 1
+    if value < 12:
+        return 2
+    return 3

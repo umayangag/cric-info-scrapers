@@ -9,9 +9,10 @@ from sklearn.metrics import confusion_matrix
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import cross_val_score
 from sklearn import svm
+from sklearn import preprocessing
 
 RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=False, max_depth=100,
-                            class_weight={0: 4, 1:1, 2: 2})
+                            class_weight={0: 4, 1: 1, 2: 2})
 gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(4, 3), random_state=1)
 SVM = svm.SVC(kernel='linear', C=1)
@@ -23,6 +24,14 @@ dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
 
 def batting_predict():
     input_data = pd.read_csv(dataset_source)
+
+    scaler = preprocessing.StandardScaler().fit(input_data)
+    data_scaled = scaler.transform(input_data)
+    final_df = pd.DataFrame(data=data_scaled, columns=input_data.columns)
+    # input_data.reset_index(drop=True, inplace=True)
+    final_df["runs"] = input_data["runs"]
+    input_data = final_df
+
     X = input_data[[
         "batting_position",
         "player_consistency",
@@ -41,7 +50,7 @@ def batting_predict():
         "opposition",
         # "season",
     ]]  # Features
-    y = input_data["performance"]  # Labels
+    y = input_data["runs"]  # Labels
 
     oversample = SMOTE()
     X, y = oversample.fit_resample(X, y)
@@ -55,7 +64,7 @@ def batting_predict():
     print("Score:", predictor.score(X_test, y_test))
     print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
     # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).min())
-    print(confusion_matrix(y_test, y_pred, labels=[0, 1, 2]))
+    print(confusion_matrix(y_test, y_pred, labels=[0, 1, 2, 3]))
 
     print(predictor.get_params())
 

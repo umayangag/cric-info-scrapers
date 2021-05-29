@@ -40,7 +40,7 @@ def bowling_predict():
         "opposition",
         "season",
     ]]  # Features
-    y = input_data["performance"]  # Labels
+    y = input_data["econ"]  # Labels
 
     oversample = SMOTE()
     X, y = oversample.fit_resample(X, y)
@@ -54,7 +54,7 @@ def bowling_predict():
     print("Score:", predictor.score(X_test, y_test))
     print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
     # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).min())
-    print(confusion_matrix(y_test, y_pred, labels=[0, 1, 2]))
+    print(confusion_matrix(y_test, y_pred, labels=[0, 1, 2, 3]))
 
 
 bowling_predict()

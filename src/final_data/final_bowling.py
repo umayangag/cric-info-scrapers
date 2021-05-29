@@ -51,12 +51,12 @@ def final_bowling_dataset(conn):
 
     df_encoded["bowling_session"] = df_encoded["bowling_session"].apply(encode_session)
     df_encoded["viscosity"] = df_encoded["viscosity"].apply(encode_viscosity)
-    # df_encoded["performance"] = df_encoded["runs"].apply(encode_runs)
+    df_encoded["econ"] = df_encoded["econ"].apply(encode_econ)
 
-    df_encoded = categorize_bowling_performance(df_encoded)
+    # df_encoded = categorize_bowling_performance(df_encoded)
     df_encoded = df_encoded.loc[:, df_encoded.columns != "player_name"]
     df_encoded = normalize_bowling_dataset(df_encoded)
-    df_encoded = df_encoded.loc[:, df_encoded.columns != 'econ']
+    # df_encoded = df_encoded.loc[:, df_encoded.columns != 'econ']
     df_encoded = df_encoded.loc[:, df_encoded.columns != 'wickets']
     df_encoded = df_encoded.loc[:, df_encoded.columns != 'match_id']
 
