@@ -19,7 +19,7 @@ clf = MLPClassifier(solver='lbfgs', activation='relu', alpha=1e-5, hidden_layer_
 SVM = svm.SVC(kernel='linear', C=1)
 
 dirname = os.path.dirname(__file__)
-dataset_source = os.path.join(dirname, "output\overall.csv")
+dataset_source = os.path.join(dirname, "output\\final_dataset.csv")
 
 
 def batting_predict(predictor):
@@ -32,8 +32,8 @@ def batting_predict(predictor):
     final_df["result"] = input_data["result"]
     input_data = final_df
 
-    # X = input_data.loc[:, input_data.columns != 'result']
-    X = input_data[[
+    X = input_data.loc[:, input_data.columns != 'result']
+    # X = input_data[[
         # 'player_id',
         # 'runs_scored',
         # 'balls_faced',
@@ -52,10 +52,10 @@ def batting_predict(predictor):
         # 'econ',
         # 'wides',
         # 'no_balls',
-        'score',
-        'wickets',
+        # 'score',
+        # 'wickets',
         # 'overs',
-        'balls',
+        # 'balls',
         # 'inning',
         # 'opposition_id',
         # 'venue_id',
@@ -80,7 +80,7 @@ def batting_predict(predictor):
         # 'bowling_pressure',
         # 'batting_contribution',
         # 'bowling_contribution'
-    ]]
+    # ]]
     y = input_data["result"]  # Labels
     print(X.columns)
     oversample = SMOTE()
