@@ -138,5 +138,5 @@ player_df = player_df.loc[:, player_df.columns != "minutes_batted"]
 player_df = player_df.loc[:, player_df.columns != "rpo"]
 player_df = player_df.loc[:, player_df.columns != "target"]
 player_df = player_df.loc[:, player_df.columns != "extras"]
-
+print(player_df.columns)
 player_df.to_csv(output_file_encoded, index=False)

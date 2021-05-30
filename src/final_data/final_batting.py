@@ -6,24 +6,24 @@ from analyze.cluster_batting import cluster_batting_performance
 from analyze.normalize_batting import normalize_batting_dataset
 from final_data.encoders import *
 
-columns = [
-    "runs",
-    "balls",
-    "fours",
-    "sixes",
+batting_columns = [
+    "runs_scored",
+    "balls_faced",
+    "fours_scored",
+    "sixes_scored",
     "match_id",
     "batting_position",
     "player_name",
-    "player_consistency",
-    "player_form",
-    "temp",
-    "wind",
-    "rain",
-    "humidity",
-    "cloud",
-    "pressure",
-    "viscosity",
-    "inning",
+    "batting_consistency",
+    "batting_form",
+    "batting_temp",
+    "batting_wind",
+    "batting_rain",
+    "batting_humidity",
+    "batting_cloud",
+    "batting_pressure",
+    "batting_viscosity",
+    "batting_inning",
     "batting_session",
     "toss",
     "venue",
@@ -35,31 +35,31 @@ dirname = os.path.dirname(__file__)
 output_file_encoded = os.path.join(dirname, "output\\batting_encoded.csv")
 
 
-def calculate_batting_performance(row):
-    return row['runs'] * row["strike_rate"]
+# def calculate_batting_performance(row):
+#     return row['runs'] * row["strike_rate"]
 
 
-def categorize_batting_performance(dataset):
-    batting_performance = dataset[["runs", "strike_rate"]]
-    # calculate batting performance
-    indexes = batting_performance.apply(lambda row: calculate_batting_performance(row),
-                                        axis=1)
-    batting_performance["performance_index"] = indexes
-    batting_performance = cluster_batting_performance(batting_performance)
-    print(batting_performance)
-    dataset["performance"] = batting_performance["batting_performance"]
-    # dataset["performance_index"] = batting_performance["performance_index"]
-    return dataset
+# def categorize_batting_performance(dataset):
+#     batting_performance = dataset[["runs", "strike_rate"]]
+#     # calculate batting performance
+#     indexes = batting_performance.apply(lambda row: calculate_batting_performance(row),
+#                                         axis=1)
+#     batting_performance["performance_index"] = indexes
+#     batting_performance = cluster_batting_performance(batting_performance)
+#     print(batting_performance)
+#     dataset["performance"] = batting_performance["batting_performance"]
+#     # dataset["performance_index"] = batting_performance["performance_index"]
+#     return dataset
 
 
 def final_batting_dataset(conn):
     db_cursor = conn.cursor()
     db_cursor.execute(batting_dataset_query)
     data_list = db_cursor.fetchall()
-    df_encoded = pd.DataFrame(data_list, columns=columns)
+    df_encoded = pd.DataFrame(data_list, columns=batting_columns)
 
     df_encoded["batting_session"] = df_encoded["batting_session"].apply(encode_session)
-    df_encoded["viscosity"] = df_encoded["viscosity"].apply(encode_viscosity)
+    df_encoded["batting_viscosity"] = df_encoded["batting_viscosity"].apply(encode_viscosity)
     # df_encoded["runs"] = df_encoded["runs"].apply(encode_runs)
 
     # df_encoded = categorize_batting_performance(df_encoded)

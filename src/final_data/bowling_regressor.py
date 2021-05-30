@@ -45,7 +45,6 @@ X = input_data[[
     "season",
 ]]  # Features
 y = input_data[["runs", "balls", "wickets"]]  # Labels
-print(input_data)
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 train_set = 1465
 X_train = X.iloc[:train_set, :]

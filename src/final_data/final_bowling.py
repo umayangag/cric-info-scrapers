@@ -8,21 +8,21 @@ from sklearn.cluster import KMeans
 from final_data.encoders import *
 
 columns = [
-    "balls",
-    "runs",
-    "wickets",
+    "deliveries",
+    "runs_conceded",
+    "wickets_taken",
     "match_id",
     "player_name",
-    "player_consistency",
-    "player_form",
-    "temp",
-    "wind",
-    "rain",
-    "humidity",
-    "cloud",
-    "pressure",
-    "viscosity",
-    "inning",
+    "bowling_consistency",
+    "bowling_form",
+    "bowling_temp",
+    "bowling_wind",
+    "bowling_rain",
+    "bowling_humidity",
+    "bowling_cloud",
+    "bowling_pressure",
+    "bowling_viscosity",
+    "bowling_inning",
     "bowling_session",
     "toss",
     "venue",
@@ -34,14 +34,14 @@ dirname = os.path.dirname(__file__)
 output_file_encoded = os.path.join(dirname, "output\\bowling_encoded.csv")
 
 
-def categorize_bowling_performance(dataset):
-    bowling_performance = dataset[["econ", "wickets"]]
-    # calculate bowling performance
-    bowling_performance = cluster_bowling_performance(bowling_performance)
-    print(bowling_performance)
-    dataset["performance"] = bowling_performance["bowling_performance"]
-    # dataset["performance_index"] = bowling_performance["performance_index"]
-    return dataset
+# def categorize_bowling_performance(dataset):
+#     bowling_performance = dataset[["econ", "wickets"]]
+#     # calculate bowling performance
+#     bowling_performance = cluster_bowling_performance(bowling_performance)
+#     print(bowling_performance)
+#     dataset["performance"] = bowling_performance["bowling_performance"]
+#     # dataset["performance_index"] = bowling_performance["performance_index"]
+#     return dataset
 
 
 def final_bowling_dataset(conn):
@@ -51,7 +51,7 @@ def final_bowling_dataset(conn):
     df_encoded = pd.DataFrame(data_list, columns=columns)
 
     df_encoded["bowling_session"] = df_encoded["bowling_session"].apply(encode_session)
-    df_encoded["viscosity"] = df_encoded["viscosity"].apply(encode_viscosity)
+    df_encoded["bowling_viscosity"] = df_encoded["bowling_viscosity"].apply(encode_viscosity)
     # df_encoded["econ"] = df_encoded["econ"].apply(encode_econ)
 
     # df_encoded = categorize_bowling_performance(df_encoded)

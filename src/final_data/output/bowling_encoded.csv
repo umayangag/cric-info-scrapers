@@ -1,4 +1,4 @@
-balls,runs,wickets,player_consistency,player_form,temp,wind,rain,humidity,cloud,pressure,viscosity,inning,bowling_session,toss,venue,opposition,season
+deliveries,runs_conceded,wickets_taken,bowling_consistency,bowling_form,bowling_temp,bowling_wind,bowling_rain,bowling_humidity,bowling_cloud,bowling_pressure,bowling_viscosity,bowling_inning,bowling_session,toss,venue,opposition,season
 60,46,1,413.386,17.9419,26,9,0,39,4,1009,3,2,0,1,31.5971,31.7433,1
 48,39,0,29.6395,20.1244,26,9,0,39,4,1009,3,2,0,1,19.6409,20.1245,1
 18,16,1,264.519,9.7462,26,9,0,39,4,1009,3,2,0,1,28.0079,18.1202,1

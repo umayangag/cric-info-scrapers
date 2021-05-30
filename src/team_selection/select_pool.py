@@ -21,16 +21,16 @@ columns = [
 
 predict_batting_columns = [
     # "batting_position",
-    "player_consistency",
-    "player_form",
-    "temp",
-    "wind",
-    "rain",
-    "humidity",
-    "cloud",
-    "pressure",
-    "viscosity",
-    "inning",
+    "batting_consistency",
+    "batting_form",
+    "batting_temp",
+    "batting_wind",
+    "batting_rain",
+    "batting_humidity",
+    "batting_cloud",
+    "batting_pressure",
+    "batting_viscosity",
+    "batting_inning",
     "batting_session",
     "toss",
     "venue",
@@ -39,16 +39,16 @@ predict_batting_columns = [
 ]
 
 predict_bowling_columns = [
-    "player_consistency",
-    "player_form",
-    "temp",
-    "wind",
-    "rain",
-    "humidity",
-    "cloud",
-    "pressure",
-    "viscosity",
-    "inning",
+    "bowling_consistency",
+    "bowling_form",
+    "bowling_temp",
+    "bowling_wind",
+    "bowling_rain",
+    "bowling_humidity",
+    "bowling_cloud",
+    "bowling_pressure",
+    "bowling_viscosity",
+    "bowling_inning",
     "bowling_session",
     "toss",
     "venue",
@@ -56,10 +56,23 @@ predict_bowling_columns = [
     "season",
 ]
 
+final_columns = ['player_id', 'runs_scored', 'balls_faced', 'fours_scored',
+                 'sixes_scored', 'strike_rate', 'batting_position', 'overs_bowled',
+                 'deliveries', 'maidens', 'runs_conceded', 'wickets_taken', 'dots',
+                 'fours_given', 'sixes_given', 'econ', 'wides', 'no_balls', 'score',
+                 'wickets', 'overs', 'balls', 'inning', 'result', 'opposition_id',
+                 'venue_id', 'toss', 'season_id', 'match_number', 'batting_temp',
+                 'batting_feels', 'batting_wind', 'batting_gust', 'batting_rain',
+                 'batting_humidity', 'batting_cloud', 'batting_pressure', 'bowling_temp',
+                 'bowling_feels', 'bowling_wind', 'bowling_gust', 'bowling_rain',
+                 'bowling_humidity', 'bowling_cloud', 'bowling_pressure',
+                 'batting_contribution', 'bowling_contribution']
+
 dirname = os.path.dirname(__file__)
 output_file_encoded = os.path.join(dirname, "output\\player_pool.csv")
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
+
 
 def get_bowling_performance(player_list, match_id):
     db_cursor.execute(
@@ -128,9 +141,8 @@ def get_bowling_performance(player_list, match_id):
                            opposition,
                            season_id])
     dataset = pd.DataFrame(data_array, columns=predict_bowling_columns)
-    # print(dataset)
-    # print(print(dataset.to_numpy()))
-    print(predict_bowling(dataset))
+    return predict_bowling(dataset)
+
 
 def get_batting_performance(player_list, match_id):
     db_cursor.execute(
@@ -199,9 +211,7 @@ def get_batting_performance(player_list, match_id):
                            opposition,
                            season_id])
     dataset = pd.DataFrame(data_array, columns=predict_batting_columns)
-    # print(dataset)
-    # print(print(dataset.to_numpy()))
-    print(predict_batting(dataset))
+    return predict_batting(dataset)
 
 
 def get_player_pool():
@@ -211,15 +221,15 @@ def get_player_pool():
     player_df = pd.DataFrame(player_list, columns=columns)
     wicket_keepers = player_df.loc[player_df['is_wicket_keeper'] == 1]
     bowlers = player_df.loc[player_df['bowling_consistency'] > 0]
-    # print(player_df)
-    # print(wicket_keepers)
-    # print(bowlers)
-
-    # print(list(itertools.combinations(wicket_keepers["player_name"],1)))
-    # print(list(itertools.combinations(bowlers["player_name"],5)))
-    return player_df
+    return player_df, wicket_keepers, bowlers
 
 
-players = get_player_pool()
-# get_batting_performance(players, 1193505)
-get_bowling_performance(players, 1193505)
+players, keepers, bowlers_list = get_player_pool()
+match_id = 1193505
+batting_df = get_batting_performance(players, match_id)
+bowling_df = get_bowling_performance(players, match_id)
+
+batting_df.to_csv("batting_test.csv", index=False)
+bowling_df.to_csv("bowling_test.csv", index=False)
+# print(batting_df.columns)
+# print(bowling_df.columns)

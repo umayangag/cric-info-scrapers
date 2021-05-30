@@ -48,7 +48,7 @@ columns = [
     "season",
 ]
 X = input_data[columns]
-y = input_data[["runs", "balls", "fours", "sixes", "batting_position"]]  # Labels
+y = input_data[["runs_scored", "balls_faced", "fours_scored", "sixes_scored", "batting_position"]]  # Labels
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 train_set = 2095
 X_train = X.iloc[:train_set, :]
