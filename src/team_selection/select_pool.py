@@ -1,12 +1,4 @@
-from config.mysql import get_db_connection
 import pandas as pd
-import itertools
-from final_data.queries import batting_dataset_query
-import os
-import numpy as np
-from analyze.cluster_batting import cluster_batting_performance
-from analyze.normalize_batting import normalize_batting_dataset
-from final_data.encoders import *
 from final_data.batting_regressor import predict_batting
 from final_data.bowling_regressor import predict_bowling
 from team_selection.dataset_definitions import *
@@ -108,5 +100,4 @@ bowling_df = bowling_df.loc[:, bowling_df.columns != "toss"]
 bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
 bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
 final_df = pd.merge(batting_df, bowling_df, on="player_name", how="left").fillna(0)
-final_df.to_csv("pool.csv")
-print(final_df.columns)
+final_df.to_csv("pool.csv", index=False)

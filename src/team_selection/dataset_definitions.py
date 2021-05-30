@@ -1,3 +1,5 @@
+import numpy as np
+
 player_columns = [
     "id",
     "player_name",
@@ -26,6 +28,8 @@ input_batting_columns = [
     "player_name",
 ]
 
+output_batting_columns = ["runs_scored", "balls_faced", "fours_scored", "sixes_scored", "batting_position"]
+derived_batting_columns = ["is_out", "batting_contribution", "strike_rate"]
 input_bowling_columns = [
     "bowling_consistency",
     "bowling_form",
@@ -44,3 +48,9 @@ input_bowling_columns = [
     "season",
     "player_name",
 ]
+output_bowling_columns = ["runs_conceded", "deliveries", "wickets_taken"]
+derived_bowling_columns = ["bowling_contribution"]
+match_summary_columns = ["total_score", "total_wickets", "total_balls", "target", "extras", "match_number", "results"]
+
+all_batting_columns = np.concatenate((input_batting_columns, output_batting_columns, derived_batting_columns))
+all_bowling_columns = np.concatenate((input_bowling_columns, output_bowling_columns, derived_bowling_columns))

@@ -4,21 +4,40 @@ from final_data.encoders import *
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
 
+def get_match_ids():
+    db_cursor.execute(
+        f'SELECT match_id FROM match_details')
+    results = db_cursor.fetchall()
+    print(results)
+    return results
+
+def get_batting_data(match_id, player_id):
+    db_cursor.execute(
+        f'SELECT description, runs, balls, fours, sixes, strike_rate, batting_position '
+        f'FROM batting_data WHERE match_id={match_id} and player_id={player_id}')
+    results = db_cursor.fetchall()
+    if len(results) == 1:
+        return results[0]
+    else:
+        return 0, 0, 0, 0, 0, 0, 0
+
+
+def get_bowling_data(match_id, player_id):
+    db_cursor.execute(
+        f'SELECT runs, balls, wickets '
+        f'FROM bowling_data WHERE match_id={match_id} and player_id={player_id}')
+    results = db_cursor.fetchall()
+    if len(results) == 1:
+        return results[0]
+    else:
+        return 0, 0, 0
+
 
 def get_match_data(match_id, label):
     db_cursor.execute(
-        f'SELECT inning, {label}_session, toss,venue_id, opposition_id, season_id '
+        f'SELECT inning, {label}_session, toss,venue_id, opposition_id, season_id,score, wickets, balls, target, extras, match_number, result '
         f'FROM match_details WHERE match_id={match_id} ')
-    match_data = db_cursor.fetchall()[0]
-
-    inning = match_data[0]
-    session = encode_session(match_data[1])
-    toss = match_data[2]
-    venue_id = match_data[3]
-    opposition_id = match_data[4]
-    season_id = match_data[5]
-
-    return inning, session, toss, venue_id, opposition_id, season_id
+    return db_cursor.fetchall()[0]
 
 
 def get_weather_data(match_id, label):
@@ -26,17 +45,7 @@ def get_weather_data(match_id, label):
         f'SELECT temp,wind, rain, humidity, cloud, pressure, viscosity '
         f'FROM weather_data WHERE match_id={match_id} and session LIKE "{label}"')
 
-    weather_data = db_cursor.fetchall()[0]
-
-    temp = weather_data[0]
-    wind = weather_data[1]
-    rain = weather_data[2]
-    humidity = weather_data[3]
-    cloud = weather_data[4]
-    pressure = weather_data[5]
-    viscosity = encode_viscosity(weather_data[6])
-
-    return temp, wind, rain, humidity, cloud, pressure, viscosity
+    return db_cursor.fetchall()[0]
 
 
 def get_player_metric(match_id, label1, player_obj, label2, label3, id):
