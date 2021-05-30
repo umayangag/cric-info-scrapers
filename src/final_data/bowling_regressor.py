@@ -28,8 +28,6 @@ dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
 X = input_data[[
-    # "match_id",
-    # "player_name",
     "bowling_consistency",
     "bowling_form",
     "bowling_temp",
@@ -59,9 +57,9 @@ predictor.fit(X_train, y_train)
 
 
 def calculate_econ(row):
-    if row["balls"] == 0:
+    if row["deliveries"] == 0:
         return 0
-    return row["runs"] * 6 / row["balls"]
+    return row["runs_conceded"] * 6 / row["deliveries"]
 
 
 def predict_bowling(dataset):

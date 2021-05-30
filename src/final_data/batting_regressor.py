@@ -30,9 +30,6 @@ dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
 columns = [
-    # "match_id",
-    "batting_position",
-    # "player_name",
     "batting_consistency",
     "batting_form",
     "batting_temp",
@@ -61,9 +58,9 @@ predictor.fit(X_train, y_train)
 
 
 def calculate_strike_rate(row):
-    if row["balls"] == 0:
+    if row["balls_faced"] == 0:
         return 0
-    return row["runs"] / row["balls"]
+    return row["runs_scored"] / row["balls_faced"]
 
 
 def predict_batting(dataset):
