@@ -30,7 +30,7 @@ dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
 columns = [
-    "batting_position",
+    # "batting_position",
     "player_consistency",
     "player_form",
     "temp",
@@ -48,7 +48,7 @@ columns = [
     "season",
 ]
 X = input_data[columns]
-y = input_data[["runs", "balls"]]  # Labels
+y = input_data[["runs", "balls", "fours", "sixes", "batting_position"]]  # Labels
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 train_set = 2095
 X_train = X.iloc[:train_set, :]
@@ -58,11 +58,18 @@ y_test = y.iloc[train_set + 1:]
 predictor.fit(X_train, y_train)
 
 
+def calculate_strike_rate(row):
+    if row["balls"] == 0:
+        return 0
+    return row["runs"] / row["balls"]
+
+
 def predict_batting(dataset):
     predicted = predictor.predict(dataset)
-    result = pd.DataFrame(predicted, columns=["runs", "balls"])
-    dataset["runs_scored"] = result["runs"]
-    dataset["balls_faced"] = result["balls"]
+    result = pd.DataFrame(predicted, columns=y.columns)
+    for column in y.columns:
+        dataset[column] = result[column]
+    dataset["strike_rate"] = dataset.apply(lambda row: calculate_strike_rate(row), axis=1)
     return dataset
 
 

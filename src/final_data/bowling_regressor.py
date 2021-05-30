@@ -44,7 +44,7 @@ X = input_data[[
     "opposition",
     "season",
 ]]  # Features
-y = input_data[["econ", "wickets"]]  # Labels
+y = input_data[["runs", "balls", "wickets"]]  # Labels
 print(input_data)
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 train_set = 1465
@@ -55,6 +55,21 @@ y_test = y.iloc[train_set + 1:]
 predictor.fit(X_train, y_train)
 
 predictor.fit(X_train, y_train)
+
+
+def calculate_econ(row):
+    if row["balls"] == 0:
+        return 0
+    return row["runs"] * 6 / row["balls"]
+
+
+def predict_bowling(dataset):
+    predicted = predictor.predict(dataset)
+    result = pd.DataFrame(predicted, columns=y.columns)
+    for column in y.columns:
+        dataset[column] = result[column]
+    dataset["econ"] = dataset.apply(lambda row: calculate_econ(row), axis=1)
+    return dataset
 
 
 def bowling_predict_test():

@@ -1,4 +1,4 @@
-batting_dataset_query = "SELECT  runs, batting_data.balls, batting_data.match_id, batting_position," \
+batting_dataset_query = "SELECT  runs, batting_data.balls, batting_data.fours, batting_data.sixes, batting_data.match_id, batting_position," \
                         "player.player_name, player.batting_consistency, player_form_data.batting_form, weather.temp,weather.wind, weather.rain, " \
                         "weather.humidity, weather.cloud, weather.pressure, weather.viscosity, match_details.inning, " \
                         "" \
@@ -36,7 +36,7 @@ batting_win_dataset_query = "SELECT  match_details.score, match_details.balls, r
                             "left join player_form_data on batting_data.player_id=player_form_data.player_id " \
                             "and match_details.season_id=player_form_data.season_id"
 
-bowling_dataset_query = "SELECT  econ,bowling_data.wickets, bowling_data.match_id, " \
+bowling_dataset_query = "SELECT  bowling_data.balls, bowling_data.runs, bowling_data.wickets, bowling_data.match_id, " \
                         "player.player_name, player.bowling_consistency, player_form_data.bowling_form, weather.temp,weather.wind, weather.rain, " \
                         "weather.humidity, weather.cloud, weather.pressure, weather.viscosity, match_details.inning, " \
                         "" \

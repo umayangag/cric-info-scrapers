@@ -9,6 +9,8 @@ from final_data.encoders import *
 columns = [
     "runs",
     "balls",
+    "fours",
+    "sixes",
     "match_id",
     "batting_position",
     "player_name",

@@ -8,7 +8,8 @@ from sklearn.cluster import KMeans
 from final_data.encoders import *
 
 columns = [
-    "econ",
+    "balls",
+    "runs",
     "wickets",
     "match_id",
     "player_name",

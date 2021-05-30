@@ -8,6 +8,7 @@ from analyze.cluster_batting import cluster_batting_performance
 from analyze.normalize_batting import normalize_batting_dataset
 from final_data.encoders import *
 from final_data.batting_regressor import predict_batting
+from final_data.bowling_regressor import predict_bowling
 
 columns = [
     "id",
@@ -18,8 +19,8 @@ columns = [
     "bowling_consistency",
 ]
 
-predict_columns = [
-    "batting_position",
+predict_batting_columns = [
+    # "batting_position",
     "player_consistency",
     "player_form",
     "temp",
@@ -37,11 +38,99 @@ predict_columns = [
     "season",
 ]
 
+predict_bowling_columns = [
+    "player_consistency",
+    "player_form",
+    "temp",
+    "wind",
+    "rain",
+    "humidity",
+    "cloud",
+    "pressure",
+    "viscosity",
+    "inning",
+    "bowling_session",
+    "toss",
+    "venue",
+    "opposition",
+    "season",
+]
+
 dirname = os.path.dirname(__file__)
 output_file_encoded = os.path.join(dirname, "output\\player_pool.csv")
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
 
+def get_bowling_performance(player_list, match_id):
+    db_cursor.execute(
+        f'SELECT inning, bowling_session, toss,venue_id, opposition_id, season_id FROM match_details WHERE match_id={match_id} ')
+    match_data = db_cursor.fetchall()[0]
+
+    inning = match_data[0]
+    bowling_session = encode_session(match_data[1])
+    toss = match_data[2]
+    venue_id = match_data[3]
+    opposition_id = match_data[4]
+    season_id = match_data[5]
+
+    db_cursor.execute(
+        f'SELECT temp,wind, rain, humidity, cloud, pressure, viscosity FROM weather_data WHERE match_id={match_id} and session LIKE "bowling"')
+
+    weather_data = db_cursor.fetchall()[0]
+
+    temp = weather_data[0]
+    wind = weather_data[1]
+    rain = weather_data[2]
+    humidity = weather_data[3]
+    cloud = weather_data[4]
+    pressure = weather_data[5]
+    viscosity = encode_viscosity(weather_data[6])
+
+    data_array = []
+
+    for player in player_list.iterrows():
+        db_cursor.execute(
+            f'SELECT bowling_form FROM player_form_data WHERE player_id={player[0]} and season_id={season_id-1}')
+        form_data = db_cursor.fetchall()
+        if len(form_data) > 0:
+            player_form = form_data[0][0]
+        else:
+            player_form = player[1]["bowling_consistency"]
+
+        db_cursor.execute(
+            f'SELECT bowling_venue FROM player_venue_data WHERE player_id={player[0]} and venue_id={venue_id}')
+        venue_data = db_cursor.fetchall()
+        if len(venue_data) > 0:
+            venue = venue_data[0][0]
+        else:
+            venue = player[1]["bowling_consistency"]
+
+        db_cursor.execute(
+            f'SELECT bowling_opposition FROM player_opposition_data WHERE player_id={player[0]} and opposition_id={opposition_id}')
+        opposition_data = db_cursor.fetchall()
+        if len(opposition_data) > 0:
+            opposition = opposition_data[0][0]
+        else:
+            opposition = player[1]["bowling_consistency"]
+        data_array.append([player[1]["bowling_consistency"],
+                           player_form,
+                           temp,
+                           wind,
+                           rain,
+                           humidity,
+                           cloud,
+                           pressure,
+                           viscosity,
+                           inning,
+                           bowling_session,
+                           toss,
+                           venue,
+                           opposition,
+                           season_id])
+    dataset = pd.DataFrame(data_array, columns=predict_bowling_columns)
+    # print(dataset)
+    # print(print(dataset.to_numpy()))
+    print(predict_bowling(dataset))
 
 def get_batting_performance(player_list, match_id):
     db_cursor.execute(
@@ -56,7 +145,7 @@ def get_batting_performance(player_list, match_id):
     season_id = match_data[5]
 
     db_cursor.execute(
-        f'SELECT temp,wind, rain, humidity, cloud, pressure, viscosity FROM weather_data WHERE match_id={match_id} ')
+        f'SELECT temp,wind, rain, humidity, cloud, pressure, viscosity FROM weather_data WHERE match_id={match_id} and session LIKE "batting"')
 
     weather_data = db_cursor.fetchall()[0]
 
@@ -94,8 +183,7 @@ def get_batting_performance(player_list, match_id):
             opposition = opposition_data[0][0]
         else:
             opposition = player[1]["batting_consistency"]
-        data_array.append([1,
-                           player[1]["batting_consistency"],
+        data_array.append([player[1]["batting_consistency"],
                            player_form,
                            temp,
                            wind,
@@ -110,7 +198,7 @@ def get_batting_performance(player_list, match_id):
                            venue,
                            opposition,
                            season_id])
-    dataset = pd.DataFrame(data_array, columns=predict_columns)
+    dataset = pd.DataFrame(data_array, columns=predict_batting_columns)
     # print(dataset)
     # print(print(dataset.to_numpy()))
     print(predict_batting(dataset))
@@ -133,4 +221,5 @@ def get_player_pool():
 
 
 players = get_player_pool()
-get_batting_performance(players, 1193505)
+# get_batting_performance(players, 1193505)
+get_bowling_performance(players, 1193505)
