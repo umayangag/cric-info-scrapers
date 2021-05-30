@@ -8,7 +8,7 @@ from final_data.encoders import *
 
 columns = [
     "runs",
-    "strike_rate",
+    "balls",
     "match_id",
     "batting_position",
     "player_name",

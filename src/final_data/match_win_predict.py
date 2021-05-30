@@ -80,7 +80,7 @@ def batting_predict(predictor):
         # 'bowling_pressure',
         # 'batting_contribution',
         # 'bowling_contribution'
-    ]]  # Features
+    ]]
     y = input_data["result"]  # Labels
     print(X.columns)
     oversample = SMOTE()
@@ -108,7 +108,7 @@ def batting_predict(predictor):
     # print("Score:", predictor.score(X_test, y_test))
     accuracy = metrics.accuracy_score(y_test, y_pred)
     print("Accuracy:", accuracy)
-    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).mean())
+    # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).mean())
     print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
     # print(predictor.coefs_)

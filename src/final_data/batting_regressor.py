@@ -19,7 +19,7 @@ RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=Fal
 gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(4, 3), random_state=1)
 SVM = svm.SVC(kernel='linear', C=1)
-regr = RandomForestRegressor(max_depth=2, random_state=0)
+regr = RandomForestRegressor(max_depth=4, random_state=0)
 reg = LinearRegression()
 mltreg = MultiOutputRegressor(regr)
 predictor = mltreg
@@ -55,7 +55,7 @@ def batting_predict():
         "opposition",
         "season",
     ]]
-    y = input_data[["runs", "strike_rate"]]  # Labels
+    y = input_data[["runs", "balls"]]  # Labels
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
@@ -69,7 +69,7 @@ def batting_predict():
     for i in range(0, len(y_pred)):
         print(comparison["actual"][i], " ", comparison["predicted"][i], "")
     print("Accuracy:", metrics.mean_absolute_error(y_test, y_pred))
-    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
+    # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
 
 
 batting_predict()

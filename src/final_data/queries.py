@@ -1,4 +1,4 @@
-batting_dataset_query = "SELECT  runs, strike_rate, batting_data.match_id, batting_position," \
+batting_dataset_query = "SELECT  runs, batting_data.balls, batting_data.match_id, batting_position," \
                         "player.player_name, player.batting_consistency, player_form_data.batting_form, weather.temp,weather.wind, weather.rain, " \
                         "weather.humidity, weather.cloud, weather.pressure, weather.viscosity, match_details.inning, " \
                         "" \
