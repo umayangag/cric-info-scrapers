@@ -1,0 +1,46 @@
+player_columns = [
+    "id",
+    "player_name",
+    "is_wicket_keeper",
+    "is_retired",
+    "batting_consistency",
+    "bowling_consistency",
+]
+
+input_batting_columns = [
+    "batting_consistency",
+    "batting_form",
+    "batting_temp",
+    "batting_wind",
+    "batting_rain",
+    "batting_humidity",
+    "batting_cloud",
+    "batting_pressure",
+    "batting_viscosity",
+    "batting_inning",
+    "batting_session",
+    "toss",
+    "venue",
+    "opposition",
+    "season",
+    "player_name",
+]
+
+input_bowling_columns = [
+    "bowling_consistency",
+    "bowling_form",
+    "bowling_temp",
+    "bowling_wind",
+    "bowling_rain",
+    "bowling_humidity",
+    "bowling_cloud",
+    "bowling_pressure",
+    "bowling_viscosity",
+    "batting_inning",
+    "bowling_session",
+    "toss",
+    "bowling_venue",
+    "bowling_opposition",
+    "season",
+    "player_name",
+]

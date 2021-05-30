@@ -1,22 +1,16 @@
-from config.mysql import get_db_connection
 import pandas as pd
-import itertools
-from final_data.queries import batting_dataset_query
 import os
-import numpy as np
-from analyze.cluster_batting import cluster_batting_performance
-from analyze.normalize_batting import normalize_batting_dataset
-from final_data.encoders import *
-from final_data.batting_regressor import predict_batting
 from final_data.bowling_regressor import predict_bowling
-from team_selection.dataset_definitions import *
 from team_selection.shared.match_data import *
+from team_selection.dataset_definitions import *
 
+dirname = os.path.dirname(__file__)
+output_file_encoded = os.path.join(dirname, "output\\final_dataset.csv")
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
 
 
-def get_bowling_performance(player_list, match_id):
+def get_bowling_df(player_list, match_id):
     inning, session, toss, venue_id, opposition_id, season_id = get_match_data(match_id, "bowling")
     temp, wind, rain, humidity, cloud, pressure, viscosity = get_weather_data(match_id, "bowling")
 
@@ -45,13 +39,10 @@ def get_bowling_performance(player_list, match_id):
                            player_opposition,
                            season_id,
                            player_id])
-    dataset = pd.DataFrame(data_array, columns=input_bowling_columns)
-    predicted = predict_bowling(dataset.loc[:, dataset.columns != "player_name"])
-    predicted["player_name"] = dataset["player_name"]
-    return predicted
+    return pd.DataFrame(data_array, columns=input_bowling_columns)
 
 
-def get_batting_performance(player_list, match_id):
+def get_batting_df(player_list, match_id):
     inning, session, toss, venue_id, opposition_id, season_id = get_match_data(match_id, "batting")
     temp, wind, rain, humidity, cloud, pressure, viscosity = get_weather_data(match_id, "batting")
 
@@ -81,32 +72,26 @@ def get_batting_performance(player_list, match_id):
                            player_opposition,
                            season_id,
                            player_id])
-    dataset = pd.DataFrame(data_array, columns=input_batting_columns)
-    predicted = predict_batting(dataset.loc[:, dataset.columns != "player_name"])
-    predicted["player_name"] = dataset["player_name"]
-    return predicted
+    return pd.DataFrame(data_array, columns=input_batting_columns)
 
 
-def get_player_pool():
-    db_cursor.execute(
-        f'SELECT * FROM player WHERE is_retired=0 and (batting_consistency !=0 or bowling_consistency!=0)')
-    player_list = db_cursor.fetchall()
+def get_players(match_id):
+    batsmen = get_player_list(match_id, "batting")
+    bowlers = get_player_list(match_id, "bowling")
+    player_list = batsmen + list(set(bowlers) - set(batsmen))
+
     player_df = pd.DataFrame(player_list, columns=player_columns)
     wicket_keepers = player_df.loc[player_df['is_wicket_keeper'] == 1]
     bowlers = player_df.loc[player_df['bowling_consistency'] > 0]
     return player_df, wicket_keepers, bowlers
 
 
-players, keepers, bowlers_list = get_player_pool()
 match_id = 1193505
-batting_df = get_batting_performance(players, match_id)
-bowling_df = get_bowling_performance(bowlers_list, match_id)
-
-batting_df.to_csv("batting.csv")
-bowling_df.to_csv("bowling.csv")
-bowling_df = bowling_df.loc[:, bowling_df.columns != "toss"]
-bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
-bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
+players, keepers, bowlers_list = get_players(match_id)
+batting_df = get_batting_df(players, match_id)
+bowling_df = get_bowling_df(bowlers_list, match_id)
+# bowling_df = bowling_df.loc[:, bowling_df.columns != "toss"]
+# bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
+# bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
 final_df = pd.merge(batting_df, bowling_df, on="player_name", how="left").fillna(0)
-final_df.to_csv("pool.csv")
-print(final_df.columns)
+final_df.to_csv("final_dataset.csv")
