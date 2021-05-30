@@ -229,7 +229,8 @@ match_id = 1193505
 batting_df = get_batting_performance(players, match_id)
 bowling_df = get_bowling_performance(players, match_id)
 
-batting_df.to_csv("batting_test.csv", index=False)
-bowling_df.to_csv("bowling_test.csv", index=False)
-# print(batting_df.columns)
-# print(bowling_df.columns)
+# final_df=batting_df.app
+# batting_df.to_csv("batting_test.csv", index=False)
+# bowling_df.to_csv("bowling_test.csv", index=False)
+print(batting_df.columns)
+print(bowling_df.columns)

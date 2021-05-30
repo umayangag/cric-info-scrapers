@@ -28,23 +28,25 @@ dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
 X = input_data[[
-    "player_consistency",
-    "player_form",
-    "temp",
-    "wind",
-    "rain",
-    "humidity",
-    "cloud",
-    "pressure",
-    "viscosity",
-    "inning",
+    # "match_id",
+    # "player_name",
+    "bowling_consistency",
+    "bowling_form",
+    "bowling_temp",
+    "bowling_wind",
+    "bowling_rain",
+    "bowling_humidity",
+    "bowling_cloud",
+    "bowling_pressure",
+    "bowling_viscosity",
+    "bowling_inning",
     "bowling_session",
     "toss",
     "venue",
     "opposition",
     "season",
 ]]  # Features
-y = input_data[["runs", "balls", "wickets"]]  # Labels
+y = input_data[["runs_conceded", "deliveries", "wickets_taken"]]  # Labels
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 train_set = 1465
 X_train = X.iloc[:train_set, :]
