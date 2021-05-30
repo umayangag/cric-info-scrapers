@@ -35,51 +35,51 @@ def batting_predict(predictor):
     # X = input_data.loc[:, input_data.columns != 'result']
     X = input_data[[
         # 'player_id',
-        'runs_scored',
-        'balls_faced',
-        'fours_scored',
-        'sixes_scored',
-        'strike_rate',
-        'batting_position',
-        'overs_bowled',
-        'deliveries',
-        'maidens',
-        'runs_conceded',
-        'wickets_taken',
-        'dots',
-        'fours_given',
-        'sixes_given',
-        'econ',
-        'wides',
-        'no_balls',
+        # 'runs_scored',
+        # 'balls_faced',
+        # 'fours_scored',
+        # 'sixes_scored',
+        # 'strike_rate',
+        # 'batting_position',
+        # 'overs_bowled',
+        # 'deliveries',
+        # 'maidens',
+        # 'runs_conceded',
+        # 'wickets_taken',
+        # 'dots',
+        # 'fours_given',
+        # 'sixes_given',
+        # 'econ',
+        # 'wides',
+        # 'no_balls',
         'score',
         'wickets',
-        'overs',
+        # 'overs',
         'balls',
-        'inning',
-        'opposition_id',
-        'venue_id',
-        'toss',
+        # 'inning',
+        # 'opposition_id',
+        # 'venue_id',
+        # 'toss',
         # 'season_id',
         # 'match_number',
-        'batting_temp',
-        'batting_feels',
-        'batting_wind',
-        'batting_gust',
-        'batting_rain',
-        'batting_humidity',
-        'batting_cloud',
-        'batting_pressure',
-        'bowling_temp',
-        'bowling_feels',
-        'bowling_wind',
-        'bowling_gust',
-        'bowling_rain',
-        'bowling_humidity',
-        'bowling_cloud',
-        'bowling_pressure',
-        'batting_contribution',
-        'bowling_contribution'
+        # 'batting_temp',
+        # 'batting_feels',
+        # 'batting_wind',
+        # 'batting_gust',
+        # 'batting_rain',
+        # 'batting_humidity',
+        # 'batting_cloud',
+        # 'batting_pressure',
+        # 'bowling_temp',
+        # 'bowling_feels',
+        # 'bowling_wind',
+        # 'bowling_gust',
+        # 'bowling_rain',
+        # 'bowling_humidity',
+        # 'bowling_cloud',
+        # 'bowling_pressure',
+        # 'batting_contribution',
+        # 'bowling_contribution'
     ]]  # Features
     y = input_data["result"]  # Labels
     print(X.columns)
@@ -108,7 +108,7 @@ def batting_predict(predictor):
     # print("Score:", predictor.score(X_test, y_test))
     accuracy = metrics.accuracy_score(y_test, y_pred)
     print("Accuracy:", accuracy)
-    # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=5).min())
+    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).mean())
     print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
     # print(predictor.coefs_)
@@ -116,7 +116,7 @@ def batting_predict(predictor):
     return accuracy
 
 
-batting_predict(clf)
+batting_predict(RF)
 # values = []
 # for i in range(1, 20):
 #     for j in range(1, 20):
