@@ -62,7 +62,7 @@ def final_batting_dataset(conn):
 
     # df_encoded = categorize_batting_performance(df_encoded)
     df_encoded = df_encoded.loc[:, df_encoded.columns != "player_name"]
-    df_encoded = normalize_batting_dataset(df_encoded)
+    # df_encoded = normalize_batting_dataset(df_encoded)
     # df_encoded = df_encoded.loc[:, df_encoded.columns != 'runs']
     # df_encoded = df_encoded.loc[:, df_encoded.columns != 'strike_rate']
     df_encoded = df_encoded.loc[:, df_encoded.columns != 'match_id']

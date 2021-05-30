@@ -26,31 +26,38 @@ predictor = mltreg
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
 
+input_data = pd.read_csv(dataset_source)
+X = input_data[[
+    "player_consistency",
+    "player_form",
+    "temp",
+    "wind",
+    "rain",
+    "humidity",
+    "cloud",
+    "pressure",
+    "viscosity",
+    "inning",
+    "bowling_session",
+    "toss",
+    "venue",
+    "opposition",
+    "season",
+]]  # Features
+y = input_data[["econ", "wickets"]]  # Labels
+print(input_data)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+train_set = 1465
+X_train = X.iloc[:train_set, :]
+X_test = X.iloc[train_set + 1:, :]
+y_train = y.iloc[:train_set]
+y_test = y.iloc[train_set + 1:]
+predictor.fit(X_train, y_train)
 
-def bowling_predict():
-    input_data = pd.read_csv(dataset_source)
-    X = input_data[[
-        "player_consistency",
-        "player_form",
-        "temp",
-        "wind",
-        "rain",
-        "humidity",
-        "cloud",
-        "pressure",
-        "viscosity",
-        "inning",
-        "bowling_session",
-        "toss",
-        "venue",
-        "opposition",
-        "season",
-    ]]  # Features
-    y = input_data[["econ", "wickets"]]  # Labels
+predictor.fit(X_train, y_train)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 
-    predictor.fit(X_train, y_train)
+def bowling_predict_test():
     y_pred = predictor.predict(X_test)
 
     comparison = {}
@@ -63,4 +70,6 @@ def bowling_predict():
     print("Accuracy:", metrics.mean_absolute_error(y_test, y_pred))
     print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
 
-bowling_predict()
+
+if __name__ == "__main__":
+    bowling_predict_test()

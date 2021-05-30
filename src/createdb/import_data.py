@@ -4,6 +4,7 @@ from createdb.importers.import_weather_data import import_weather_data
 from createdb.importers.import_batting_data import import_batting_data
 from createdb.importers.import_bowling_data import import_bowling_data
 from createdb.importers.import_keepers_data import import_keepers_data
+from createdb.importers.import_retired import import_retired_data
 import os
 
 dirname = os.path.dirname(__file__)
@@ -13,6 +14,7 @@ weather_data_bowling_filepath = os.path.join(dirname, 'data\\weather_data-bowlin
 batting_data_filepath = os.path.join(dirname, 'data\\batting_data.csv')
 bowling_data_filepath = os.path.join(dirname, 'data\\bowling_data.csv')
 keepers_data_filepath = os.path.join(dirname, 'data\\keepers.csv')
+retired_data_filepath = os.path.join(dirname, 'data\\retired.csv')
 
 db_connection = get_db_connection()
 
@@ -22,3 +24,4 @@ db_connection = get_db_connection()
 # import_batting_data(db_connection, batting_data_filepath)
 # import_bowling_data(db_connection, bowling_data_filepath)
 import_keepers_data(db_connection, keepers_data_filepath)
+import_retired_data(db_connection, retired_data_filepath)

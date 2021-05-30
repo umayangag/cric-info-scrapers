@@ -12,7 +12,8 @@ from sklearn.metrics import confusion_matrix
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import cross_val_score
 from sklearn import svm
-from sklearn import preprocessing
+
+# from sklearn import preprocessing
 
 RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=False, max_depth=100,
                             class_weight={0: 4, 1: 1, 2: 2})
@@ -27,41 +28,53 @@ predictor = mltreg
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
 
+input_data = pd.read_csv(dataset_source)
+columns = [
+    "batting_position",
+    "player_consistency",
+    "player_form",
+    "temp",
+    "wind",
+    "rain",
+    "humidity",
+    "cloud",
+    "pressure",
+    "viscosity",
+    "inning",
+    "batting_session",
+    "toss",
+    "venue",
+    "opposition",
+    "season",
+]
+X = input_data[columns]
+y = input_data[["runs", "balls"]]  # Labels
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+train_set = 2095
+X_train = X.iloc[:train_set, :]
+X_test = X.iloc[train_set + 1:, :]
+y_train = y.iloc[:train_set]
+y_test = y.iloc[train_set + 1:]
+predictor.fit(X_train, y_train)
 
-def batting_predict():
-    input_data = pd.read_csv(dataset_source)
 
+def predict_batting(dataset):
+    predicted = predictor.predict(dataset)
+    result = pd.DataFrame(predicted, columns=["runs", "balls"])
+    dataset["runs_scored"] = result["runs"]
+    dataset["balls_faced"] = result["balls"]
+    return dataset
+
+
+def batting_predict_test():
     # scaler = preprocessing.StandardScaler().fit(input_data)
     # data_scaled = scaler.transform(input_data)
     # final_df = pd.DataFrame(data=data_scaled, columns=input_data.columns)
     # final_df["runs"] = input_data["runs"]
     # input_data = final_df
 
-    X = input_data[[
-        "batting_position",
-        "player_consistency",
-        "player_form",
-        "temp",
-        "wind",
-        "rain",
-        "humidity",
-        "cloud",
-        "pressure",
-        "viscosity",
-        "inning",
-        "batting_session",
-        "toss",
-        "venue",
-        "opposition",
-        "season",
-    ]]
-    y = input_data[["runs", "balls"]]  # Labels
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-
-    predictor.fit(X_train, y_train)
     y_pred = predictor.predict(X_test)
-
+    print(X_test)
     comparison = {}
     comparison["actual"] = y_test.to_numpy()
     comparison["predicted"] = y_pred
@@ -72,4 +85,6 @@ def batting_predict():
     # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
 
 
-batting_predict()
+if __name__ == "__main__":
+    batting_predict_test()
+    # predict_batting("", 1, 1)
