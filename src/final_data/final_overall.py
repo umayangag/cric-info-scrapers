@@ -13,26 +13,16 @@ output_file_encoded = os.path.join(dirname, "output\\overall.csv")
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
 df = pd.read_csv(input_file_encoded)
-player_columns = ["player_id",
-                  "description",
-                  "runs_scored",
-                  "balls_faced",
-                  "minutes_batted",
-                  "fours_scored",
-                  "sixes_scored",
-                  "strike_rate",
-                  "batting_position",
-                  "overs_bowled",
-                  "deliveries",
-                  "maidens",
-                  "runs_conceded",
-                  "wickets_taken",
-                  "dots",
-                  "fours_given",
-                  "sixes_given",
-                  "econ",
-                  "wides",
-                  "no_balls"]
+player_columns = ['batting_consistency', 'batting_form', 'batting_temp', 'batting_wind',
+                  'batting_rain', 'batting_humidity', 'batting_cloud', 'batting_pressure',
+                  'batting_viscosity', 'batting_inning', 'batting_session', 'toss',
+                  'venue', 'opposition', 'season', 'runs_scored', 'balls_faced',
+                  'fours_scored', 'sixes_scored', 'batting_position', 'strike_rate',
+                  'player_name', 'bowling_consistency', 'bowling_form', 'bowling_temp',
+                  'bowling_wind', 'bowling_rain', 'bowling_humidity', 'bowling_cloud',
+                  'bowling_pressure', 'bowling_viscosity', 'bowling_inning',
+                  'bowling_session', 'runs_conceded', 'deliveries', 'wickets_taken',
+                  'econ']
 
 for column in df.columns:
     player_columns.append(column)
@@ -128,12 +118,12 @@ player_df["bowling_contribution"] = player_df.apply(lambda item: calculate_bowli
 player_df = player_df.loc[:, player_df.columns != "description"]
 player_df = player_df.loc[:, player_df.columns != "date"]
 player_df = player_df.loc[:, player_df.columns != "match_id"]
-player_df = player_df.loc[:, player_df.columns != "batting_session"]
-player_df = player_df.loc[:, player_df.columns != "bowling_session"]
-player_df = player_df.loc[:, player_df.columns != "bowling_session"]
-player_df = player_df.loc[:, player_df.columns != "batting_viscosity"]
-player_df = player_df.loc[:, player_df.columns != "bowling_viscosity"]
-player_df = player_df.loc[:, player_df.columns != "minutes_batted"]
+# player_df = player_df.loc[:, player_df.columns != "batting_session"]
+# player_df = player_df.loc[:, player_df.columns != "bowling_session"]
+# player_df = player_df.loc[:, player_df.columns != "bowling_session"]
+# player_df = player_df.loc[:, player_df.columns != "batting_viscosity"]
+# player_df = player_df.loc[:, player_df.columns != "bowling_viscosity"]
+# player_df = player_df.loc[:, player_df.columns != "minutes_batted"]
 # player_df = player_df.loc[:, player_df.columns != "score"]
 player_df = player_df.loc[:, player_df.columns != "rpo"]
 player_df = player_df.loc[:, player_df.columns != "target"]

@@ -36,6 +36,7 @@ predict_batting_columns = [
     "venue",
     "opposition",
     "season",
+    "player_name",
 ]
 
 predict_bowling_columns = [
@@ -54,19 +55,8 @@ predict_bowling_columns = [
     "venue",
     "opposition",
     "season",
+    "player_name",
 ]
-
-final_columns = ['player_id', 'runs_scored', 'balls_faced', 'fours_scored',
-                 'sixes_scored', 'strike_rate', 'batting_position', 'overs_bowled',
-                 'deliveries', 'maidens', 'runs_conceded', 'wickets_taken', 'dots',
-                 'fours_given', 'sixes_given', 'econ', 'wides', 'no_balls', 'score',
-                 'wickets', 'overs', 'balls', 'inning', 'result', 'opposition_id',
-                 'venue_id', 'toss', 'season_id', 'match_number', 'batting_temp',
-                 'batting_feels', 'batting_wind', 'batting_gust', 'batting_rain',
-                 'batting_humidity', 'batting_cloud', 'batting_pressure', 'bowling_temp',
-                 'bowling_feels', 'bowling_wind', 'bowling_gust', 'bowling_rain',
-                 'bowling_humidity', 'bowling_cloud', 'bowling_pressure',
-                 'batting_contribution', 'bowling_contribution']
 
 dirname = os.path.dirname(__file__)
 output_file_encoded = os.path.join(dirname, "output\\player_pool.csv")
@@ -102,8 +92,9 @@ def get_bowling_performance(player_list, match_id):
     data_array = []
 
     for player in player_list.iterrows():
+        player_id = player[1][0]
         db_cursor.execute(
-            f'SELECT bowling_form FROM player_form_data WHERE player_id={player[0]} and season_id={season_id-1}')
+            f'SELECT bowling_form FROM player_form_data WHERE player_id={player_id} and season_id={season_id-1}')
         form_data = db_cursor.fetchall()
         if len(form_data) > 0:
             player_form = form_data[0][0]
@@ -111,7 +102,7 @@ def get_bowling_performance(player_list, match_id):
             player_form = player[1]["bowling_consistency"]
 
         db_cursor.execute(
-            f'SELECT bowling_venue FROM player_venue_data WHERE player_id={player[0]} and venue_id={venue_id}')
+            f'SELECT bowling_venue FROM player_venue_data WHERE player_id={player_id} and venue_id={venue_id}')
         venue_data = db_cursor.fetchall()
         if len(venue_data) > 0:
             venue = venue_data[0][0]
@@ -119,7 +110,7 @@ def get_bowling_performance(player_list, match_id):
             venue = player[1]["bowling_consistency"]
 
         db_cursor.execute(
-            f'SELECT bowling_opposition FROM player_opposition_data WHERE player_id={player[0]} and opposition_id={opposition_id}')
+            f'SELECT bowling_opposition FROM player_opposition_data WHERE player_id={player_id} and opposition_id={opposition_id}')
         opposition_data = db_cursor.fetchall()
         if len(opposition_data) > 0:
             opposition = opposition_data[0][0]
@@ -139,9 +130,12 @@ def get_bowling_performance(player_list, match_id):
                            toss,
                            venue,
                            opposition,
-                           season_id])
+                           season_id,
+                           player_id])
     dataset = pd.DataFrame(data_array, columns=predict_bowling_columns)
-    return predict_bowling(dataset)
+    predicted = predict_bowling(dataset.loc[:, dataset.columns != "player_name"])
+    predicted["player_name"] = dataset["player_name"]
+    return predicted
 
 
 def get_batting_performance(player_list, match_id):
@@ -172,8 +166,9 @@ def get_batting_performance(player_list, match_id):
     data_array = []
 
     for player in player_list.iterrows():
+        player_id = player[1][0]
         db_cursor.execute(
-            f'SELECT batting_form FROM player_form_data WHERE player_id={player[0]} and season_id={season_id-1}')
+            f'SELECT batting_form FROM player_form_data WHERE player_id={player_id} and season_id={season_id-1}')
         form_data = db_cursor.fetchall()
         if len(form_data) > 0:
             player_form = form_data[0][0]
@@ -181,7 +176,7 @@ def get_batting_performance(player_list, match_id):
             player_form = player[1]["batting_consistency"]
 
         db_cursor.execute(
-            f'SELECT batting_venue FROM player_venue_data WHERE player_id={player[0]} and venue_id={venue_id}')
+            f'SELECT batting_venue FROM player_venue_data WHERE player_id={player_id} and venue_id={venue_id}')
         venue_data = db_cursor.fetchall()
         if len(venue_data) > 0:
             venue = venue_data[0][0]
@@ -189,7 +184,7 @@ def get_batting_performance(player_list, match_id):
             venue = player[1]["batting_consistency"]
 
         db_cursor.execute(
-            f'SELECT batting_opposition FROM player_opposition_data WHERE player_id={player[0]} and opposition_id={opposition_id}')
+            f'SELECT batting_opposition FROM player_opposition_data WHERE player_id={player_id} and opposition_id={opposition_id}')
         opposition_data = db_cursor.fetchall()
         if len(opposition_data) > 0:
             opposition = opposition_data[0][0]
@@ -209,9 +204,12 @@ def get_batting_performance(player_list, match_id):
                            toss,
                            venue,
                            opposition,
-                           season_id])
+                           season_id,
+                           player_id])
     dataset = pd.DataFrame(data_array, columns=predict_batting_columns)
-    return predict_batting(dataset)
+    predicted = predict_batting(dataset.loc[:, dataset.columns != "player_name"])
+    predicted["player_name"] = dataset["player_name"]
+    return predicted
 
 
 def get_player_pool():
@@ -227,10 +225,14 @@ def get_player_pool():
 players, keepers, bowlers_list = get_player_pool()
 match_id = 1193505
 batting_df = get_batting_performance(players, match_id)
-bowling_df = get_bowling_performance(players, match_id)
+bowling_df = get_bowling_performance(bowlers_list, match_id)
 
-# final_df=batting_df.app
-# batting_df.to_csv("batting_test.csv", index=False)
-# bowling_df.to_csv("bowling_test.csv", index=False)
-print(batting_df.columns)
-print(bowling_df.columns)
+batting_df.to_csv("batting.csv")
+bowling_df.to_csv("bowling.csv")
+bowling_df = bowling_df.loc[:, bowling_df.columns != "toss"]
+bowling_df = bowling_df.loc[:, bowling_df.columns != "venue"]
+bowling_df = bowling_df.loc[:, bowling_df.columns != "opposition"]
+bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
+final_df = pd.merge(batting_df, bowling_df, on="player_name", how="left").fillna(0)
+final_df.to_csv("final_test.csv")
+print(final_df.columns)
