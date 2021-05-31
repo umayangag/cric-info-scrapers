@@ -8,7 +8,6 @@ def get_match_ids():
     db_cursor.execute(
         f'SELECT match_id FROM match_details')
     results = db_cursor.fetchall()
-    print(results)
     return results
 
 def get_batting_data(match_id, player_id):

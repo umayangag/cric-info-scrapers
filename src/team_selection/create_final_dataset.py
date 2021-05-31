@@ -118,7 +118,7 @@ def get_players(match_id):
 
     player_df = pd.DataFrame(player_list, columns=player_columns)
     wicket_keepers = player_df.loc[player_df['is_wicket_keeper'] == 1]
-    bowlers = player_df.loc[player_df['bowling_consistency'] > 0]
+    bowlers = pd.DataFrame(bowlers, columns=player_columns)
     return player_df, wicket_keepers, bowlers
 
 
