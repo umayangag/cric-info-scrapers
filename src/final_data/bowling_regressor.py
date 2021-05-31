@@ -13,6 +13,8 @@ from sklearn.metrics import confusion_matrix
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import cross_val_score
 from sklearn import svm
+import numpy as np
+from team_selection.dataset_definitions import *
 
 RF = RandomForestClassifier(n_estimators=100)
 gnb = GaussianNB()
@@ -27,24 +29,10 @@ dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
-X = input_data[[
-    "bowling_consistency",
-    "bowling_form",
-    "bowling_temp",
-    "bowling_wind",
-    "bowling_rain",
-    "bowling_humidity",
-    "bowling_cloud",
-    "bowling_pressure",
-    "bowling_viscosity",
-    "bowling_inning",
-    "bowling_session",
-    "toss",
-    "venue",
-    "opposition",
-    "season",
-]]  # Features
-y = input_data[["runs_conceded", "deliveries", "wickets_taken"]]  # Labels
+training_input_columns = input_bowling_columns.copy()
+training_input_columns.remove("player_name")
+X = input_data[training_input_columns]
+y = input_data[output_bowling_columns]  # Labels
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 train_set = 1465
 X_train = X.iloc[:train_set, :]

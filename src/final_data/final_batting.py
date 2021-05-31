@@ -1,35 +1,14 @@
 from config.mysql import get_db_connection
 import pandas as pd
+import numpy as np
 from final_data.queries import batting_dataset_query
 import os
 from analyze.cluster_batting import cluster_batting_performance
 from analyze.normalize_batting import normalize_batting_dataset
 from final_data.encoders import *
+from team_selection.dataset_definitions import *
 
-batting_columns = [
-    "runs_scored",
-    "balls_faced",
-    "fours_scored",
-    "sixes_scored",
-    "match_id",
-    "batting_position",
-    "player_name",
-    "batting_consistency",
-    "batting_form",
-    "batting_temp",
-    "batting_wind",
-    "batting_rain",
-    "batting_humidity",
-    "batting_cloud",
-    "batting_pressure",
-    "batting_viscosity",
-    "batting_inning",
-    "batting_session",
-    "toss",
-    "venue",
-    "opposition",
-    "season",
-]
+batting_columns = np.concatenate((output_batting_columns, input_batting_columns))
 
 dirname = os.path.dirname(__file__)
 output_file_encoded = os.path.join(dirname, "output\\batting_encoded.csv")

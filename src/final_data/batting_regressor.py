@@ -12,6 +12,8 @@ from sklearn.metrics import confusion_matrix
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import cross_val_score
 from sklearn import svm
+import numpy as np
+from team_selection.dataset_definitions import *
 
 # from sklearn import preprocessing
 
@@ -29,25 +31,10 @@ dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
-columns = [
-    "batting_consistency",
-    "batting_form",
-    "batting_temp",
-    "batting_wind",
-    "batting_rain",
-    "batting_humidity",
-    "batting_cloud",
-    "batting_pressure",
-    "batting_viscosity",
-    "batting_inning",
-    "batting_session",
-    "toss",
-    "venue",
-    "opposition",
-    "season",
-]
-X = input_data[columns]
-y = input_data[["runs_scored", "balls_faced", "fours_scored", "sixes_scored", "batting_position"]]  # Labels
+training_input_columns = input_batting_columns.copy()
+training_input_columns.remove("player_name")
+X = input_data[training_input_columns]
+y = input_data[output_batting_columns]  # Labels
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 train_set = 2095
 X_train = X.iloc[:train_set, :]
