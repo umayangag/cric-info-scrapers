@@ -47,7 +47,7 @@ predictor.fit(X_train, y_train)
 def calculate_strike_rate(row):
     if row["balls_faced"] == 0:
         return 0
-    return row["runs_scored"] / row["balls_faced"]
+    return row["runs_scored"]*100 / row["balls_faced"]
 
 
 def predict_batting(dataset):

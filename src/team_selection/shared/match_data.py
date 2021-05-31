@@ -23,7 +23,7 @@ def get_batting_data(match_id, player_id):
 
 def get_bowling_data(match_id, player_id):
     db_cursor.execute(
-        f'SELECT runs, balls, wickets '
+        f'SELECT runs, balls, wickets, econ '
         f'FROM bowling_data WHERE match_id={match_id} and player_id={player_id}')
     results = db_cursor.fetchall()
     if len(results) == 1:

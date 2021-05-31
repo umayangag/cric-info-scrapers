@@ -26,7 +26,7 @@ def get_bowling_df(player_list, match_id):
         player_opposition = get_player_metric(match_id, "bowling", player_obj, "opposition", "opposition",
                                               opposition_id)
 
-        runs, deliveries, wickets = get_bowling_data(match_id, player_id)
+        runs, deliveries, wickets, econ = get_bowling_data(match_id, player_id)
         if score == 0 or score is None or runs == 0 or runs is None:
             contribution = 0
         else:
@@ -50,7 +50,8 @@ def get_bowling_df(player_list, match_id):
                            runs,
                            deliveries,
                            wickets,
-                           contribution
+                           contribution,
+                           econ
                            ])
     return pd.DataFrame(data_array, columns=all_bowling_columns)
 
