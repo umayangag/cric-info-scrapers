@@ -21,6 +21,7 @@ def get_bowling_df(player_list, match_id):
     for player in player_list.iterrows():
         player_obj = player[1]
         player_id = player_obj[0]
+        player_name = player_obj[1]
         player_form = get_player_metric(match_id, "bowling", player_obj, "form", "season", season_id - 1)
         player_venue = get_player_metric(match_id, "bowling", player_obj, "venue", "venue", venue_id)
         player_opposition = get_player_metric(match_id, "bowling", player_obj, "opposition", "opposition",
@@ -46,7 +47,7 @@ def get_bowling_df(player_list, match_id):
                            player_venue,
                            player_opposition,
                            season_id,
-                           player_id,
+                           player_name,
                            runs,
                            deliveries,
                            wickets,
@@ -67,6 +68,7 @@ def get_batting_df(player_list, match_id):
     for player in player_list.iterrows():
         player_obj = player[1]
         player_id = player_obj[0]
+        player_name = player_obj[1]
         player_form = get_player_metric(match_id, "batting", player_obj, "form", "season", season_id - 1)
         player_venue = get_player_metric(match_id, "batting", player_obj, "venue", "venue", venue_id)
         player_opposition = get_player_metric(match_id, "batting", player_obj, "opposition", "opposition",
@@ -92,13 +94,12 @@ def get_batting_df(player_list, match_id):
                            player_venue,
                            player_opposition,
                            season_id,
-                           player_id,
+                           player_name,
                            runs,
                            balls,
                            fours,
                            sixes,
                            strike_rate,
-                           encode_how_out(description),
                            contribution,
                            strike_rate,
                            score,
@@ -112,7 +113,7 @@ def get_batting_df(player_list, match_id):
     return pd.DataFrame(data_array, columns=np.concatenate((all_batting_columns, match_summary_columns)))
 
 
-def get_players(match_id):
+def get_actual_players_who_played(match_id):
     batsmen = get_player_list(match_id, "batting")
     bowlers = get_player_list(match_id, "bowling")
     player_list = batsmen + list(set(bowlers) - set(batsmen))
@@ -123,16 +124,17 @@ def get_players(match_id):
     return player_df, wicket_keepers, bowlers
 
 
-df_array = []
-for match in get_match_ids():
-    match_id = match[0]
-    players, keepers, bowlers_list = get_players(match_id)
-    batting_df = get_batting_df(players, match_id)
-    bowling_df = get_bowling_df(bowlers_list, match_id)
-    bowling_df = bowling_df.loc[:, bowling_df.columns != "toss"]
-    bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
-    bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
-    final_df = pd.merge(batting_df, bowling_df, on="player_name", how="left").fillna(0)
-    df_array.append(final_df)
-parent_df = pd.concat(df_array, ignore_index=True)
-parent_df.to_csv("final_dataset.csv", index=False)
+if __name__ == "__main__":
+    df_array = []
+    for match in get_match_ids():
+        match_id = match[0]
+        players, keepers, bowlers_list = get_actual_players_who_played(match_id)
+        batting_df = get_batting_df(players, match_id)
+        bowling_df = get_bowling_df(bowlers_list, match_id)
+        bowling_df = bowling_df.loc[:, bowling_df.columns != "toss"]
+        bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
+        bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
+        final_df = pd.merge(batting_df, bowling_df, on="player_name", how="left").fillna(0)
+        df_array.append(final_df)
+    parent_df = pd.concat(df_array, ignore_index=True)
+    parent_df.to_csv("final_dataset.csv", index=False)

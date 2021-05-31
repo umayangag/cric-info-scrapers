@@ -34,7 +34,7 @@ def get_bowling_data(match_id, player_id):
 
 def get_match_data(match_id, label):
     db_cursor.execute(
-        f'SELECT inning, {label}_session, toss,venue_id, opposition_id, season_id,score, wickets, balls, target, extras, match_number, result '
+        f'SELECT inning, {label}_session, toss,venue_id, opposition_id, season_id,score, wickets, balls, target, extras, match_id, result '
         f'FROM match_details WHERE match_id={match_id} ')
     return db_cursor.fetchall()[0]
 

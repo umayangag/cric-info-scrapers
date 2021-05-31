@@ -29,7 +29,7 @@ input_batting_columns = [
 ]
 
 output_batting_columns = ["runs_scored", "balls_faced", "fours_scored", "sixes_scored", "batting_position"]
-derived_batting_columns = ["is_out", "batting_contribution", "strike_rate"]
+derived_batting_columns = ["batting_contribution", "strike_rate"]
 input_bowling_columns = [
     "bowling_consistency",
     "bowling_form",

@@ -12,7 +12,7 @@ from sklearn import svm
 from sklearn import preprocessing
 
 RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=False, max_depth=100,
-                            class_weight={0: 1.8, 1: 1})
+                            class_weight={0: 1.6, 1: 1})
 gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', activation='relu', alpha=1e-5, hidden_layer_sizes=(10, 4), random_state=1,
                     max_iter=10000)
@@ -24,65 +24,61 @@ dataset_source = os.path.join(dirname, "..\\team_selection\\final_dataset.csv")
 
 def batting_predict(predictor):
     input_data = pd.read_csv(dataset_source)
-
-    scaler = preprocessing.StandardScaler().fit(input_data)
-    data_scaled = scaler.transform(input_data)
-    final_df = pd.DataFrame(data=data_scaled, columns=input_data.columns)
-    final_df["result"] = input_data["result"]
-    input_data = final_df
-
-    # X = input_data.loc[:, input_data.columns != 'result']
-    X = input_data[['batting_consistency',
-                    'batting_form',
-                    'batting_temp',
-                    'batting_wind',
-                    'batting_rain',
-                    'batting_humidity',
-                    'batting_cloud',
-                    'batting_pressure',
-                    'batting_viscosity',
-                    'batting_inning',
-                    'batting_session',
-                    'toss',
-                    'venue',
-                    'opposition',
-                    'season',
-                    'player_name',
-                    'runs_scored',
-                    'balls_faced',
-                    'fours_scored',
-                    'sixes_scored',
-                    'batting_position',
-                    'is_out',
-                    'batting_contribution',
-                    'strike_rate',
-                    'total_score',
-                    'total_wickets',
-                    'total_balls',
-                    'target',
-                    'extras',
-                    'match_number',
-                    'bowling_consistency',
-                    'bowling_form',
-                    'bowling_temp',
-                    'bowling_wind',
-                    'bowling_rain',
-                    'bowling_humidity',
-                    'bowling_cloud',
-                    'bowling_pressure',
-                    'bowling_viscosity',
-                    'bowling_session',
-                    'bowling_venue',
-                    'bowling_opposition',
-                    'runs_conceded',
-                    'deliveries',
-                    'wickets_taken',
-                    'bowling_contribution']]
+    X = input_data[[
+        'batting_consistency',
+        'batting_form',
+        'batting_temp',
+        'batting_wind',
+        'batting_rain',
+        'batting_humidity',
+        'batting_cloud',
+        'batting_pressure',
+        'batting_viscosity',
+        'batting_inning',
+        'batting_session',
+        'toss',
+        'venue',
+        'opposition',
+        'season',
+        'runs_scored',
+        'balls_faced',
+        'fours_scored',
+        'sixes_scored',
+        'batting_position',
+        'batting_contribution',
+        'strike_rate',
+        'total_score',
+        'total_wickets',
+        'total_balls',
+        'target',
+        'extras',
+        'match_number',
+        'bowling_consistency',
+        'bowling_form',
+        'bowling_temp',
+        'bowling_wind',
+        'bowling_rain',
+        'bowling_humidity',
+        'bowling_cloud',
+        'bowling_pressure',
+        'bowling_viscosity',
+        'bowling_session',
+        'bowling_venue',
+        'bowling_opposition',
+        'runs_conceded',
+        'deliveries',
+        'wickets_taken',
+        'bowling_contribution',
+        "econ"
+    ]]
     y = input_data["result"]  # Labels
-    print(X.columns)
     oversample = SMOTE()
     X, y = oversample.fit_resample(X, y)
-    print(X)
+
+    scaler = preprocessing.StandardScaler().fit(X)
+    data_scaled = scaler.transform(X)
+    X = pd.DataFrame(data=data_scaled, columns=X.columns)
+
     train_set = 2000
 
     X_train = X.iloc[:train_set, :]
@@ -94,7 +90,7 @@ def batting_predict(predictor):
     #
     predictor.fit(X_train, y_train)
     y_pred = predictor.predict(X_test)
-    probability = predictor.predict_proba(X_test)
+    # probability = predictor.predict_proba(X_test)
     # print(type(y_pred), type(y_test))
     # print(type(probability))
     # for i, row in y_test.items():
@@ -111,6 +107,15 @@ def batting_predict(predictor):
     # print(predictor.coefs_)
     # print(predictor.get_params())
     return accuracy
+
+
+def predict_for_team(team_data):
+    team_performance = team_data.copy()
+    predicted = RF.predict_proba(team_performance)
+    df = pd.DataFrame(predicted, columns=["lose", "win"])
+    print(df["win"].to_numpy())
+    team_performance["winning_probability"] = df["win"].to_numpy()
+    return team_performance
 
 
 batting_predict(RF)

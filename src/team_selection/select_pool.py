@@ -3,6 +3,8 @@ from final_data.batting_regressor import predict_batting
 from final_data.bowling_regressor import predict_bowling
 from team_selection.dataset_definitions import *
 from team_selection.shared.match_data import *
+from team_selection.player_combinator import *
+from final_data.match_win_predict import predict_for_team
 
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
@@ -18,6 +20,7 @@ def get_bowling_performance(player_list, match_id):
     for player in player_list.iterrows():
         player_obj = player[1]
         player_id = player_obj[0]
+        player_name = player_obj[1]
         player_form = get_player_metric(match_id, "bowling", player_obj, "form", "season", season_id - 1)
         player_venue = get_player_metric(match_id, "bowling", player_obj, "venue", "venue", venue_id)
         player_opposition = get_player_metric(match_id, "bowling", player_obj, "opposition", "opposition",
@@ -37,7 +40,7 @@ def get_bowling_performance(player_list, match_id):
                            player_venue,
                            player_opposition,
                            season_id,
-                           player_id])
+                           player_name])
     dataset = pd.DataFrame(data_array, columns=input_bowling_columns)
     predicted = predict_bowling(dataset.loc[:, dataset.columns != "player_name"])
     predicted["player_name"] = dataset["player_name"]
@@ -55,6 +58,7 @@ def get_batting_performance(player_list, match_id):
     for player in player_list.iterrows():
         player_obj = player[1]
         player_id = player_obj[0]
+        player_name = player_obj[1]
         player_form = get_player_metric(match_id, "batting", player_obj, "form", "season", season_id - 1)
         player_venue = get_player_metric(match_id, "batting", player_obj, "venue", "venue", venue_id)
         player_opposition = get_player_metric(match_id, "batting", player_obj, "opposition", "opposition",
@@ -75,7 +79,7 @@ def get_batting_performance(player_list, match_id):
                            player_venue,
                            player_opposition,
                            season_id,
-                           player_id])
+                           player_name])
     dataset = pd.DataFrame(data_array, columns=input_batting_columns)
     predicted = predict_batting(dataset.loc[:, dataset.columns != "player_name"])
     predicted["player_name"] = dataset["player_name"]
@@ -92,8 +96,9 @@ def get_player_pool():
     return player_df, wicket_keepers, bowlers
 
 
-players, keepers, bowlers_list = get_player_pool()
 match_id = 1193505
+players, keepers, bowlers_list = get_player_pool()
+
 batting_df = get_batting_performance(players, match_id)
 bowling_df = get_bowling_performance(bowlers_list, match_id)
 
@@ -101,4 +106,11 @@ bowling_df = bowling_df.loc[:, bowling_df.columns != "toss"]
 bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
 bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
 final_df = pd.merge(batting_df, bowling_df, on="player_name", how="left").fillna(0)
-final_df.to_csv("pool.csv", index=False)
+short_listed = shotlist_players(final_df, match_id)
+calculated_team = calculate_overall_performance(short_listed, match_id)
+input_df = calculated_team.loc[:, calculated_team.columns != "player_name"]
+predictions = predict_for_team(input_df)
+predictions["player_name"] = calculated_team["player_name"]
+
+# short_listed.to_csv("shotlisted.csv", index=False)
+# predictions.to_csv("predictions.csv", index=False)
