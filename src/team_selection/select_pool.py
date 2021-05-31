@@ -9,7 +9,8 @@ db_cursor = db_connection.cursor()
 
 
 def get_bowling_performance(player_list, match_id):
-    inning, session, toss, venue_id, opposition_id, season_id = get_match_data(match_id, "bowling")
+    inning, session, toss, venue_id, opposition_id, season_id, score, total_wickets, balls, target, extras, match_number, result = get_match_data(
+        match_id, "bowling")
     temp, wind, rain, humidity, cloud, pressure, viscosity = get_weather_data(match_id, "bowling")
 
     data_array = []
@@ -29,9 +30,9 @@ def get_bowling_performance(player_list, match_id):
                            humidity,
                            cloud,
                            pressure,
-                           viscosity,
+                           encode_viscosity(viscosity),
                            inning,
-                           session,
+                           encode_session(session),
                            toss,
                            player_venue,
                            player_opposition,
@@ -44,7 +45,9 @@ def get_bowling_performance(player_list, match_id):
 
 
 def get_batting_performance(player_list, match_id):
-    inning, session, toss, venue_id, opposition_id, season_id = get_match_data(match_id, "batting")
+    inning, session, toss, venue_id, opposition_id, season_id, score, wickets, all_balls, target, extras, match_number, result = get_match_data(
+        match_id,
+        "batting")
     temp, wind, rain, humidity, cloud, pressure, viscosity = get_weather_data(match_id, "batting")
 
     data_array = []
@@ -65,9 +68,9 @@ def get_batting_performance(player_list, match_id):
                            humidity,
                            cloud,
                            pressure,
-                           viscosity,
+                           encode_viscosity(viscosity),
                            inning,
-                           session,
+                           encode_session(session),
                            toss,
                            player_venue,
                            player_opposition,
@@ -94,8 +97,6 @@ match_id = 1193505
 batting_df = get_batting_performance(players, match_id)
 bowling_df = get_bowling_performance(bowlers_list, match_id)
 
-batting_df.to_csv("batting.csv")
-bowling_df.to_csv("bowling.csv")
 bowling_df = bowling_df.loc[:, bowling_df.columns != "toss"]
 bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
 bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
