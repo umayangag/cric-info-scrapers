@@ -39,7 +39,7 @@ def final_batting_dataset(conn):
 
     df_encoded["batting_session"] = df_encoded["batting_session"].apply(encode_session)
     df_encoded["batting_viscosity"] = df_encoded["batting_viscosity"].apply(encode_viscosity)
-    # df_encoded["runs"] = df_encoded["runs"].apply(encode_runs)
+    # df_encoded["runs_scored"] = df_encoded["runs_scored"].apply(encode_runs)
 
     # df_encoded = categorize_batting_performance(df_encoded)
     df_encoded = df_encoded.loc[:, df_encoded.columns != "player_name"]

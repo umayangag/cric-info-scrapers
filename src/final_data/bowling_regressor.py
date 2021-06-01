@@ -67,16 +67,16 @@ def predict_bowling(dataset):
 
 
 def bowling_predict_test():
-    y_pred = predictor.predict(X_test)
-
-    comparison = {}
-    comparison["actual"] = y_test.to_numpy()
-    comparison["predicted"] = y_pred
-
-    for i in range(0, len(y_pred)):
-        print(comparison["actual"][i], " ", comparison["predicted"][i], "", )
-
-    print("Error:", metrics.mean_absolute_error(y_test, y_pred))
+    # y_pred = predictor.predict(X_test)
+    #
+    # comparison = {}
+    # comparison["actual"] = y_test.to_numpy()
+    # comparison["predicted"] = y_pred
+    #
+    # for i in range(0, len(y_pred)):
+    #     print(comparison["actual"][i], " ", comparison["predicted"][i], "", )
+    #
+    # print("Error:", metrics.mean_absolute_error(y_test, y_pred))
     print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
 
 

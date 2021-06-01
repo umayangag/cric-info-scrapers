@@ -32,7 +32,7 @@ def final_bowling_dataset(conn):
 
     df_encoded["bowling_session"] = df_encoded["bowling_session"].apply(encode_session)
     df_encoded["bowling_viscosity"] = df_encoded["bowling_viscosity"].apply(encode_viscosity)
-    # df_encoded["econ"] = df_encoded["econ"].apply(encode_econ)
+    # df_encoded["runs_conceded"] = df_encoded["runs_conceded"].apply(encode_runs_conceded)
 
     # df_encoded = categorize_bowling_performance(df_encoded)
     df_encoded = df_encoded.loc[:, df_encoded.columns != "player_name"]

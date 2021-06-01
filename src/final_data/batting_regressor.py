@@ -35,13 +35,14 @@ input_data = pd.read_csv(dataset_source)
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
 
-# scaler = preprocessing.StandardScaler().fit(input_data)
-# data_scaled = scaler.transform(input_data)
-# final_df = pd.DataFrame(data=data_scaled, columns=input_data.columns)
-# input_data = final_df
-
 X = input_data[training_input_columns]
 y = input_data[output_batting_columns]  # Labels
+
+scaler = preprocessing.StandardScaler().fit(X)
+data_scaled = scaler.transform(X)
+final_df = pd.DataFrame(data=data_scaled, columns=training_input_columns)
+X = final_df
+
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 train_set = 2095
 X_train = X.iloc[:train_set, :]
@@ -54,7 +55,7 @@ predictor.fit(X_train, y_train)
 def calculate_strike_rate(row):
     if row["balls_faced"] == 0:
         return 0
-    return row["runs_scored"]*100 / row["balls_faced"]
+    return row["runs_scored"] * 100 / row["balls_faced"]
 
 
 def predict_batting(dataset):
@@ -67,16 +68,16 @@ def predict_batting(dataset):
 
 
 def batting_predict_test():
-    y_pred = predictor.predict(X_test)
-    print(X_test)
-    comparison = {}
-    comparison["actual"] = y_test.to_numpy()
-    comparison["predicted"] = y_pred
-
-    for i in range(0, len(y_pred)):
-        print(comparison["actual"][i], " ", comparison["predicted"][i], "")
-    print("Error:", metrics.mean_absolute_error(y_test, y_pred))
-    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
+    # y_pred = predictor.predict(X_test)
+    # print(X_test)
+    # comparison = {}
+    # comparison["actual"] = y_test.to_numpy()
+    # comparison["predicted"] = y_pred
+    #
+    # for i in range(0, len(y_pred)):
+    #     print(comparison["actual"][i], " ", comparison["predicted"][i], "")
+    # print("Error:", metrics.mean_absolute_error(y_test, y_pred))
+    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).mean())
 
 
 if __name__ == "__main__":
