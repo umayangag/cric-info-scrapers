@@ -1,7 +1,7 @@
 from team_selection.create_final_dataset import get_actual_players_who_played
 
 
-def shotlist_players(pool_df, match_id):
+def actual_team_players(pool_df, match_id):
     actual_player_df, wicket_keepers, bowlers = get_actual_players_who_played(match_id)
     return pool_df[pool_df['player_name'].isin(actual_player_df["player_name"].to_numpy())]
 

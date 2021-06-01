@@ -113,26 +113,26 @@ def predict_for_team(team_data):
     team_performance = team_data.copy()
     predicted = RF.predict_proba(team_performance)
     df = pd.DataFrame(predicted, columns=["lose", "win"])
-    print(df["win"].to_numpy())
     team_performance["winning_probability"] = df["win"].to_numpy()
-    return team_performance
+    return team_performance, df["win"].mean()
 
 
-batting_predict(RF)
-# values = []
-# for i in range(1, 20):
-#     for j in range(1, 20):
-#         cf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(i, j), random_state=1)
-#         value = batting_predict(cf)
-#         values.append([i, j, value])
-# print(values)
+if __name__ == "__main__":
+    batting_predict(RF)
+    # values = []
+    # for i in range(1, 20):
+    #     for j in range(1, 20):
+    #         cf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(i, j), random_state=1)
+    #         value = batting_predict(cf)
+    #         values.append([i, j, value])
+    # print(values)
 
-# i = 0
-# j = 0
-# max = 0
-# for item in array:
-#     if item[2] > max:
-#         i = item[0]
-#         j = item[1]
-#         max = item[2]
-# print(i,j,max)
+    # i = 0
+    # j = 0
+    # max = 0
+    # for item in array:
+    #     if item[2] > max:
+    #         i = item[0]
+    #         j = item[1]
+    #         max = item[2]
+    # print(i,j,max)

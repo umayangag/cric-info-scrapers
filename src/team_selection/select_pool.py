@@ -5,6 +5,7 @@ from team_selection.dataset_definitions import *
 from team_selection.shared.match_data import *
 from team_selection.player_combinator import *
 from final_data.match_win_predict import predict_for_team
+from itertools import combinations
 
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
@@ -96,21 +97,32 @@ def get_player_pool():
     return player_df, wicket_keepers, bowlers
 
 
-match_id = 1193505
-players, keepers, bowlers_list = get_player_pool()
+if __name__ == "__main__":
+    match_id = 1193505
+    players, keepers, bowlers_list = get_player_pool()
 
-batting_df = get_batting_performance(players, match_id)
-bowling_df = get_bowling_performance(bowlers_list, match_id)
+    batting_df = get_batting_performance(players, match_id)
+    bowling_df = get_bowling_performance(bowlers_list, match_id)
 
-bowling_df = bowling_df.loc[:, bowling_df.columns != "toss"]
-bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
-bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
-final_df = pd.merge(batting_df, bowling_df, on="player_name", how="left").fillna(0)
-short_listed = shotlist_players(final_df, match_id)
-calculated_team = calculate_overall_performance(short_listed, match_id)
-input_df = calculated_team.loc[:, calculated_team.columns != "player_name"]
-predictions = predict_for_team(input_df)
-predictions["player_name"] = calculated_team["player_name"]
+    bowling_df = bowling_df.loc[:, bowling_df.columns != "toss"]
+    bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
+    bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
+    player_pool = pd.merge(batting_df, bowling_df, on="player_name", how="left").fillna(0)
 
-# short_listed.to_csv("shotlisted.csv", index=False)
-# predictions.to_csv("predictions.csv", index=False)
+    batsmen_pool = player_pool[player_pool["bowling_consistency"] == 0]
+    bowlers_pool = player_pool[player_pool["bowling_consistency"] > 0]
+
+    # print(batsmen_pool.columns)
+    # print(batsmen_pool["player_name"])
+    # print(bowlers_pool["player_name"])
+    # TODO select 10 batsmen and 10 bowlers
+    # TODO get combinations of 11
+
+    # short_listed = actual_team_players(player_pool, match_id)
+
+    # calculated_team = calculate_overall_performance(short_listed, match_id)
+    # calculted_team_without_names = calculated_team.loc[:, calculated_team.columns != "player_name"]
+    # player_performance_predictions, overall_win_probability = predict_for_team(calculted_team_without_names)
+    # player_performance_predictions["player_name"] = calculated_team["player_name"]
+    #
+    # print(overall_win_probability)
