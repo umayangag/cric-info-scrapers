@@ -14,6 +14,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn import svm
 import numpy as np
 from team_selection.dataset_definitions import *
+from sklearn import preprocessing
 
 # from sklearn import preprocessing
 
@@ -33,6 +34,12 @@ dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
 input_data = pd.read_csv(dataset_source)
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
+
+# scaler = preprocessing.StandardScaler().fit(input_data)
+# data_scaled = scaler.transform(input_data)
+# final_df = pd.DataFrame(data=data_scaled, columns=input_data.columns)
+# input_data = final_df
+
 X = input_data[training_input_columns]
 y = input_data[output_batting_columns]  # Labels
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
@@ -60,12 +67,6 @@ def predict_batting(dataset):
 
 
 def batting_predict_test():
-    # scaler = preprocessing.StandardScaler().fit(input_data)
-    # data_scaled = scaler.transform(input_data)
-    # final_df = pd.DataFrame(data=data_scaled, columns=input_data.columns)
-    # final_df["runs"] = input_data["runs"]
-    # input_data = final_df
-
     y_pred = predictor.predict(X_test)
     print(X_test)
     comparison = {}
@@ -74,8 +75,8 @@ def batting_predict_test():
 
     for i in range(0, len(y_pred)):
         print(comparison["actual"][i], " ", comparison["predicted"][i], "")
-    print("Accuracy:", metrics.mean_absolute_error(y_test, y_pred))
-    # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
+    print("Error:", metrics.mean_absolute_error(y_test, y_pred))
+    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
 
 
 if __name__ == "__main__":
