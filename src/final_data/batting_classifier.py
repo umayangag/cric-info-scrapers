@@ -35,20 +35,24 @@ input_data = pd.read_csv(dataset_source)
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
 
-# scaler = preprocessing.StandardScaler().fit(input_data)
-# data_scaled = scaler.transform(input_data)
-# final_df = pd.DataFrame(data=data_scaled, columns=input_data.columns)
-# input_data = final_df
-
 X = input_data[training_input_columns]
 y = input_data["runs_scored"]  # Labels
+
+oversample = SMOTE()
+X, y = oversample.fit_resample(X, y)
+
+scaler = preprocessing.StandardScaler().fit(X)
+data_scaled = scaler.transform(X)
+final_df = pd.DataFrame(data=data_scaled, columns=training_input_columns)
+X = final_df
+
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 train_set = 2095
 X_train = X.iloc[:train_set, :]
 X_test = X.iloc[train_set + 1:, :]
 y_train = y.iloc[:train_set]
 y_test = y.iloc[train_set + 1:]
-# predictor.fit(X_train, y_train)
+predictor.fit(X_train, y_train)
 
 
 def calculate_strike_rate(row):
@@ -75,7 +79,6 @@ def batting_predict_test():
     #
     # for i in range(0, len(y_pred)):
     #     print(comparison["actual"][i], " ", comparison["predicted"][i], "")
-    # print("Error:", metrics.mean_absolute_error(y_test, y_pred))
     print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean())
 
 
