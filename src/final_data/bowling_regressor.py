@@ -26,7 +26,7 @@ SVM = svm.SVC(kernel='linear', C=1)
 regr = RandomForestRegressor(max_depth=100, random_state=0)
 reg = LinearRegression()
 mltreg = MultiOutputRegressor(regr)
-predictor = regr
+predictor = mltreg
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
@@ -36,7 +36,7 @@ training_input_columns = input_bowling_columns.copy()
 training_input_columns.remove("player_name")
 
 X = input_data[training_input_columns]
-y = input_data["runs_conceded"]  # Labels
+y = input_data[output_bowling_columns]  # Labels
 
 scaler = preprocessing.StandardScaler().fit(X)
 data_scaled = scaler.transform(X)
@@ -62,7 +62,7 @@ def calculate_econ(row):
 
 def predict_bowling(dataset):
     predicted = predictor.predict(dataset)
-    result = pd.DataFrame(predicted, columns=y.columns)
+    result = pd.DataFrame(predicted, columns=output_bowling_columns)
     for column in y.columns:
         dataset[column] = result[column]
     dataset["econ"] = dataset.apply(lambda row: calculate_econ(row), axis=1)

@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=False, max_depth=100,
-                            class_weight={0: 1.6, 1: 1})
+                            class_weight={0: 1, 1: 1})
 gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', activation='relu', alpha=1e-5, hidden_layer_sizes=(10, 4), random_state=1,
                     max_iter=10000)
@@ -80,8 +80,8 @@ def batting_predict(predictor):
     scaler = preprocessing.StandardScaler().fit(X)
     data_scaled = scaler.transform(X)
     X = pd.DataFrame(data=data_scaled, columns=X.columns)
-
-    train_set = 2000
+    print(X)
+    train_set = 2423
 
     X_train = X.iloc[:train_set, :]
     X_test = X.iloc[train_set + 1:, :]

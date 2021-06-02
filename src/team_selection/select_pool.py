@@ -6,6 +6,7 @@ from team_selection.shared.match_data import *
 from team_selection.player_combinator import *
 from final_data.match_win_predict import predict_for_team
 from itertools import combinations
+from team_selection.fill_missing_attributes import *
 
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
@@ -83,6 +84,7 @@ def get_batting_performance(player_list, match_id):
                            player_name])
     dataset = pd.DataFrame(data_array, columns=input_batting_columns)
     predicted = predict_batting(dataset.loc[:, dataset.columns != "player_name"])
+    print(predicted)
     predicted["player_name"] = dataset["player_name"]
     return predicted
 
@@ -107,10 +109,12 @@ if __name__ == "__main__":
     bowling_df = bowling_df.loc[:, bowling_df.columns != "toss"]
     bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
     bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
-    player_pool = pd.merge(batting_df, bowling_df, on="player_name", how="left").fillna(0)
+    player_pool = pd.merge(batting_df, bowling_df, on="player_name", how="left")
+    # player_pool = fill_missing_attributes(player_pool)
+    player_pool.to_csv("pool.csv", index=False)
 
-    batsmen_pool = player_pool[player_pool["bowling_consistency"] == 0]
-    bowlers_pool = player_pool[player_pool["bowling_consistency"] > 0]
+    # batsmen_pool = player_pool[player_pool["bowling_consistency"] == 0]
+    # bowlers_pool = player_pool[player_pool["bowling_consistency"] > 0]
 
     # print(batsmen_pool.columns)
     # print(batsmen_pool["player_name"])

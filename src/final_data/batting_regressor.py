@@ -28,7 +28,7 @@ SVM = svm.SVC(kernel='linear', C=1)
 regr = RandomForestRegressor(max_depth=4, n_estimators=4,criterion='mse', max_features='auto', min_impurity_decrease=0, random_state=0)
 reg = LinearRegression()
 mltreg = MultiOutputRegressor(regr)
-predictor = regr
+predictor = mltreg
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
@@ -38,7 +38,7 @@ training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
 
 X = input_data[training_input_columns]
-y = input_data["runs_scored"]  # Labels
+y = input_data[output_batting_columns]  # Labels
 
 scaler = preprocessing.StandardScaler().fit(X)
 data_scaled = scaler.transform(X)
@@ -46,13 +46,12 @@ final_df = pd.DataFrame(data=data_scaled, columns=training_input_columns)
 X = final_df
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-train_set = 2095
+train_set = 2107
 X_train = X.iloc[:train_set, :]
 X_test = X.iloc[train_set + 1:, :]
 y_train = y.iloc[:train_set]
 y_test = y.iloc[train_set + 1:]
 predictor.fit(X_train, y_train)
-
 
 def calculate_strike_rate(row):
     if row["balls_faced"] == 0:
@@ -62,7 +61,7 @@ def calculate_strike_rate(row):
 
 def predict_batting(dataset):
     predicted = predictor.predict(dataset)
-    result = pd.DataFrame(predicted, columns=y.columns)
+    result = pd.DataFrame(predicted, columns=output_batting_columns)
     for column in y.columns:
         dataset[column] = result[column]
     dataset["strike_rate"] = dataset.apply(lambda row: calculate_strike_rate(row), axis=1)
@@ -72,12 +71,12 @@ def predict_batting(dataset):
 def batting_predict_test():
     y_pred = predictor.predict(X_test)
     # print(X_test)
-    # comparison = {}
-    # comparison["actual"] = y_test.to_numpy()
-    # comparison["predicted"] = y_pred
-    #
-    # for i in range(0, len(y_pred)):
-    #     print(comparison["actual"][i], " ", comparison["predicted"][i], "")
+    comparison = {}
+    comparison["actual"] = y_test.to_numpy()
+    comparison["predicted"] = y_pred
+
+    for i in range(0, len(y_pred)):
+        print(comparison["actual"][i], " ", comparison["predicted"][i], "")
     print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
     print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
     print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
