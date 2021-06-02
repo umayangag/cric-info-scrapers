@@ -15,6 +15,8 @@ from sklearn import svm
 import numpy as np
 from team_selection.dataset_definitions import *
 from sklearn import preprocessing
+import matplotlib.pyplot as plt
+import numpy as np
 
 # from sklearn import preprocessing
 
@@ -23,10 +25,10 @@ RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=Fal
 gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(4, 3), random_state=1)
 SVM = svm.SVC(kernel='linear', C=1)
-regr = RandomForestRegressor(max_depth=4, random_state=0)
+regr = RandomForestRegressor(max_depth=4, n_estimators=4,criterion='mse', max_features='auto', min_impurity_decrease=0, random_state=0)
 reg = LinearRegression()
 mltreg = MultiOutputRegressor(regr)
-predictor = mltreg
+predictor = regr
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
@@ -36,7 +38,7 @@ training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
 
 X = input_data[training_input_columns]
-y = input_data[output_batting_columns]  # Labels
+y = input_data["runs_scored"]  # Labels
 
 scaler = preprocessing.StandardScaler().fit(X)
 data_scaled = scaler.transform(X)
@@ -68,7 +70,7 @@ def predict_batting(dataset):
 
 
 def batting_predict_test():
-    # y_pred = predictor.predict(X_test)
+    y_pred = predictor.predict(X_test)
     # print(X_test)
     # comparison = {}
     # comparison["actual"] = y_test.to_numpy()
@@ -76,8 +78,12 @@ def batting_predict_test():
     #
     # for i in range(0, len(y_pred)):
     #     print(comparison["actual"][i], " ", comparison["predicted"][i], "")
-    # print("Error:", metrics.mean_absolute_error(y_test, y_pred))
-    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).mean())
+    print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+    print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+    print('R2:', metrics.r2_score(y_test, y_pred))
+
+    # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).mean())
 
 
 if __name__ == "__main__":

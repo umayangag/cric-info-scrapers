@@ -15,8 +15,8 @@ from sklearn import svm
 import numpy as np
 from team_selection.dataset_definitions import *
 from sklearn import preprocessing
-
-# from sklearn import preprocessing
+import matplotlib.pyplot as plt
+import numpy as np
 
 RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=False, max_depth=100,
                             class_weight={0: 4, 1: 1, 2: 2})
@@ -35,7 +35,23 @@ input_data = pd.read_csv(dataset_source)
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
 
-X = input_data[training_input_columns]
+X = input_data[[
+    'batting_consistency',
+    'batting_form',
+    'batting_temp',
+    'batting_wind',
+    # 'batting_rain',
+    'batting_humidity',
+    'batting_cloud',
+    'batting_pressure',
+    # 'batting_viscosity',
+    # 'batting_inning',
+    # 'batting_session',
+    # 'toss',
+    'venue',
+    'opposition',
+    # 'season',
+]]
 y = input_data["runs_scored"]  # Labels
 
 oversample = SMOTE()
@@ -43,7 +59,7 @@ X, y = oversample.fit_resample(X, y)
 
 scaler = preprocessing.StandardScaler().fit(X)
 data_scaled = scaler.transform(X)
-final_df = pd.DataFrame(data=data_scaled, columns=training_input_columns)
+final_df = pd.DataFrame(data=data_scaled, columns=X.columns)
 X = final_df
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
@@ -79,6 +95,18 @@ def batting_predict_test():
     #
     # for i in range(0, len(y_pred)):
     #     print(comparison["actual"][i], " ", comparison["predicted"][i], "")
+
+    # plt.figure(figsize=(6 * 1.618, 6))
+    # index = np.arange(len(X.columns))
+    # bar_width = 0.35
+    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    # plt.ylabel('features')
+    # plt.xlabel('importance')
+    # plt.title('Feature importance')
+    # plt.yticks(index, X.columns)
+    # plt.tight_layout()
+    # plt.show()
+
     print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean())
 
 

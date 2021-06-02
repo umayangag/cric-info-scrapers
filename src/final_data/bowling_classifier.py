@@ -16,6 +16,8 @@ from sklearn import svm
 import numpy as np
 from team_selection.dataset_definitions import *
 from sklearn import preprocessing
+import matplotlib.pyplot as plt
+import numpy as np
 
 RF = RandomForestClassifier(n_estimators=100)
 gnb = GaussianNB()
@@ -80,6 +82,18 @@ def bowling_predict_test():
     #     print(comparison["actual"][i], " ", comparison["predicted"][i], "", )
     #
     # print("Error:", metrics.mean_absolute_error(y_test, y_pred))
+
+    plt.figure(figsize=(6 * 1.618, 6))
+    index = np.arange(len(X.columns))
+    bar_width = 0.35
+    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    plt.ylabel('features')
+    plt.xlabel('importance')
+    plt.title('Feature importance')
+    plt.yticks(index, X.columns)
+    plt.tight_layout()
+    plt.show()
+
     print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
 
 

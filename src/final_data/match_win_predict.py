@@ -10,6 +10,8 @@ from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import cross_val_score
 from sklearn import svm
 from sklearn import preprocessing
+import matplotlib.pyplot as plt
+import numpy as np
 
 RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=False, max_depth=100,
                             class_weight={0: 1.6, 1: 1})
@@ -104,6 +106,18 @@ def batting_predict(predictor):
     print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean())
     print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
+    print(X.columns)
+    print(predictor.feature_importances_)
+    plt.figure(figsize=(6 * 1.618, 6))
+    index = np.arange(len(X.columns))
+    bar_width = 0.35
+    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    plt.ylabel('features')
+    plt.xlabel('importance')
+    plt.title('Feature importance')
+    plt.yticks(index,X.columns)
+    plt.tight_layout()
+    plt.show()
     # print(predictor.coefs_)
     # print(predictor.get_params())
     return accuracy

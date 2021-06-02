@@ -16,15 +16,17 @@ from sklearn import svm
 import numpy as np
 from team_selection.dataset_definitions import *
 from sklearn import preprocessing
+import matplotlib.pyplot as plt
+import numpy as np
 
 RF = RandomForestClassifier(n_estimators=100)
 gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 5), random_state=1, max_iter=5000)
 SVM = svm.SVC(kernel='linear', C=1)
-regr = RandomForestRegressor(max_depth=2, random_state=0)
+regr = RandomForestRegressor(max_depth=100, random_state=0)
 reg = LinearRegression()
-mltreg = MultiOutputRegressor(reg)
-predictor = mltreg
+mltreg = MultiOutputRegressor(regr)
+predictor = regr
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
@@ -33,13 +35,14 @@ input_data = pd.read_csv(dataset_source)
 training_input_columns = input_bowling_columns.copy()
 training_input_columns.remove("player_name")
 
-scaler = preprocessing.StandardScaler().fit(input_data)
-data_scaled = scaler.transform(input_data)
-final_df = pd.DataFrame(data=data_scaled, columns=input_data.columns)
-input_data = final_df
-
 X = input_data[training_input_columns]
-y = input_data[output_bowling_columns]  # Labels
+y = input_data["runs_conceded"]  # Labels
+
+scaler = preprocessing.StandardScaler().fit(X)
+data_scaled = scaler.transform(X)
+final_df = pd.DataFrame(data=data_scaled, columns=X.columns)
+X = final_df
+
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 train_set = 1465
 X_train = X.iloc[:train_set, :]
@@ -67,7 +70,7 @@ def predict_bowling(dataset):
 
 
 def bowling_predict_test():
-    # y_pred = predictor.predict(X_test)
+    y_pred = predictor.predict(X_test)
     #
     # comparison = {}
     # comparison["actual"] = y_test.to_numpy()
@@ -77,7 +80,24 @@ def bowling_predict_test():
     #     print(comparison["actual"][i], " ", comparison["predicted"][i], "", )
     #
     # print("Error:", metrics.mean_absolute_error(y_test, y_pred))
-    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
+
+    plt.figure(figsize=(6 * 1.618, 6))
+    index = np.arange(len(X.columns))
+    bar_width = 0.35
+    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    plt.ylabel('features')
+    plt.xlabel('importance')
+    plt.title('Feature importance')
+    plt.yticks(index, X.columns)
+    plt.tight_layout()
+    plt.show()
+
+    print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+    print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+    print('R2:', metrics.r2_score(y_test, y_pred))
+
+    # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
 
 
 if __name__ == "__main__":

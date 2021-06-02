@@ -134,7 +134,9 @@ if __name__ == "__main__":
         bowling_df = bowling_df.loc[:, bowling_df.columns != "toss"]
         bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
         bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
-        final_df = pd.merge(batting_df, bowling_df, on="player_name", how="left").fillna(0)
+        final_df = pd.merge(batting_df, bowling_df, on="player_name", how="left")
+        # final_df = final_df.fillna(final_df.mean())
+        # final_df = final_df.fillna(0)
         df_array.append(final_df)
     parent_df = pd.concat(df_array, ignore_index=True)
     parent_df.to_csv("final_dataset.csv", index=False)
