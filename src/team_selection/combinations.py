@@ -41,12 +41,12 @@ file_object = open('batting_combinations.txt', 'a')
 #         file_object.write(str(list(player_set)) + "\n")
 # file_object.close()
 
-file_object = open('bowling_combinations.txt', 'a')
-
-# for i in range(5, 11):
-#     print(i)
-player_comb = combinations(bowlers, 6)
-for player_set in player_comb:
-    print(player_set)
-    file_object.write(str(list(player_set)) + "\n")
-file_object.close()
+# file_object = open('bowling_combinations.txt', 'a')
+#
+# # for i in range(5, 11):
+# #     print(i)
+# player_comb = combinations(bowlers, 8)
+# for player_set in player_comb:
+#     print(player_set)
+#     file_object.write(str(list(player_set)) + "\n")
+# file_object.close()
