@@ -18,42 +18,44 @@ def get_bowling_df(player_list, match_id):
 
     data_array = []
 
-    for player in player_list.iterrows():
-        player_obj = player[1]
-        player_id = player_obj[0]
-        player_name = player_obj[1]
-        player_form = get_player_metric(match_id, "bowling", player_obj, "form", "season", season_id - 1)
-        player_venue = get_player_metric(match_id, "bowling", player_obj, "venue", "venue", venue_id)
-        player_opposition = get_player_metric(match_id, "bowling", player_obj, "opposition", "opposition",
-                                              opposition_id)
+    if score > 0:
 
-        runs, deliveries, wickets, econ = get_bowling_data(match_id, player_id)
-        if score == 0 or score is None or runs == 0 or runs is None:
-            contribution = 0
-        else:
-            contribution = runs / score
-        data_array.append([player[1]["bowling_consistency"],
-                           player_form,
-                           temp,
-                           wind,
-                           rain,
-                           humidity,
-                           cloud,
-                           pressure,
-                           encode_viscosity(viscosity),
-                           inning,
-                           encode_session(session),
-                           toss,
-                           player_venue,
-                           player_opposition,
-                           season_id,
-                           player_name,
-                           runs,
-                           deliveries,
-                           wickets,
-                           contribution,
-                           econ
-                           ])
+        for player in player_list.iterrows():
+            player_obj = player[1]
+            player_id = player_obj[0]
+            player_name = player_obj[1]
+            player_form = get_player_metric(match_id, "bowling", player_obj, "form", "season", season_id - 1)
+            player_venue = get_player_metric(match_id, "bowling", player_obj, "venue", "venue", venue_id)
+            player_opposition = get_player_metric(match_id, "bowling", player_obj, "opposition", "opposition",
+                                                  opposition_id)
+
+            runs, deliveries, wickets, econ = get_bowling_data(match_id, player_id)
+            if score == 0 or score is None or runs == 0 or runs is None:
+                contribution = 0
+            else:
+                contribution = runs / score
+            data_array.append([player[1]["bowling_consistency"],
+                               player_form,
+                               temp,
+                               wind,
+                               rain,
+                               humidity,
+                               cloud,
+                               pressure,
+                               encode_viscosity(viscosity),
+                               inning,
+                               encode_session(session),
+                               toss,
+                               player_venue,
+                               player_opposition,
+                               season_id,
+                               player_name,
+                               runs,
+                               deliveries,
+                               wickets,
+                               contribution,
+                               econ
+                               ])
     return pd.DataFrame(data_array, columns=all_bowling_columns)
 
 

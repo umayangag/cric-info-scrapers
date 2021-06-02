@@ -7,4 +7,5 @@ def import_keepers_data(db_connection, filename):
     for index, row in keepers.iterrows():
         name = row['Name']
         db_cursor.execute(f'UPDATE player SET is_wicket_keeper = 1 WHERE player.player_name LIKE "{name}"')
+    db_cursor.execute(f'UPDATE player SET is_wicket_keeper = 0 WHERE player.is_wicket_keeper IS NULL')
     db_connection.commit()

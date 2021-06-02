@@ -3,6 +3,7 @@ import csv
 from datetime import datetime
 from shared.utils import *
 
+
 def import_match_details(db_connection, filename):
     db_cursor = db_connection.cursor()
     with open(filename) as csv_file:
@@ -23,13 +24,15 @@ def import_match_details(db_connection, filename):
                 season = row[18]
                 seasonId = get_record_id(db_connection, "season", season)
 
-                toss =0
+                toss = 0
                 if row[17] == "TRUE":
                     toss = 1
 
-                result = 0
+                result = -1
                 if row[7] == "won":
                     result = 1
+                elif row[7] == "lost":
+                    result = 0
 
                 match_number = row[19].replace("ODI No. ", "", 1)
 

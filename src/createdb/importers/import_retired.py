@@ -9,4 +9,5 @@ def import_retired_data(db_connection, filename):
     for index, row in retired.iterrows():
         name = row['Name']
         db_cursor.execute(f'UPDATE player SET is_retired = 1 WHERE player.player_name LIKE "{name}"')
+    db_cursor.execute(f'UPDATE player SET is_retired = 0 WHERE player.is_retired IS NULL')
     db_connection.commit()
