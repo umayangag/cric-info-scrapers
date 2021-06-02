@@ -20,77 +20,79 @@ clf = MLPClassifier(solver='lbfgs', activation='relu', alpha=1e-5, hidden_layer_
                     max_iter=10000)
 SVM = svm.SVC(kernel='linear', C=1)
 
+predictor = RF
+
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "..\\team_selection\\final_dataset.csv")
 
+input_data = pd.read_csv(dataset_source)
+X = input_data[[
+    'batting_consistency',
+    'batting_form',
+    'batting_temp',
+    'batting_wind',
+    'batting_rain',
+    'batting_humidity',
+    'batting_cloud',
+    'batting_pressure',
+    'batting_viscosity',
+    'batting_inning',
+    'batting_session',
+    'toss',
+    'venue',
+    'opposition',
+    'season',
+    'runs_scored',
+    'balls_faced',
+    'fours_scored',
+    'sixes_scored',
+    'batting_position',
+    'batting_contribution',
+    'strike_rate',
+    'total_score',
+    'total_wickets',
+    'total_balls',
+    'target',
+    'extras',
+    'match_number',
+    'bowling_consistency',
+    'bowling_form',
+    'bowling_temp',
+    'bowling_wind',
+    'bowling_rain',
+    'bowling_humidity',
+    'bowling_cloud',
+    'bowling_pressure',
+    'bowling_viscosity',
+    'bowling_session',
+    'bowling_venue',
+    'bowling_opposition',
+    'runs_conceded',
+    'deliveries',
+    'wickets_taken',
+    'bowling_contribution',
+    "econ"
+]]
+y = input_data["result"]  # Labels
+oversample = SMOTE()
+X, y = oversample.fit_resample(X, y)
+
+scaler = preprocessing.StandardScaler().fit(X)
+data_scaled = scaler.transform(X)
+X = pd.DataFrame(data=data_scaled, columns=X.columns)
+train_set = 2423
+
+X_train = X.iloc[:train_set, :]
+X_test = X.iloc[train_set + 1:, :]
+y_train = y.iloc[:train_set]
+y_test = y.iloc[train_set + 1:]
+
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+#
+predictor.fit(X_train, y_train)
+
 
 def batting_predict(predictor):
-    input_data = pd.read_csv(dataset_source)
-    X = input_data[[
-        'batting_consistency',
-        'batting_form',
-        'batting_temp',
-        'batting_wind',
-        'batting_rain',
-        'batting_humidity',
-        'batting_cloud',
-        'batting_pressure',
-        'batting_viscosity',
-        'batting_inning',
-        'batting_session',
-        'toss',
-        'venue',
-        'opposition',
-        'season',
-        'runs_scored',
-        'balls_faced',
-        'fours_scored',
-        'sixes_scored',
-        'batting_position',
-        'batting_contribution',
-        'strike_rate',
-        'total_score',
-        'total_wickets',
-        'total_balls',
-        'target',
-        'extras',
-        'match_number',
-        'bowling_consistency',
-        'bowling_form',
-        'bowling_temp',
-        'bowling_wind',
-        'bowling_rain',
-        'bowling_humidity',
-        'bowling_cloud',
-        'bowling_pressure',
-        'bowling_viscosity',
-        'bowling_session',
-        'bowling_venue',
-        'bowling_opposition',
-        'runs_conceded',
-        'deliveries',
-        'wickets_taken',
-        'bowling_contribution',
-        "econ"
-    ]]
-    y = input_data["result"]  # Labels
-    oversample = SMOTE()
-    X, y = oversample.fit_resample(X, y)
-
-    scaler = preprocessing.StandardScaler().fit(X)
-    data_scaled = scaler.transform(X)
-    X = pd.DataFrame(data=data_scaled, columns=X.columns)
-    print(X)
-    train_set = 2423
-
-    X_train = X.iloc[:train_set, :]
-    X_test = X.iloc[train_set + 1:, :]
-    y_train = y.iloc[:train_set]
-    y_test = y.iloc[train_set + 1:]
-
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-    #
-    predictor.fit(X_train, y_train)
     y_pred = predictor.predict(X_test)
     # probability = predictor.predict_proba(X_test)
     # print(type(y_pred), type(y_test))
@@ -106,8 +108,6 @@ def batting_predict(predictor):
     print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean())
     print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
-    print(X.columns)
-    print(predictor.feature_importances_)
     plt.figure(figsize=(6 * 1.618, 6))
     index = np.arange(len(X.columns))
     bar_width = 0.35
@@ -115,7 +115,7 @@ def batting_predict(predictor):
     plt.ylabel('features')
     plt.xlabel('importance')
     plt.title('Feature importance')
-    plt.yticks(index,X.columns)
+    plt.yticks(index, X.columns)
     plt.tight_layout()
     plt.show()
     # print(predictor.coefs_)
