@@ -38,10 +38,13 @@ training_input_columns.remove("player_name")
 X = input_data[training_input_columns]
 y = input_data[output_bowling_columns]  # Labels
 
-scaler = preprocessing.StandardScaler().fit(X)
-data_scaled = scaler.transform(X)
-final_df = pd.DataFrame(data=data_scaled, columns=X.columns)
-X = final_df
+input_scaler = preprocessing.StandardScaler().fit(X)
+input_data_scaled = input_scaler.transform(X)
+X = pd.DataFrame(data=input_data_scaled, columns=X.columns)
+
+output_scaler = preprocessing.StandardScaler().fit(y)
+output_data_scaled = output_scaler.transform(y)
+y = pd.DataFrame(data=output_data_scaled, columns=y.columns)
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 train_set = 1465
@@ -61,8 +64,9 @@ def calculate_econ(row):
 
 
 def predict_bowling(dataset):
-    predicted = predictor.predict(dataset)
-    result = pd.DataFrame(predicted, columns=output_bowling_columns)
+    scaled_dataset = input_scaler.transform(dataset)
+    predicted = predictor.predict(scaled_dataset)
+    result = pd.DataFrame(output_scaler.inverse_transform(predicted), columns=output_bowling_columns)
     for column in y.columns:
         dataset[column] = result[column]
     dataset["econ"] = dataset.apply(lambda row: calculate_econ(row), axis=1)
@@ -71,33 +75,22 @@ def predict_bowling(dataset):
 
 def bowling_predict_test():
     y_pred = predictor.predict(X_test)
-    #
-    # comparison = {}
-    # comparison["actual"] = y_test.to_numpy()
-    # comparison["predicted"] = y_pred
-    #
-    # for i in range(0, len(y_pred)):
-    #     print(comparison["actual"][i], " ", comparison["predicted"][i], "", )
-    #
+
+    comparison = {}
+    comparison["actual"] = y_test.to_numpy()
+    comparison["predicted"] = y_pred
+
+    for i in range(0, len(y_pred)):
+        print(comparison["actual"][i], " ", comparison["predicted"][i], "", )
+
     # print("Error:", metrics.mean_absolute_error(y_test, y_pred))
+    #
+    # print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+    # print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+    # print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+    # print('R2:', metrics.r2_score(y_test, y_pred))
 
-    plt.figure(figsize=(6 * 1.618, 6))
-    index = np.arange(len(X.columns))
-    bar_width = 0.35
-    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    plt.ylabel('features')
-    plt.xlabel('importance')
-    plt.title('Feature importance')
-    plt.yticks(index, X.columns)
-    plt.tight_layout()
-    plt.show()
-
-    print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
-    print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
-    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
-    print('R2:', metrics.r2_score(y_test, y_pred))
-
-    # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
+    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
 
 
 if __name__ == "__main__":

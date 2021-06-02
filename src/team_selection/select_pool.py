@@ -84,7 +84,6 @@ def get_batting_performance(player_list, match_id):
                            player_name])
     dataset = pd.DataFrame(data_array, columns=input_batting_columns)
     predicted = predict_batting(dataset.loc[:, dataset.columns != "player_name"])
-    print(predicted)
     predicted["player_name"] = dataset["player_name"]
     return predicted
 
@@ -110,7 +109,7 @@ if __name__ == "__main__":
     bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
     bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
     player_pool = pd.merge(batting_df, bowling_df, on="player_name", how="left")
-    # player_pool = fill_missing_attributes(player_pool)
+    player_pool = fill_missing_attributes(player_pool)
     player_pool.to_csv("pool.csv", index=False)
 
     # batsmen_pool = player_pool[player_pool["bowling_consistency"] == 0]

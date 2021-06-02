@@ -25,7 +25,7 @@ RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=Fal
 gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(4, 3), random_state=1)
 SVM = svm.SVC(kernel='linear', C=1)
-regr = RandomForestRegressor(max_depth=4, n_estimators=4,criterion='mse', max_features='auto', min_impurity_decrease=0, random_state=0)
+regr = RandomForestRegressor(max_depth=100, n_estimators=100, max_features='auto', random_state=0)
 reg = LinearRegression()
 mltreg = MultiOutputRegressor(regr)
 predictor = mltreg
@@ -40,10 +40,13 @@ training_input_columns.remove("player_name")
 X = input_data[training_input_columns]
 y = input_data[output_batting_columns]  # Labels
 
-scaler = preprocessing.StandardScaler().fit(X)
-data_scaled = scaler.transform(X)
-final_df = pd.DataFrame(data=data_scaled, columns=training_input_columns)
-X = final_df
+input_scaler = preprocessing.StandardScaler().fit(X)
+input_data_scaled = input_scaler.transform(X)
+X = pd.DataFrame(data=input_data_scaled, columns=X.columns)
+
+output_scaler = preprocessing.StandardScaler().fit(y)
+output_data_scaled = output_scaler.transform(y)
+y = pd.DataFrame(data=output_data_scaled, columns=y.columns)
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 train_set = 2107
@@ -53,6 +56,7 @@ y_train = y.iloc[:train_set]
 y_test = y.iloc[train_set + 1:]
 predictor.fit(X_train, y_train)
 
+
 def calculate_strike_rate(row):
     if row["balls_faced"] == 0:
         return 0
@@ -60,8 +64,9 @@ def calculate_strike_rate(row):
 
 
 def predict_batting(dataset):
-    predicted = predictor.predict(dataset)
-    result = pd.DataFrame(predicted, columns=output_batting_columns)
+    scaled_dataset = input_scaler.transform(dataset)
+    predicted = predictor.predict(scaled_dataset)
+    result = pd.DataFrame(output_scaler.inverse_transform(predicted), columns=output_batting_columns)
     for column in y.columns:
         dataset[column] = result[column]
     dataset["strike_rate"] = dataset.apply(lambda row: calculate_strike_rate(row), axis=1)
@@ -72,16 +77,17 @@ def batting_predict_test():
     y_pred = predictor.predict(X_test)
     # print(X_test)
     comparison = {}
-    comparison["actual"] = y_test.to_numpy()
-    comparison["predicted"] = y_pred
+    comparison["actual"] = output_scaler.inverse_transform(y_test)
+    comparison["predicted"] = output_scaler.inverse_transform(y_pred)
 
     for i in range(0, len(y_pred)):
         print(comparison["actual"][i], " ", comparison["predicted"][i], "")
-    print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
-    print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
-    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
-    print('R2:', metrics.r2_score(y_test, y_pred))
 
+    # print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+    # print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+    # print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+    # print('R2:', metrics.r2_score(y_test, y_pred))
+    #
     # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).mean())
 
 
