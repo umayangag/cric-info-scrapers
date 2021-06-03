@@ -133,7 +133,13 @@ if __name__ == "__main__":
 
     bowlers = player_performance_predictions[player_performance_predictions["bowling_consistency"] > 0]
     batsmen = player_performance_predictions[player_performance_predictions["bowling_consistency"] == 0]
-    batsmen["winning_probability"] = batsmen["winning_probability"] * 1.9
+
+
+    def normalize_batting_probability(value):
+        return value * 2
+
+
+    batsmen["winning_probability"] = batsmen["winning_probability"].apply(normalize_batting_probability)
     player_performance_predictions = pd.concat([bowlers, batsmen])
 
     print(player_performance_predictions[
