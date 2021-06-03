@@ -12,7 +12,7 @@ def calculate_batting_consistency(db_connection):
             f'SELECT description, runs, balls, minutes, fours, sixes, strike_rate FROM batting_data where player_id={player[0]}')
         player_data = db_cursor.fetchall()
         inning_count = len(player_data)
-        if inning_count > 5:
+        if inning_count > 10:
             df = pd.DataFrame(player_data)
             not_out_count = len(df[df[0] == "not out"])
             sum_of_runs = df[1].sum()

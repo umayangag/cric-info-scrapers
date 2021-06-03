@@ -27,7 +27,7 @@ def calculate_batting_venue(db_connection):
                 f'and venue_id = {venue[0]};')
             player_data = db_cursor.fetchall()
             inning_count = len(player_data)
-            if inning_count > 0:
+            if inning_count > 5:
                 df = pd.DataFrame(player_data)
                 not_out_count = len(df[df[0] == "not out"])
                 sum_of_runs = df[1].sum()

@@ -12,7 +12,7 @@ def calculate_bowling_consistency(db_connection):
             f'SELECT balls, runs, wickets, econ FROM bowling_data where player_id={player[0]}')
         player_data = db_cursor.fetchall()
         inning_count = len(player_data)
-        if inning_count > 5:
+        if inning_count > 10:
             df = pd.DataFrame(player_data)
             total_overs = df[0].sum() / 6
             strike_rate = df[0].sum() / df[2].sum()

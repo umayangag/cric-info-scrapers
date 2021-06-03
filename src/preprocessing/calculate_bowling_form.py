@@ -30,7 +30,7 @@ def calculate_bowling_form(db_connection):
                 f'and season_id = {season_id};')
             player_data = db_cursor.fetchall()
             inning_count = len(player_data)
-            if inning_count > 0:
+            if inning_count > 5:
                 df = pd.DataFrame(player_data)
                 total_overs = df[0].sum() / 6
                 if df[2].sum() == 0:
