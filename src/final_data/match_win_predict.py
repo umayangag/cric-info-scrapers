@@ -125,7 +125,7 @@ def batting_predict(predictor):
 
 def predict_for_team(team_data):
     team_performance = team_data.copy()
-    predicted = RF.predict_proba(team_performance)
+    predicted = predictor.predict_proba(team_performance)
     df = pd.DataFrame(predicted, columns=["lose", "win"])
     team_performance["winning_probability"] = df["win"].to_numpy()
     return team_performance, df["win"].mean()
