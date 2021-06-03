@@ -124,9 +124,6 @@ if __name__ == "__main__":
     # print(batsmen_pool.columns)
     # print(batsmen_pool["player_name"])
     # print(bowlers_pool["player_name"])
-    # TODO select 10 batsmen and 10 bowlers
-    # TODO get combinations of 11
-    short_listed = actual_team_players(player_pool, match_id)
     # print(short_listed["player_name"])
 
     calculated_team = calculate_overall_performance(player_pool, match_id)
@@ -134,7 +131,55 @@ if __name__ == "__main__":
     player_performance_predictions, overall_win_probability = predict_for_team(calculated_team_without_names)
     player_performance_predictions["player_name"] = calculated_team["player_name"]
 
+    bowlers = player_performance_predictions[player_performance_predictions["bowling_consistency"] > 0]
+    batsmen = player_performance_predictions[player_performance_predictions["bowling_consistency"] == 0]
+    batsmen["winning_probability"] = batsmen["winning_probability"] * 1.9
+    player_performance_predictions = pd.concat([bowlers, batsmen])
+
     print(player_performance_predictions[
-        ["player_name", "runs_scored", "econ", "wickets_taken", "winning_probability"]].sort_values(
+        ["player_name", "runs_scored", "runs_conceded", "econ", "wickets_taken", "winning_probability"]].sort_values(
         by="winning_probability", ascending=False))
-    print(overall_win_probability)
+
+    # bowlers = player_performance_predictions[player_performance_predictions["bowling_consistency"] > 0] \
+    #     .sort_values(by=["econ", "wickets_taken", "winning_probability"], ascending=[True, False, False])
+    #
+    # batsmen = player_performance_predictions[player_performance_predictions["bowling_consistency"] == 0] \
+    #     .sort_values(by=["runs_scored", "strike_rate", "winning_probability"], ascending=[False, False, False])
+    #
+    # print(batsmen[["runs_scored", "strike_rate", "winning_probability", "player_name"]])
+    # print(bowlers[["econ", "wickets_taken", "winning_probability", "player_name"]])
+    #
+    # max_margin = -100000
+    # final_team = 0
+    # for no_of_bowlers in range(5, 12):
+    #     selected_bowlers = bowlers[:no_of_bowlers]
+    #     selected_batsmen = batsmen[:11 - no_of_bowlers]
+    #     final = pd.concat([selected_bowlers, selected_batsmen])
+    #     margin = final["runs_scored"].sum() - final["runs_conceded"].sum()
+    #     if margin > max_margin:
+    #         max_margin = margin
+    #         final_team = final
+    #     print("Winning margin", no_of_bowlers, margin)
+    # print(final_team[["runs_scored", "econ", "player_name", "winning_probability"]])
+    #
+    # calculated_team = calculate_overall_performance(final_team, match_id)
+    # calculated_team_without_names = calculated_team.loc[:, calculated_team.columns != "player_name"]
+    # calculated_team_without_names = calculated_team_without_names.loc[:,
+    #                                 calculated_team_without_names.columns != "winning_probability"]
+    # player_performance_predictions, overall_win_probability = predict_for_team(calculated_team_without_names)
+    # player_performance_predictions["player_name"] = calculated_team["player_name"]
+    #
+    # print(player_performance_predictions)
+    # print(overall_win_probability)
+    #
+    # short_listed = actual_team_players(player_pool, match_id)
+    #
+    # calculated_team = calculate_overall_performance(short_listed, match_id)
+    # calculated_team_without_names = calculated_team.loc[:, calculated_team.columns != "player_name"]
+    # player_performance_predictions, overall_win_probability = predict_for_team(calculated_team_without_names)
+    # player_performance_predictions["player_name"] = calculated_team["player_name"]
+    #
+    # print(player_performance_predictions)
+    # print(overall_win_probability)
+
+# pick the team with highest winning margin
