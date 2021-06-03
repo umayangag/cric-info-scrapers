@@ -132,7 +132,7 @@ def predict_for_team(team_data):
 
 
 if __name__ == "__main__":
-    batting_predict(RF)
+    batting_predict(predictor)
     # values = []
     # for i in range(1, 20):
     #     for j in range(1, 20):

@@ -129,10 +129,10 @@ if __name__ == "__main__":
     short_listed = actual_team_players(player_pool, match_id)
     # print(short_listed["player_name"])
 
-    calculated_team = calculate_overall_performance(short_listed, match_id)
+    calculated_team = calculate_overall_performance(player_pool, match_id)
     calculted_team_without_names = calculated_team.loc[:, calculated_team.columns != "player_name"]
     player_performance_predictions, overall_win_probability = predict_for_team(calculted_team_without_names)
     player_performance_predictions["player_name"] = calculated_team["player_name"]
 
-    print(player_performance_predictions)
+    print(player_performance_predictions[["player_name","runs_scored","balls_faced","winning_probability"]].sort_values(by="winning_probability", ascending=False))
     print(overall_win_probability)

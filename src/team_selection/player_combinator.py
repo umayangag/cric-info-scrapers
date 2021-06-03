@@ -8,23 +8,21 @@ def actual_team_players(pool_df, match_id):
 
 def calculate_overall_performance(input_df, match_id):
     team_df = input_df.copy()
-    if len(team_df) > 11:
-        print("invalid number of players in team. only 11 allowed")
-        return team_df
+    magic_number = 11 / len(team_df)
     extras = 14.26
-    total_score = team_df["runs_scored"].sum() + extras
+    total_score = team_df["runs_scored"].sum()*magic_number + extras
 
     def calculate_contribution(row, key):
         return row[key] / total_score
 
-    team_df["total_score"] = total_score
+    team_df["total_score"] = total_score*magic_number
     team_df["total_wickets"] = 7.59
-    team_df["total_balls"] = team_df["balls_faced"].sum()
-    team_df["target"] = team_df["runs_scored"].sum()
+    team_df["total_balls"] = team_df["balls_faced"].sum()*magic_number
+    team_df["target"] = team_df["runs_scored"].sum()*magic_number
     team_df["extras"] = extras
     team_df["match_number"] = match_id
 
-    print(total_score, team_df["runs_conceded"].sum())
+    print(total_score, team_df["runs_conceded"].sum()*magic_number)
 
     team_df["bowling_contribution"] = team_df.apply(lambda row: calculate_contribution(row, "runs_conceded"), axis=1)
     team_df["batting_contribution"] = team_df.apply(lambda row: calculate_contribution(row, "runs_scored"), axis=1)
