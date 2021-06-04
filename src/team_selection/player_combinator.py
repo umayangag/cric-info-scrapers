@@ -51,7 +51,7 @@ def calculate_overall_performance(input_df, match_id):
     # TODO: for evaluation
     # SELECT * FROM `match_details` WHERE `wickets` < 10 AND `balls` < 300 AND `target` IS NOT NULL
     # where the team stopped batting, since they have chased the opposition target before the 50 overs
-    # need to compare predicted score with score for 50 overs
+    # need to compare predicted score with score for 50 overs. because the predicted score will always be high
 
     return team_df
 
