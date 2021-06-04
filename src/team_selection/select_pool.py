@@ -122,11 +122,19 @@ if __name__ == "__main__":
     player_performance_predictions, overall_win_probability = predict_for_team(calculated_team_without_names)
     player_performance_predictions["player_name"] = calculated_team["player_name"]
 
-    selected = player_performance_predictions.sort_values(
+    predicted_team = player_performance_predictions.sort_values(
         by="winning_probability", ascending=False)[:11]
-    print(selected[["player_name", "runs_scored", "runs_conceded", "econ", "wickets_taken", "winning_probability"]])
 
-    calculated_team = calculate_overall_performance(selected, match_id)
+    calculated_team = calculate_overall_performance(predicted_team, match_id)
 
     print(calculated_team.sort_values(by="batting_position", ascending=True)[
+              ["player_name", "runs_scored", "runs_conceded", "econ", "wickets_taken", "winning_probability"]])
+
+    # ---------------------------------------------------------------
+
+    actual_team = actual_team_players(player_performance_predictions, match_id)
+
+    actual_team = calculate_overall_performance(actual_team, match_id)
+
+    print(actual_team.sort_values(by="batting_position", ascending=True)[
               ["player_name", "runs_scored", "runs_conceded", "econ", "wickets_taken", "winning_probability"]])
