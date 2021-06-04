@@ -105,7 +105,7 @@ def get_batting_df(player_list, match_id):
                                balls,
                                fours,
                                sixes,
-                               strike_rate,
+                               batting_position,
                                contribution,
                                strike_rate,
                                score,

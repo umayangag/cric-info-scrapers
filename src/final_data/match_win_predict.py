@@ -16,11 +16,11 @@ import numpy as np
 RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=False, max_depth=100,
                             class_weight={0: 1, 1: 1})
 gnb = GaussianNB()
-clf = MLPClassifier(solver='lbfgs', activation='relu', alpha=1e-5, hidden_layer_sizes=(10, 4), random_state=1,
+clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(43, 11, 1), random_state=1,
                     max_iter=10000)
 SVM = svm.SVC(kernel='linear', C=1)
 
-predictor = RF
+predictor = clf
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "..\\team_selection\\final_dataset.csv")
@@ -41,7 +41,7 @@ X = input_data[[
     'toss',
     'venue',
     'opposition',
-    'season',
+    # 'season',
     'runs_scored',
     'balls_faced',
     'fours_scored',
@@ -54,7 +54,7 @@ X = input_data[[
     'total_balls',
     'target',
     'extras',
-    'match_number',
+    # 'match_number',
     'bowling_consistency',
     'bowling_form',
     'bowling_temp',
@@ -73,6 +73,7 @@ X = input_data[[
     'bowling_contribution',
     "econ"
 ]]
+print(len(X.columns))
 y = input_data["result"]  # Labels
 oversample = SMOTE()
 X, y = oversample.fit_resample(X, y)
@@ -105,25 +106,26 @@ def batting_predict(predictor):
     # print("Score:", predictor.score(X_test, y_test))
     accuracy = metrics.accuracy_score(y_test, y_pred)
     print("Accuracy:", accuracy)
-    print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean())
+    print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).min())
     print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
-    plt.figure(figsize=(6 * 1.618, 6))
-    index = np.arange(len(X.columns))
-    bar_width = 0.35
-    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    plt.ylabel('features')
-    plt.xlabel('importance')
-    plt.title('Feature importance')
-    plt.yticks(index, X.columns)
-    plt.tight_layout()
-    plt.show()
+    # plt.figure(figsize=(6 * 1.618, 6))
+    # index = np.arange(len(X.columns))
+    # bar_width = 0.35
+    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    # plt.ylabel('features')
+    # plt.xlabel('importance')
+    # plt.title('Feature importance')
+    # plt.yticks(index, X.columns)
+    # plt.tight_layout()
+    # plt.show()
     # print(predictor.coefs_)
     # print(predictor.get_params())
     return accuracy
 
 
 def predict_for_team(team_data):
+    print(set(X.columns) - set(team_data.columns))
     team_performance = team_data.copy()
     predicted = predictor.predict_proba(team_performance)
     df = pd.DataFrame(predicted, columns=["lose", "win"])
