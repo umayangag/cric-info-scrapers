@@ -1,25 +1,14 @@
 import pandas as pd
 import os
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import cross_val_score
-from sklearn import svm
 from sklearn import preprocessing
-import matplotlib.pyplot as plt
-import numpy as np
 
-RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=False, max_depth=100,
-                            class_weight={0: 1, 1: 1})
-gnb = GaussianNB()
 clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(43, 11, 1), random_state=1,
                     max_iter=10000)
-SVM = svm.SVC(kernel='linear', C=1)
-
 predictor = clf
 
 dirname = os.path.dirname(__file__)
