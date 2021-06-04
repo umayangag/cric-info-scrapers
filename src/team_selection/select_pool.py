@@ -112,21 +112,6 @@ if __name__ == "__main__":
     # player_pool = fill_missing_attributes(player_pool)
     # player_pool.to_csv("pool.csv", index=False)
     player_pool = pd.read_csv("pool.csv")
-    # player_pool = player_pool.loc[:, player_pool.columns != "result"]
-    # player_pool = player_pool.loc[:, player_pool.columns != "season"]
-    #
-    # batsmen_pool = player_pool[player_pool["bowling_consistency"] == 0]
-    # bowlers_pool = player_pool[player_pool["bowling_consistency"] > 0]
-    #
-    # print(batsmen_pool[["player_name", "strike_rate", "runs_scored"]]
-    #       .sort_values(by="strike_rate", ascending=False)[:10])
-    # print(bowlers_pool[["player_name", "econ", "wickets_taken", "runs_conceded"]]
-    #       .sort_values(by="econ", ascending=True)[:10])
-
-    # print(batsmen_pool.columns)
-    # print(batsmen_pool["player_name"])
-    # print(bowlers_pool["player_name"])
-    # print(short_listed["player_name"])
 
     calculated_team = calculate_overall_performance(player_pool, match_id)
     calculated_team_without_names = calculated_team.loc[:, calculated_team.columns != "player_name"]
@@ -137,15 +122,11 @@ if __name__ == "__main__":
     player_performance_predictions, overall_win_probability = predict_for_team(calculated_team_without_names)
     player_performance_predictions["player_name"] = calculated_team["player_name"]
 
-    bowlers = player_performance_predictions[player_performance_predictions["bowling_consistency"] > 0]
-    batsmen = player_performance_predictions[player_performance_predictions["bowling_consistency"] == 0]
-
-    # def normalize_batting_probability(value):
-    #     return value * 2
-
-    # batsmen["winning_probability"] = batsmen["winning_probability"].apply(normalize_batting_probability)
-    player_performance_predictions = pd.concat([bowlers, batsmen])
-
     selected = player_performance_predictions.sort_values(
         by="winning_probability", ascending=False)[:11]
     print(selected[["player_name", "runs_scored", "runs_conceded", "econ", "wickets_taken", "winning_probability"]])
+
+    calculated_team = calculate_overall_performance(selected, match_id)
+
+    print(calculated_team.sort_values(by="batting_position", ascending=True)[
+              ["player_name", "runs_scored", "runs_conceded", "econ", "wickets_taken", "winning_probability"]])
