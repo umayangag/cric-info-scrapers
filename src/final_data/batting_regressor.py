@@ -1,26 +1,15 @@
 import pandas as pd
 import os
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
-from sklearn.neural_network import MLPClassifier
 from sklearn.multioutput import MultiOutputRegressor
-from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
-from sklearn.metrics import confusion_matrix
-from imblearn.over_sampling import SMOTE
-from sklearn.model_selection import cross_val_score
-from sklearn import svm
-import numpy as np
 from sklearn.neural_network import MLPRegressor
 from team_selection.dataset_definitions import *
 from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import numpy as np
 from final_data.smoter import SmoteR
-
-# from sklearn import preprocessing
 
 rfr = RandomForestRegressor(bootstrap=True, min_impurity_decrease=0.0, min_weight_fraction_leaf=0.0, max_depth=100,
                             n_estimators=100, max_features='auto', random_state=0,
@@ -65,10 +54,12 @@ y_test = input_data.loc[input_data['season'] >= season_index][["runs_scored"]]
 cols = X_train.columns.tolist()
 cols.append('runs_scored')
 D = pd.DataFrame(np.concatenate([X_train, y_train], axis=1), columns=cols)
-Xs = SmoteR(D, target='runs_scored', th=0.999, o=300, u=100, k=10, categorical_col=[])
+Xs = SmoteR(D, target='runs_scored', th=0.6, o=2000, u=80, k=4, categorical_col=[])
 
 X_train = Xs.drop(columns=['runs_scored'])
 y_train = Xs[['runs_scored']]
+
+print(len(X_train))
 
 predictor.fit(X_train, y_train.values.ravel())
 
@@ -94,23 +85,23 @@ def batting_predict_test():
     y_pred = predictor.predict(X_test)
     # print(X_test)
 
-    # plt.figure(figsize=(6 * 1.618, 6))
-    # index = np.arange(len(X.columns))
-    # bar_width = 0.35
-    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    # plt.ylabel('features')
-    # plt.xlabel('importance')
-    # plt.title('Feature importance')
-    # plt.yticks(index, X.columns)
-    # plt.tight_layout()
-    # plt.show()
+    plt.figure(figsize=(6 * 1.618, 6))
+    index = np.arange(len(X.columns))
+    bar_width = 0.35
+    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    plt.ylabel('features')
+    plt.xlabel('importance')
+    plt.title('Feature importance')
+    plt.yticks(index, X.columns)
+    plt.tight_layout()
+    plt.show()
 
-    # plt.plot(range(0,len(y_test)), y_test, color='red')
-    # plt.plot(range(0,len(y_pred)), y_pred, color='blue')
-    # plt.title('Actual vs Predicted')
-    # plt.xlabel('Instance')
-    # plt.ylabel('Runs Scored')
-    # plt.show()
+    plt.plot(range(0,len(y_test)), y_test, color='red')
+    plt.plot(range(0,len(y_pred)), y_pred, color='blue')
+    plt.title('Actual vs Predicted')
+    plt.xlabel('Instance')
+    plt.ylabel('Runs Scored')
+    plt.show()
 
     plt.scatter(y_train, predictor.predict(X_train), color='red')
     plt.plot(y_train, y_train, color='blue')

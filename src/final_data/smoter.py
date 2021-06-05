@@ -75,23 +75,23 @@ def SmoteR(D, target, th=0.999, o=200, u=100, k=3, categorical_col=[]):
     y_bar = D[target].median()
 
     # find rare cases where target less than median
-    rareL = D[(relevance(D[target]) > th) & (D[target] > y_bar)]
+    rareL = D[(relevance(D[target], y_bar) > th) & (D[target] > y_bar)]
     # generate rare cases for rareL
     new_casesL = get_synth_cases(rareL, target, o, k, categorical_col)
 
     # find rare cases where target greater than median
-    rareH = D[(relevance(D[target]) > th) & (D[target] < y_bar)]
+    rareH = D[(relevance(D[target], y_bar) > th) & (D[target] < y_bar)]
     # generate rare cases for rareH
     new_casesH = get_synth_cases(rareH, target, o, k, categorical_col)
 
     new_cases = pd.concat([new_casesL, new_casesH], axis=0)
 
     # undersample norm cases
-    norm_cases = D[relevance(D[target]) <= th]
+    norm_cases = D[relevance(D[target], y_bar) <= th]
     # get the number of norm cases
     nr_norm = int(len(norm_cases) * u / 100)
 
-    norm_cases = norm_cases.sample(min(len(D[relevance(D[target]) <= th]), nr_norm))
+    norm_cases = norm_cases.sample(min(len(D[relevance(D[target], y_bar) <= th]), nr_norm))
 
     # get the resulting dataset
     new_D = pd.concat([new_cases, norm_cases], axis=0)
