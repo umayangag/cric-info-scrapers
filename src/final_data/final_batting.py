@@ -1,10 +1,7 @@
 from config.mysql import get_db_connection
 import pandas as pd
-import numpy as np
 from final_data.queries import batting_dataset_query
 import os
-from analyze.cluster_batting import cluster_batting_performance
-from analyze.normalize_batting import normalize_batting_dataset
 from final_data.encoders import *
 from team_selection.dataset_definitions import *
 
@@ -30,12 +27,12 @@ output_file_encoded = os.path.join(dirname, "output\\batting_encoded.csv")
 #     # dataset["performance_index"] = batting_performance["performance_index"]
 #     return dataset
 
-
 def final_batting_dataset(conn):
     db_cursor = conn.cursor()
     db_cursor.execute(batting_dataset_query)
     data_list = db_cursor.fetchall()
     df_encoded = pd.DataFrame(data_list, columns=batting_columns)
+    # df_encoded = df_encoded.loc[df_encoded['runs_scored'] > 0]
 
     df_encoded["batting_session"] = df_encoded["batting_session"].apply(encode_session)
     df_encoded["batting_viscosity"] = df_encoded["batting_viscosity"].apply(encode_viscosity)
