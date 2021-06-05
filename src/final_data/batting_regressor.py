@@ -26,12 +26,18 @@ input_data = pd.read_csv(dataset_source)
 model_output_columns= ["runs_scored"]
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
-training_input_columns.remove("season")
-remove_columns = ["batting_consistency", "batting_form", "batting_wind", "batting_rain", "batting_session"]
+remove_columns = [
+    # "batting_consistency",
+    # "batting_form",
+    # "batting_wind",
+    # "batting_rain",
+    # "batting_session",
+    # "season"
+]
 
 season_index = 20
-training_data = input_data.loc[input_data["season"] < season_index].drop(columns=["season"])
-test_data = input_data.loc[input_data["season"] >= season_index].drop(columns=["season"])
+training_data = input_data.loc[input_data["season"] < season_index]
+test_data = input_data.loc[input_data["season"] >= season_index]
 
 X = training_data[training_input_columns].drop(columns=remove_columns)
 y = training_data[model_output_columns]  # Labels
