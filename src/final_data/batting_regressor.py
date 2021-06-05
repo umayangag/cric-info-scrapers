@@ -18,6 +18,7 @@ from team_selection.dataset_definitions import *
 from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import numpy as np
+from final_data.smoter import SmoteR
 
 # from sklearn import preprocessing
 
@@ -59,6 +60,16 @@ X_train = input_data.loc[input_data['season'] < season_index][training_input_col
 X_test = input_data.loc[input_data['season'] >= season_index][training_input_columns]
 y_train = input_data.loc[input_data['season'] < season_index][["runs_scored"]]
 y_test = input_data.loc[input_data['season'] >= season_index][["runs_scored"]]
+
+# construct the initial dataset for SmoteR
+cols = X_train.columns.tolist()
+cols.append('runs_scored')
+D = pd.DataFrame(np.concatenate([X_train, y_train], axis=1), columns=cols)
+Xs = SmoteR(D, target='runs_scored', th=0.999, o=300, u=100, k=10, categorical_col=[])
+
+X_train = Xs.drop(columns=['runs_scored'])
+y_train = Xs[['runs_scored']]
+
 predictor.fit(X_train, y_train.values.ravel())
 
 

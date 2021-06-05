@@ -8,4 +8,7 @@ def sigmoid(x):
 
 def relevance(x):
     x = np.array(x)
-    return sigmoid(x - 50)
+    y = np.array([])
+    for value in x:
+        y = np.append(y, [sigmoid(value - 50)])
+    return y

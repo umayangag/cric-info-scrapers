@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.neighbors import KNeighborsRegressor
 import numpy as np
 from final_data.relevance import relevance
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 def get_synth_cases(D, target, o=200, k=3, categorical_col=[]):
