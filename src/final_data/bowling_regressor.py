@@ -32,16 +32,17 @@ dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
-model_output_columns= ["wickets_taken"]
+model_output_columns= ["runs_conceded"]
 training_input_columns = input_bowling_columns.copy()
 training_input_columns.remove("player_name")
 remove_columns = [
     # "bowling_consistency",
     # "bowling_form",
-    # "bowling_wind",
-    # "bowling_rain",
-    # "bowling_session",
-    # "season"
+    "bowling_wind",
+    "bowling_rain",
+    "bowling_session",
+    "bowling_viscosity",
+    "toss",
 ]
 
 season_index = 20

@@ -97,8 +97,8 @@ def batting_predict_test():
     plt.tight_layout()
     plt.show()
 
-    plt.plot(range(0, len(y_test)), y_test, color='red')
-    plt.plot(range(0, len(y_pred)), y_pred, color='blue')
+    plt.plot(range(0, len(y_test)), y_test, color='blue')
+    plt.plot(range(0, len(y_pred)), y_pred, color='red')
     plt.title('Actual vs Predicted')
     plt.xlabel('Instance')
     plt.ylabel('Runs Scored')
