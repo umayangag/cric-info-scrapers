@@ -7,7 +7,7 @@ from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import cross_val_score
 from sklearn import preprocessing
 
-clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(43, 11, 1,1), random_state=1,
+clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(43, 11, 1), random_state=1,
                     max_iter=10000)
 predictor = clf
 
