@@ -27,12 +27,12 @@ model_output_columns= output_batting_columns
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
 remove_columns = [
-    # "batting_consistency",
-    # "batting_form",
-    # "batting_wind",
-    # "batting_rain",
-    # "batting_session",
-    # "season"
+    "batting_consistency",
+    "batting_form",
+    "batting_wind",
+    "batting_rain",
+    "batting_session",
+    "season"
 ]
 
 season_index = 20

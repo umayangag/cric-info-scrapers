@@ -27,12 +27,15 @@ model_output_columns= ["runs_scored"]
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
 remove_columns = [
-    # "batting_consistency",
-    # "batting_form",
-    # "batting_wind",
-    # "batting_rain",
-    # "batting_session",
-    # "season"
+    "batting_consistency",
+    "batting_form",
+    "batting_wind",
+    "batting_rain",
+    "batting_session",
+    "season",
+    "batting_viscosity",
+    "batting_inning",
+    "toss"
 ]
 
 season_index = 20
@@ -55,7 +58,7 @@ y_test = pd.DataFrame(data=output_scaler.transform(test_data[model_output_column
 # cols.append('runs_scored')
 # D = pd.DataFrame(np.concatenate([X_train, y_train], axis=1), columns=cols)
 # Xs = SmoteR(D, target='runs_scored', th=0.6, o=2000, u=80, k=4, categorical_col=[])
-
+#
 # X_train = Xs.drop(columns=['runs_scored'])
 # y_train = Xs[['runs_scored']]
 
