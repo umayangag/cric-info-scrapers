@@ -26,13 +26,13 @@ SVM = svm.SVC(kernel='linear', C=1)
 rfr = RandomForestRegressor(max_depth=100, random_state=0)
 reg = LinearRegression()
 mltreg = MultiOutputRegressor(rfr)
-predictor = rfr
+predictor = mltreg
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
-model_output_columns= ["runs_conceded"]
+model_output_columns = output_bowling_columns
 training_input_columns = input_bowling_columns.copy()
 training_input_columns.remove("player_name")
 remove_columns = [
@@ -60,7 +60,7 @@ y_train = pd.DataFrame(data=output_scaler.transform(training_data[model_output_c
 X_test = pd.DataFrame(data=input_scaler.transform(test_data[X.columns]), columns=X.columns)
 y_test = pd.DataFrame(data=output_scaler.transform(test_data[model_output_columns]), columns=model_output_columns)
 
-predictor.fit(X_train, y_train.values.ravel())
+predictor.fit(X_train, y_train)
 
 
 def calculate_econ(row):
@@ -70,7 +70,7 @@ def calculate_econ(row):
 
 
 def predict_bowling(dataset):
-    scaled_dataset = input_scaler.transform(dataset)
+    scaled_dataset = input_scaler.transform(dataset.drop(columns=remove_columns))
     predicted = predictor.predict(scaled_dataset)
     result = pd.DataFrame(output_scaler.inverse_transform(predicted), columns=output_bowling_columns)
     for column in y.columns:

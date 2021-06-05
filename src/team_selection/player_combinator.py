@@ -42,7 +42,7 @@ def calculate_overall_performance(input_df, match_id):
         print("Total Score:", (team_df["runs_scored"].sum() * magic_number) + extras)
 
     if team_df["deliveries"].sum() > 300:
-        print("Runs given:", team_df["runs_conceded"].sum() * 300 / team_df["deliveries"].sum())
+        print("Runs given:", team_df["econ"].sum() * 300 / team_df["deliveries"].sum())
     elif team_df["wickets_taken"].sum() > 10:
         print("Runs given:", team_df["runs_conceded"].sum() * 10 / team_df["wickets_taken"].sum())
     else:
