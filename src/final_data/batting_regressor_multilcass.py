@@ -17,7 +17,7 @@ rfr = RandomForestRegressor(bootstrap=True, min_impurity_decrease=0.0, min_weigh
 lr = LinearRegression()
 mlpr = MLPRegressor(random_state=1, max_iter=2000)
 mltreg = MultiOutputRegressor(rfr)
-predictor = rfr
+predictor = mltreg
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
@@ -33,11 +33,15 @@ training_input_columns.remove("batting_session")
 training_input_columns.remove("season")
 
 X = input_data[training_input_columns]
-y = input_data["runs_scored"]  # Labels
+y = input_data[output_batting_columns]  # Labels
 
 input_scaler = preprocessing.StandardScaler().fit(X)
 input_data_scaled = input_scaler.transform(X)
 X = pd.DataFrame(data=input_data_scaled, columns=X.columns)
+
+output_scaler = preprocessing.StandardScaler().fit(y)
+output_data_scaled = output_scaler.transform(y)
+y = pd.DataFrame(data=output_data_scaled, columns=["runs_scored"])
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 season_index = 20
@@ -55,8 +59,6 @@ Xs = SmoteR(D, target='runs_scored', th=0.6, o=2000, u=80, k=4, categorical_col=
 X_train = Xs.drop(columns=['runs_scored'])
 y_train = Xs[['runs_scored']]
 
-print(len(X_train))
-
 predictor.fit(X_train, y_train.values.ravel())
 
 
@@ -67,10 +69,9 @@ def calculate_strike_rate(row):
 
 
 def predict_batting(dataset):
-    scaled_dataset = dataset
+    scaled_dataset = input_scaler.transform(dataset)
     predicted = predictor.predict(scaled_dataset)
-    result = pd.DataFrame(predicted, columns=output_batting_columns)
-    print(result)
+    result = pd.DataFrame(output_scaler.inverse_transform(predicted), columns=output_batting_columns)
     for column in y.columns:
         dataset[column] = result[column]
     dataset["strike_rate"] = dataset.apply(lambda row: calculate_strike_rate(row), axis=1)
@@ -92,8 +93,8 @@ def batting_predict_test():
     plt.tight_layout()
     plt.show()
 
-    plt.plot(range(0,len(y_test)), y_test, color='red')
-    plt.plot(range(0,len(y_pred)), y_pred, color='blue')
+    plt.plot(range(0, len(y_test)), y_test, color='red')
+    plt.plot(range(0, len(y_pred)), y_pred, color='blue')
     plt.title('Actual vs Predicted')
     plt.xlabel('Instance')
     plt.ylabel('Runs Scored')
