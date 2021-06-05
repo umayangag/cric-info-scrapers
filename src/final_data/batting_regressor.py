@@ -23,7 +23,7 @@ dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
-model_output_columns= ["runs_score"]
+model_output_columns= ["runs_scored"]
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
 training_input_columns.remove("season")
