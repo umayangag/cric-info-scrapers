@@ -1,5 +1,5 @@
 import pandas as pd
-from final_data.batting_regressor import predict_batting
+from final_data.batting_regressor_multilcass import predict_batting
 from final_data.bowling_regressor import predict_bowling
 from team_selection.dataset_definitions import *
 from team_selection.shared.match_data import *
@@ -100,18 +100,18 @@ def get_player_pool():
 
 if __name__ == "__main__":
     match_id = 1193505
-    # players, keepers, bowlers_list = get_player_pool()
-    #
-    # batting_df = get_batting_performance(players, match_id)
-    # bowling_df = get_bowling_performance(bowlers_list, match_id)
-    #
-    # bowling_df = bowling_df.loc[:, bowling_df.columns != "toss"]
-    # bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
-    # bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
-    # player_pool = pd.merge(batting_df, bowling_df, on="player_name", how="left")
-    # player_pool = fill_missing_attributes(player_pool)
-    # player_pool.to_csv("pool.csv", index=False)
-    player_pool = pd.read_csv("pool.csv")
+    players, keepers, bowlers_list = get_player_pool()
+
+    batting_df = get_batting_performance(players, match_id)
+    bowling_df = get_bowling_performance(bowlers_list, match_id)
+
+    bowling_df = bowling_df.loc[:, bowling_df.columns != "toss"]
+    bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
+    bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
+    player_pool = pd.merge(batting_df, bowling_df, on="player_name", how="left")
+    player_pool = fill_missing_attributes(player_pool)
+    player_pool.to_csv("pool.csv", index=False)
+    # player_pool = pd.read_csv("pool.csv")
 
     calculated_team = calculate_overall_performance(player_pool, match_id)
     calculated_team_without_names = calculated_team.loc[:, calculated_team.columns != "player_name"]

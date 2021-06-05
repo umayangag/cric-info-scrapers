@@ -25,41 +25,34 @@ dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
 input_data = pd.read_csv(dataset_source)
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
-training_input_columns.remove("batting_consistency")
-training_input_columns.remove("batting_form")
-training_input_columns.remove("batting_wind")
-training_input_columns.remove("batting_rain")
-training_input_columns.remove("batting_session")
-training_input_columns.remove("season")
+# training_input_columns.remove("batting_consistency")
+# training_input_columns.remove("batting_form")
+# training_input_columns.remove("batting_wind")
+# training_input_columns.remove("batting_rain")
+# training_input_columns.remove("batting_session")
+# training_input_columns.remove("season")
 
+# construct the initial dataset for SmoteR
+input_data = SmoteR(input_data, target='runs_scored', th=0.6, o=2000, u=80, k=4, categorical_col=[])
 X = input_data[training_input_columns]
 y = input_data[output_batting_columns]  # Labels
 
 input_scaler = preprocessing.StandardScaler().fit(X)
-input_data_scaled = input_scaler.transform(X)
-X = pd.DataFrame(data=input_data_scaled, columns=X.columns)
+# input_data_scaled = input_scaler.transform(X)
+# X = pd.DataFrame(data=input_data_scaled, columns=X.columns)
 
 output_scaler = preprocessing.StandardScaler().fit(y)
-output_data_scaled = output_scaler.transform(y)
-y = pd.DataFrame(data=output_data_scaled, columns=["runs_scored"])
+# output_data_scaled = output_scaler.transform(y)
+# y = pd.DataFrame(data=output_data_scaled, columns=output_batting_columns)
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 season_index = 20
 X_train = input_data.loc[input_data['season'] < season_index][training_input_columns]
 X_test = input_data.loc[input_data['season'] >= season_index][training_input_columns]
-y_train = input_data.loc[input_data['season'] < season_index][["runs_scored"]]
-y_test = input_data.loc[input_data['season'] >= season_index][["runs_scored"]]
+y_train = input_data.loc[input_data['season'] < season_index][output_batting_columns]
+y_test = input_data.loc[input_data['season'] >= season_index][output_batting_columns]
 
-# construct the initial dataset for SmoteR
-cols = X_train.columns.tolist()
-cols.append('runs_scored')
-D = pd.DataFrame(np.concatenate([X_train, y_train], axis=1), columns=cols)
-Xs = SmoteR(D, target='runs_scored', th=0.6, o=2000, u=80, k=4, categorical_col=[])
-
-X_train = Xs.drop(columns=['runs_scored'])
-y_train = Xs[['runs_scored']]
-
-predictor.fit(X_train, y_train.values.ravel())
+predictor.fit(X_train, y_train)
 
 
 def calculate_strike_rate(row):
