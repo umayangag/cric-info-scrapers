@@ -23,24 +23,26 @@ dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
+model_output_columns= output_batting_columns
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
+training_input_columns.remove("season")
 remove_columns = ["batting_consistency", "batting_form", "batting_wind", "batting_rain", "batting_session"]
 
-# construct the initial dataset for SmoteR
-# input_data = SmoteR(input_data, target='runs_scored', th=0.6, o=2000, u=80, k=4, categorical_col=[])
-X = input_data[training_input_columns].drop(columns=remove_columns)
-y = input_data[output_batting_columns + ["season"]]  # Labels
+season_index = 20
+training_data = input_data.loc[input_data["season"] < season_index].drop(columns=["season"])
+test_data = input_data.loc[input_data["season"] >= season_index].drop(columns=["season"])
+
+X = training_data[training_input_columns].drop(columns=remove_columns)
+y = training_data[model_output_columns]  # Labels
 
 input_scaler = preprocessing.StandardScaler().fit(X)
 output_scaler = preprocessing.StandardScaler().fit(y)
 
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-season_index = 20
-X_train = pd.DataFrame(data=X.loc[X['season'] < season_index], columns=X.columns).drop(columns=["season"])
-X_test = pd.DataFrame(data=X.loc[X['season'] >= season_index], columns=X.columns).drop(columns=["season"])
-y_train = pd.DataFrame(data=y.loc[y['season'] < season_index], columns=y.columns).drop(columns=["season"])
-y_test = pd.DataFrame(data=y.loc[y['season'] >= season_index], columns=y.columns).drop(columns=["season"])
+X_train = pd.DataFrame(data=input_scaler.transform(training_data[X.columns]), columns=X.columns)
+y_train = pd.DataFrame(data=output_scaler.transform(training_data[model_output_columns]), columns=model_output_columns)
+X_test = pd.DataFrame(data=input_scaler.transform(test_data[X.columns]), columns=X.columns)
+y_test = pd.DataFrame(data=output_scaler.transform(test_data[model_output_columns]), columns=model_output_columns)
 
 predictor.fit(X_train, y_train)
 
