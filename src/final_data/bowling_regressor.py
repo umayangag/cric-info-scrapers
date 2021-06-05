@@ -88,9 +88,9 @@ def bowling_predict_test():
     # print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
     # print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
     # print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
-    # print('R2:', metrics.r2_score(y_test, y_pred))
+    print('R2:', metrics.r2_score(y_test, y_pred))
 
-    print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
+    # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).max())
 
 
 if __name__ == "__main__":

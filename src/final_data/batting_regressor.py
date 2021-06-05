@@ -84,10 +84,10 @@ def batting_predict_test():
     for i in range(0, len(y_pred)):
         print(comparison["actual"][i], " ", comparison["predicted"][i], "")
 
-    # print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
-    # print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
-    # print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
-    # print('R2:', metrics.r2_score(y_test, y_pred))
+    print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
+    print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
+    print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+    print('R2:', metrics.r2_score(y_test, y_pred))
     #
     # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).mean())
 
