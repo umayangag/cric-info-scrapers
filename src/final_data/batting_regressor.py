@@ -25,37 +25,33 @@ dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
 input_data = pd.read_csv(dataset_source)
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
-training_input_columns.remove("batting_consistency")
-training_input_columns.remove("batting_form")
-training_input_columns.remove("batting_wind")
-training_input_columns.remove("batting_rain")
-training_input_columns.remove("batting_session")
-training_input_columns.remove("season")
+remove_columns = ["batting_consistency", "batting_form", "batting_wind", "batting_rain", "batting_session"]
 
-X = input_data[training_input_columns]
-y = input_data["runs_scored"]  # Labels
+season_index = 20
+training_data = input_data.loc[input_data["season"] < season_index].drop(columns=["season"])
+test_data = input_data.loc[input_data["season"] >= season_index].drop(columns=["season"])
+
+X = input_data[training_input_columns].drop(columns=remove_columns)
+y = input_data[["runs_scored"]]  # Labels
 
 input_scaler = preprocessing.StandardScaler().fit(X)
-input_data_scaled = input_scaler.transform(X)
-X = pd.DataFrame(data=input_data_scaled, columns=X.columns)
+output_scaler = preprocessing.StandardScaler().fit(y)
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-season_index = 20
-X_train = input_data.loc[input_data['season'] < season_index][training_input_columns]
-X_test = input_data.loc[input_data['season'] >= season_index][training_input_columns]
-y_train = input_data.loc[input_data['season'] < season_index][["runs_scored"]]
-y_test = input_data.loc[input_data['season'] >= season_index][["runs_scored"]]
+
+X_train = pd.DataFrame(data=X.loc[X['season'] < season_index], columns=X.columns).drop(columns=["season"])
+X_test = pd.DataFrame(data=X.loc[X['season'] >= season_index], columns=X.columns).drop(columns=["season"])
+y_train = pd.DataFrame(data=y.loc[y['season'] < season_index], columns=y.columns).drop(columns=["season"])
+y_test = pd.DataFrame(data=y.loc[y['season'] >= season_index], columns=y.columns).drop(columns=["season"])
 
 # construct the initial dataset for SmoteR
-cols = X_train.columns.tolist()
-cols.append('runs_scored')
-D = pd.DataFrame(np.concatenate([X_train, y_train], axis=1), columns=cols)
-Xs = SmoteR(D, target='runs_scored', th=0.6, o=2000, u=80, k=4, categorical_col=[])
+# cols = X_train.columns.tolist()
+# cols.append('runs_scored')
+# D = pd.DataFrame(np.concatenate([X_train, y_train], axis=1), columns=cols)
+# Xs = SmoteR(D, target='runs_scored', th=0.6, o=2000, u=80, k=4, categorical_col=[])
 
-X_train = Xs.drop(columns=['runs_scored'])
-y_train = Xs[['runs_scored']]
-
-print(len(X_train))
+# X_train = Xs.drop(columns=['runs_scored'])
+# y_train = Xs[['runs_scored']]
 
 predictor.fit(X_train, y_train.values.ravel())
 
@@ -92,8 +88,8 @@ def batting_predict_test():
     plt.tight_layout()
     plt.show()
 
-    plt.plot(range(0,len(y_test)), y_test, color='red')
-    plt.plot(range(0,len(y_pred)), y_pred, color='blue')
+    plt.plot(range(0, len(y_test)), y_test, color='red')
+    plt.plot(range(0, len(y_pred)), y_pred, color='blue')
     plt.title('Actual vs Predicted')
     plt.xlabel('Instance')
     plt.ylabel('Runs Scored')

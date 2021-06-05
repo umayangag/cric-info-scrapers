@@ -66,7 +66,8 @@ def get_batting_performance(player_list, match_id):
         player_opposition = get_player_metric(match_id, "batting", player_obj, "opposition", "opposition",
                                               opposition_id)
 
-        data_array.append([player[1]["batting_consistency"],
+        data_array.append([
+            player[1]["batting_consistency"],
                            player_form,
                            temp,
                            wind,
@@ -81,7 +82,8 @@ def get_batting_performance(player_list, match_id):
                            player_venue,
                            player_opposition,
                            season_id,
-                           player_name])
+                           player_name
+                           ])
     dataset = pd.DataFrame(data_array, columns=input_batting_columns)
     predicted = predict_batting(dataset.loc[:, dataset.columns != "player_name"])
     predicted["player_name"] = dataset["player_name"]
