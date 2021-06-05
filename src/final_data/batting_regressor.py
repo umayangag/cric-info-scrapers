@@ -27,8 +27,8 @@ model_output_columns= ["runs_scored"]
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
 remove_columns = [
-    "batting_consistency",
-    "batting_form",
+    # "batting_consistency",
+    # "batting_form",
     "batting_wind",
     "batting_rain",
     "batting_session",
