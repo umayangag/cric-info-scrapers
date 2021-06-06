@@ -10,41 +10,49 @@ from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import numpy as np
 from final_data.smoter import SmoteR
+import math
+from sklearn.utils import shuffle
+from sklearn.model_selection import cross_val_score
 
 rfr = RandomForestRegressor(bootstrap=True, min_impurity_decrease=0.0, min_weight_fraction_leaf=0.0, max_depth=100,
                             n_estimators=100, max_features='auto', random_state=0,
                             criterion='mse')
 lr = LinearRegression()
-mlpr = MLPRegressor(random_state=1, max_iter=2000)
+mlpr = MLPRegressor(random_state=3, max_iter=2000, activation='tanh', solver='sgd', hidden_layer_sizes=(17))
 mltreg = MultiOutputRegressor(rfr)
-predictor = rfr
+predictor = mlpr
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
-model_output_columns= ["runs_scored"]
+model_output_columns = ["runs_scored"]
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
 remove_columns = [
     # "batting_consistency",
     # "batting_form",
-    "batting_wind",
-    "batting_rain",
-    "batting_session",
-    "season",
-    "batting_viscosity",
-    "batting_inning",
-    "toss"
+    # "batting_wind",
+    # "batting_rain",
+    # "batting_session",
+    # "season",
+    # "batting_viscosity",
+    # "batting_inning",
+    # "batting_pressure",
+    # "batting_temp",
+    # "batting_cloud",
+    # "batting_humidity",
+    # "toss"
 ]
 
-season_index = 20
+season_index = 19
 training_data = input_data.loc[input_data["season"] < season_index]
 test_data = input_data.loc[input_data["season"] >= season_index]
 
 X = training_data[training_input_columns].drop(columns=remove_columns)
 y = training_data[model_output_columns]  # Labels
-
+# y['runs_scored'] = y['runs_scored'].apply(lambda x:pow(x,3))
+print(X.columns)
 input_scaler = preprocessing.StandardScaler().fit(X)
 output_scaler = preprocessing.StandardScaler().fit(y)
 
@@ -57,12 +65,35 @@ y_test = pd.DataFrame(data=output_scaler.transform(test_data[model_output_column
 # cols = X_train.columns.tolist()
 # cols.append('runs_scored')
 # D = pd.DataFrame(np.concatenate([X_train, y_train], axis=1), columns=cols)
-# Xs = SmoteR(D, target='runs_scored', th=0.6, o=2000, u=80, k=4, categorical_col=[])
+# Xs = SmoteR(D, target='runs_scored', th=0.8, o=1000, u=80, k=4, categorical_col=[])
 #
 # X_train = Xs.drop(columns=['runs_scored'])
 # y_train = Xs[['runs_scored']]
 
 predictor.fit(X_train, y_train.values.ravel())
+
+
+def optimizer():
+    n = 1  # how many times to shuffle the training data
+    nhn_range = [8, 10, 12, 14, 16, 18]  # number of hidden neurons
+
+    score_dict = {}
+    for nhn in nhn_range:
+        mlp = MLPRegressor(hidden_layer_sizes=(nhn,), activation='tanh',
+                           solver='sgd', shuffle=False, random_state=42,
+                           max_iter=20000, momentum=0.7, early_stopping=True,
+                           validation_fraction=0.15)
+
+        nhn_scores = []
+        for _ in range(n):
+            df_train = shuffle(X_train)
+            score = np.sqrt(-cross_val_score(mlp, df_train[X_train.columns],
+                                             y_train["runs_scored"],
+                                             cv=10, scoring='neg_mean_squared_error')).mean()
+            nhn_scores.append(score)
+        score_dict[nhn] = nhn_scores
+        score_df = pd.DataFrame.from_dict(score_dict)
+        score_df.to_csv("optimize_batting.csv")
 
 
 def calculate_strike_rate(row):
@@ -86,27 +117,36 @@ def batting_predict_test():
     y_pred = predictor.predict(X_test)
     # print(X_test)
 
-    plt.figure(figsize=(6 * 1.618, 6))
-    index = np.arange(len(X.columns))
-    bar_width = 0.35
-    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    plt.ylabel('features')
-    plt.xlabel('importance')
-    plt.title('Feature importance')
-    plt.yticks(index, X.columns)
-    plt.tight_layout()
+    # plt.figure(figsize=(6 * 1.618, 6))
+    # index = np.arange(len(X.columns))
+    # bar_width = 0.35
+    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    # plt.ylabel('features')
+    # plt.xlabel('importance')
+    # plt.title('Feature importance')
+    # plt.yticks(index, X.columns)
+    # plt.tight_layout()
+    # plt.show()
+
+    importance = predictor.coefs_
+    # summarize feature importance
+    for i, v in enumerate(importance):
+        print(i,v)
+        # print('Feature: %0d, Score: %.5f' % (i, v))
+    # plot feature importance
+    plt.bar([x for x in range(len(importance))], importance)
     plt.show()
 
-    plt.plot(range(0, len(y_test)), y_test, color='blue')
-    plt.plot(range(0, len(y_pred)), y_pred, color='red')
+    plt.plot(range(0, len(y_test)), output_scaler.inverse_transform(y_test), color='blue')
+    plt.plot(range(0, len(y_pred)), output_scaler.inverse_transform(y_pred), color='red')
     plt.title('Actual vs Predicted')
     plt.xlabel('Instance')
     plt.ylabel('Runs Scored')
     plt.show()
 
-    plt.scatter(y_train, predictor.predict(X_train), color='red')
-    plt.plot(y_train, y_train, color='blue')
-    plt.scatter(y_test, predictor.predict(X_test), color='green')
+    plt.scatter(y_train, output_scaler.inverse_transform(predictor.predict(X_train)), color='red')
+    plt.plot(y_train, output_scaler.inverse_transform(y_train), color='blue')
+    plt.scatter(y_test, output_scaler.inverse_transform(predictor.predict(X_test)), color='green')
     plt.title('Actual vs Predicted')
     plt.xlabel('Actual Runs Scored')
     plt.ylabel('Predicted Runs Scored')
@@ -122,4 +162,5 @@ def batting_predict_test():
 
 if __name__ == "__main__":
     batting_predict_test()
+    # optimizer()
     # predict_batting("", 1, 1)

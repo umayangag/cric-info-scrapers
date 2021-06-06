@@ -30,7 +30,7 @@ X = input_data[[
     'toss',
     'venue',
     'opposition',
-    # 'season',
+    'season',
     'runs_scored',
     'balls_faced',
     'fours_scored',
@@ -43,7 +43,7 @@ X = input_data[[
     'total_balls',
     'target',
     'extras',
-    # 'match_number',
+    'match_number',
     'bowling_consistency',
     'bowling_form',
     'bowling_temp',
@@ -62,6 +62,7 @@ X = input_data[[
     'bowling_contribution',
     "econ"
 ]]
+# TODO do not scale toss, result, wickets match number, batting position, etc
 print(len(X.columns))
 y = input_data["result"]  # Labels
 oversample = SMOTE()
@@ -95,7 +96,7 @@ def batting_predict(predictor):
     # print("Score:", predictor.score(X_test, y_test))
     accuracy = metrics.accuracy_score(y_test, y_pred)
     print("Accuracy:", accuracy)
-    # print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean())
+    print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean())
     print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
     # plt.figure(figsize=(6 * 1.618, 6))

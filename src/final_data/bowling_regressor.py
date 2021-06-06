@@ -6,6 +6,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.multioutput import MultiOutputRegressor
+from sklearn.neural_network import MLPRegressor
 from sklearn.neural_network import MLPClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
@@ -18,6 +19,8 @@ from team_selection.dataset_definitions import *
 from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.utils import shuffle
+from sklearn.model_selection import cross_val_score
 
 RF = RandomForestClassifier(n_estimators=100)
 gnb = GaussianNB()
@@ -25,24 +28,30 @@ clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 5), rand
 SVM = svm.SVC(kernel='linear', C=1)
 rfr = RandomForestRegressor(max_depth=100, random_state=0)
 reg = LinearRegression()
+mlpr = MLPRegressor(random_state=3, max_iter=2000, activation='tanh', solver='sgd',hidden_layer_sizes=(16))
 mltreg = MultiOutputRegressor(rfr)
-predictor = mltreg
+predictor = mlpr
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
-model_output_columns = output_bowling_columns
+model_output_columns = ["runs_conceded"]
 training_input_columns = input_bowling_columns.copy()
 training_input_columns.remove("player_name")
 remove_columns = [
     # "bowling_consistency",
     # "bowling_form",
-    "bowling_wind",
-    "bowling_rain",
-    "bowling_session",
-    "bowling_viscosity",
-    "toss",
+    # "bowling_temp",
+    # "bowling_wind",
+    # "bowling_cloud",
+    # "batting_inning",
+    # "bowling_rain",
+    # "bowling_session",
+    # "bowling_viscosity",
+    # "toss",
+    # "season",
+    # "bowling_pressure",
 ]
 
 season_index = 20
@@ -62,6 +71,27 @@ y_test = pd.DataFrame(data=output_scaler.transform(test_data[model_output_column
 
 predictor.fit(X_train, y_train)
 
+def optimizer():
+    n = 1  # how many times to shuffle the training data
+    nhn_range = [8, 10, 12, 14, 16, 18]  # number of hidden neurons
+
+    score_dict = {}
+    for nhn in nhn_range:
+        mlp = MLPRegressor(hidden_layer_sizes=(nhn,), activation='tanh',
+                           solver='sgd', shuffle=False, random_state=42,
+                           max_iter=20000, momentum=0.7, early_stopping=True,
+                           validation_fraction=0.15)
+
+        nhn_scores = []
+        for _ in range(n):
+            df_train = shuffle(X_train)
+            score = np.sqrt(-cross_val_score(mlp, df_train[X_train.columns],
+                                             y_train["runs_conceded"],
+                                             cv=10, scoring='neg_mean_squared_error')).mean()
+            nhn_scores.append(score)
+        score_dict[nhn] = nhn_scores
+        score_df = pd.DataFrame.from_dict(score_dict)
+        score_df.to_csv("optimize_bowling.csv")
 
 def calculate_econ(row):
     if row["deliveries"] == 0:
@@ -83,16 +113,16 @@ def bowling_predict_test():
     y_pred = predictor.predict(X_test)
     # print(X_test)
 
-    plt.figure(figsize=(6 * 1.618, 6))
-    index = np.arange(len(X.columns))
-    bar_width = 0.35
-    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    plt.ylabel('features')
-    plt.xlabel('importance')
-    plt.title('Feature importance')
-    plt.yticks(index, X.columns)
-    plt.tight_layout()
-    plt.show()
+    # plt.figure(figsize=(6 * 1.618, 6))
+    # index = np.arange(len(X.columns))
+    # bar_width = 0.35
+    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    # plt.ylabel('features')
+    # plt.xlabel('importance')
+    # plt.title('Feature importance')
+    # plt.yticks(index, X.columns)
+    # plt.tight_layout()
+    # plt.show()
 
     plt.plot(range(0, len(y_test)), y_test, color='red')
     plt.plot(range(0, len(y_pred)), y_pred, color='blue')
@@ -119,3 +149,4 @@ def bowling_predict_test():
 
 if __name__ == "__main__":
     bowling_predict_test()
+    # optimizer()
