@@ -17,6 +17,8 @@ from team_selection.dataset_definitions import *
 from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.ensemble import GradientBoostingClassifier
+from final_data.encoders import *
 
 RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=False, max_depth=100,
                             class_weight={0: 4, 1: 1, 2: 2})
@@ -26,7 +28,8 @@ SVM = svm.SVC(kernel='linear', C=1)
 regr = RandomForestRegressor(max_depth=4, random_state=0)
 reg = LinearRegression()
 mltreg = MultiOutputRegressor(regr)
-predictor = RF
+gb = GradientBoostingClassifier(n_estimators=1000)
+predictor = gb
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
@@ -40,22 +43,22 @@ X = input_data[[
     'batting_form',
     'batting_temp',
     'batting_wind',
-    # 'batting_rain',
+    'batting_rain',
     'batting_humidity',
     'batting_cloud',
     'batting_pressure',
-    # 'batting_viscosity',
-    # 'batting_inning',
-    # 'batting_session',
-    # 'toss',
+    'batting_viscosity',
+    'batting_inning',
+    'batting_session',
+    'toss',
     'venue',
     'opposition',
     # 'season',
 ]]
 y = input_data["runs_scored"]  # Labels
-
-oversample = SMOTE()
-X, y = oversample.fit_resample(X, y)
+y = y.apply(encode_runs)
+# oversample = SMOTE()
+# X, y = oversample.fit_resample(X, y)
 
 scaler = preprocessing.StandardScaler().fit(X)
 data_scaled = scaler.transform(X)
@@ -87,7 +90,7 @@ def predict_batting(dataset):
 
 
 def batting_predict_test():
-    # y_pred = predictor.predict(X_test)
+    y_pred = predictor.predict(X_test)
     # print(X_test)
     # comparison = {}
     # comparison["actual"] = y_test.to_numpy()
@@ -106,8 +109,9 @@ def batting_predict_test():
     # plt.yticks(index, X.columns)
     # plt.tight_layout()
     # plt.show()
-
-    print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean())
+    print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+    print(confusion_matrix(y_test, y_pred, labels=[0, 1, 2, 3]))
+    # print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean())
 
 
 if __name__ == "__main__":

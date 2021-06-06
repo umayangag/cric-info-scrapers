@@ -31,15 +31,15 @@ rfr = RandomForestRegressor(max_depth=100, random_state=0)
 reg = LinearRegression()
 mlpr = MLPRegressor(random_state=3, max_iter=2000, activation='tanh', solver='sgd',hidden_layer_sizes=(16))
 
-gb = GradientBoostingRegressor(n_estimators=500)
+gb = GradientBoostingRegressor(n_estimators=15)
 mltreg = MultiOutputRegressor(gb)
-predictor = mltreg
+predictor = gb
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
-model_output_columns = output_bowling_columns#["runs_conceded"]
+model_output_columns = ["runs_conceded"]
 training_input_columns = input_bowling_columns.copy()
 training_input_columns.remove("player_name")
 remove_columns = [
@@ -50,27 +50,27 @@ remove_columns = [
     # "bowling_cloud",
     # "batting_inning",
     # "bowling_rain",
-    # "bowling_session",
-    # "bowling_viscosity",
-    # "toss",
+    "bowling_session",
+    "bowling_viscosity",
+    "toss",
     # "season",
     # "bowling_pressure",
 ]
 
-season_index = 20
+season_index = 18
 training_data = input_data.loc[input_data["season"] < season_index]
 test_data = input_data.loc[input_data["season"] >= season_index]
 
 X = training_data[training_input_columns].drop(columns=remove_columns)
 y = training_data[model_output_columns]  # Labels
 
-input_scaler = preprocessing.StandardScaler().fit(X)
-output_scaler = preprocessing.StandardScaler().fit(y)
+# input_scaler = preprocessing.StandardScaler().fit(X)
+# output_scaler = preprocessing.StandardScaler().fit(y)
 
-X_train = pd.DataFrame(data=input_scaler.transform(training_data[X.columns]), columns=X.columns)
-y_train = pd.DataFrame(data=output_scaler.transform(training_data[model_output_columns]), columns=model_output_columns)
-X_test = pd.DataFrame(data=input_scaler.transform(test_data[X.columns]), columns=X.columns)
-y_test = pd.DataFrame(data=output_scaler.transform(test_data[model_output_columns]), columns=model_output_columns)
+X_train = pd.DataFrame(data=training_data[X.columns], columns=X.columns)
+y_train = pd.DataFrame(data=training_data[model_output_columns], columns=model_output_columns)
+X_test = pd.DataFrame(data=test_data[X.columns], columns=X.columns)
+y_test = pd.DataFrame(data=test_data[model_output_columns], columns=model_output_columns)
 
 predictor.fit(X_train, y_train)
 
@@ -103,9 +103,9 @@ def calculate_econ(row):
 
 
 def predict_bowling(dataset):
-    scaled_dataset = input_scaler.transform(dataset.drop(columns=remove_columns))
+    scaled_dataset = dataset.drop(columns=remove_columns)
     predicted = predictor.predict(scaled_dataset)
-    result = pd.DataFrame(output_scaler.inverse_transform(predicted), columns=output_bowling_columns)
+    result = pd.DataFrame(predicted, columns=output_bowling_columns)
     for column in y.columns:
         dataset[column] = result[column]
     dataset["econ"] = dataset.apply(lambda row: calculate_econ(row), axis=1)
@@ -116,16 +116,16 @@ def bowling_predict_test():
     y_pred = predictor.predict(X_test)
     # print(X_test)
 
-    # plt.figure(figsize=(6 * 1.618, 6))
-    # index = np.arange(len(X.columns))
-    # bar_width = 0.35
-    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    # plt.ylabel('features')
-    # plt.xlabel('importance')
-    # plt.title('Feature importance')
-    # plt.yticks(index, X.columns)
-    # plt.tight_layout()
-    # plt.show()
+    plt.figure(figsize=(6 * 1.618, 6))
+    index = np.arange(len(X.columns))
+    bar_width = 0.35
+    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    plt.ylabel('features')
+    plt.xlabel('importance')
+    plt.title('Feature importance')
+    plt.yticks(index, X.columns)
+    plt.tight_layout()
+    plt.show()
 
     plt.plot(range(0, len(y_test)), y_test, color='red')
     plt.plot(range(0, len(y_pred)), y_pred, color='blue')

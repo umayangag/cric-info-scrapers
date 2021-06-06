@@ -20,7 +20,7 @@ rfr = RandomForestRegressor(bootstrap=True, min_impurity_decrease=0.0, min_weigh
                             criterion='mse')
 lr = LinearRegression()
 mlpr = MLPRegressor(random_state=3, max_iter=2000, activation='tanh', solver='sgd', hidden_layer_sizes=(17))
-gb = GradientBoostingRegressor(n_estimators=500)
+gb = GradientBoostingRegressor(n_estimators=30, loss='ls', criterion='mse')
 mltreg = MultiOutputRegressor(rfr)
 predictor = gb
 
@@ -28,46 +28,50 @@ dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
+
+# input_data_normalized = input_data / input_data.sum()
+# input_data_normalized["season"] = input_data["season"]
+# input_data = input_data_normalized
 model_output_columns = ["runs_scored"]
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
 remove_columns = [
-    # "batting_consistency",
-    # "batting_form",
-    # "batting_wind",
-    # "batting_rain",
+    "batting_consistency",
+    "batting_form",
+    "batting_wind",
+    "batting_rain",
     # "batting_session",
     # "season",
-    # "batting_viscosity",
-    # "batting_inning",
-    # "batting_pressure",
-    # "batting_temp",
-    # "batting_cloud",
-    # "batting_humidity",
-    # "toss"
+    "batting_viscosity",
+    "batting_inning",
+    "batting_pressure",
+    "batting_temp",
+    "batting_cloud",
+    "batting_humidity",
+    "toss",
 ]
 
-season_index = 19
+season_index = 18
 training_data = input_data.loc[input_data["season"] < season_index]
 test_data = input_data.loc[input_data["season"] >= season_index]
 
 X = training_data[training_input_columns].drop(columns=remove_columns)
 y = training_data[model_output_columns]  # Labels
 # y['runs_scored'] = y['runs_scored'].apply(lambda x:pow(x,3))
-input_scaler = preprocessing.StandardScaler().fit(X)
-output_scaler = preprocessing.StandardScaler().fit(y)
+# input_scaler = preprocessing.StandardScaler().fit(X)
+# output_scaler = preprocessing.StandardScaler().fit(y)
 
-X_train = pd.DataFrame(data=input_scaler.transform(training_data[X.columns]), columns=X.columns)
-y_train = pd.DataFrame(data=output_scaler.transform(training_data[model_output_columns]), columns=model_output_columns)
-X_test = pd.DataFrame(data=input_scaler.transform(test_data[X.columns]), columns=X.columns)
-y_test = pd.DataFrame(data=output_scaler.transform(test_data[model_output_columns]), columns=model_output_columns)
+X_train = pd.DataFrame(data=training_data[X.columns], columns=X.columns)
+y_train = pd.DataFrame(data=training_data[model_output_columns], columns=model_output_columns)
+X_test = pd.DataFrame(data=test_data[X.columns], columns=X.columns)
+y_test = pd.DataFrame(data=test_data[model_output_columns], columns=model_output_columns)
 
 # construct the initial dataset for SmoteR
 # cols = X_train.columns.tolist()
 # cols.append('runs_scored')
 # D = pd.DataFrame(np.concatenate([X_train, y_train], axis=1), columns=cols)
-# Xs = SmoteR(D, target='runs_scored', th=0.8, o=1000, u=80, k=4, categorical_col=[])
-#
+# Xs = SmoteR(D, target='runs_scored', th=0.8, o=100, u=50, k=4, categorical_col=[])
+
 # X_train = Xs.drop(columns=['runs_scored'])
 # y_train = Xs[['runs_scored']]
 
@@ -129,16 +133,16 @@ def batting_predict_test():
     plt.tight_layout()
     plt.show()
 
-    plt.plot(range(0, len(y_test)), output_scaler.inverse_transform(y_test), color='blue')
-    plt.plot(range(0, len(y_pred)), output_scaler.inverse_transform(y_pred), color='red')
+    plt.plot(range(0, len(y_test)), y_test, color='blue')
+    plt.plot(range(0, len(y_pred)), y_pred, color='red')
     plt.title('Actual vs Predicted')
     plt.xlabel('Instance')
     plt.ylabel('Runs Scored')
     plt.show()
 
-    plt.scatter(y_train, output_scaler.inverse_transform(predictor.predict(X_train)), color='red')
-    plt.plot(y_train, output_scaler.inverse_transform(y_train), color='blue')
-    plt.scatter(y_test, output_scaler.inverse_transform(predictor.predict(X_test)), color='green')
+    plt.scatter(y_train, predictor.predict(X_train), color='red')
+    plt.plot(y_train, y_train, color='blue')
+    plt.scatter(y_test, predictor.predict(X_test), color='green')
     plt.title('Actual vs Predicted')
     plt.xlabel('Actual Runs Scored')
     plt.ylabel('Predicted Runs Scored')
