@@ -118,10 +118,10 @@ if __name__ == "__main__":
 
     calculated_team = calculate_overall_performance(player_pool, match_id)
     calculated_team_without_names = calculated_team.loc[:, calculated_team.columns != "player_name"]
-    calculated_team_without_names = calculated_team_without_names.loc[:,
-                                    calculated_team_without_names.columns != "match_number"]
-    calculated_team_without_names = calculated_team_without_names.loc[:,
-                                    calculated_team_without_names.columns != "season"]
+    # calculated_team_without_names = calculated_team_without_names.loc[:,
+    #                                 calculated_team_without_names.columns != "match_number"]
+    # calculated_team_without_names = calculated_team_without_names.loc[:,
+    #                                 calculated_team_without_names.columns != "season"]
     player_performance_predictions, overall_win_probability = predict_for_team(calculated_team_without_names)
     player_performance_predictions["player_name"] = calculated_team["player_name"]
 

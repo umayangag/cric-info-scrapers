@@ -13,14 +13,16 @@ from final_data.smoter import SmoteR
 import math
 from sklearn.utils import shuffle
 from sklearn.model_selection import cross_val_score
+from sklearn.ensemble import GradientBoostingRegressor
 
 rfr = RandomForestRegressor(bootstrap=True, min_impurity_decrease=0.0, min_weight_fraction_leaf=0.0, max_depth=100,
                             n_estimators=100, max_features='auto', random_state=0,
                             criterion='mse')
 lr = LinearRegression()
 mlpr = MLPRegressor(random_state=3, max_iter=2000, activation='tanh', solver='sgd', hidden_layer_sizes=(17))
+gb = GradientBoostingRegressor(n_estimators=500)
 mltreg = MultiOutputRegressor(rfr)
-predictor = mlpr
+predictor = gb
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
@@ -52,7 +54,6 @@ test_data = input_data.loc[input_data["season"] >= season_index]
 X = training_data[training_input_columns].drop(columns=remove_columns)
 y = training_data[model_output_columns]  # Labels
 # y['runs_scored'] = y['runs_scored'].apply(lambda x:pow(x,3))
-print(X.columns)
 input_scaler = preprocessing.StandardScaler().fit(X)
 output_scaler = preprocessing.StandardScaler().fit(y)
 
@@ -117,24 +118,15 @@ def batting_predict_test():
     y_pred = predictor.predict(X_test)
     # print(X_test)
 
-    # plt.figure(figsize=(6 * 1.618, 6))
-    # index = np.arange(len(X.columns))
-    # bar_width = 0.35
-    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    # plt.ylabel('features')
-    # plt.xlabel('importance')
-    # plt.title('Feature importance')
-    # plt.yticks(index, X.columns)
-    # plt.tight_layout()
-    # plt.show()
-
-    importance = predictor.coefs_
-    # summarize feature importance
-    for i, v in enumerate(importance):
-        print(i,v)
-        # print('Feature: %0d, Score: %.5f' % (i, v))
-    # plot feature importance
-    plt.bar([x for x in range(len(importance))], importance)
+    plt.figure(figsize=(6 * 1.618, 6))
+    index = np.arange(len(X.columns))
+    bar_width = 0.35
+    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    plt.ylabel('features')
+    plt.xlabel('importance')
+    plt.title('Feature importance')
+    plt.yticks(index, X.columns)
+    plt.tight_layout()
     plt.show()
 
     plt.plot(range(0, len(y_test)), output_scaler.inverse_transform(y_test), color='blue')
@@ -156,6 +148,7 @@ def batting_predict_test():
     print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
     print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
     print('R2:', metrics.r2_score(y_test, y_pred))
+    print('R2:', metrics.r2_score(y_train, predictor.predict(X_train)))
     #
     # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).mean())
 

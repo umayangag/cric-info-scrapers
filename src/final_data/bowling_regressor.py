@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.utils import shuffle
 from sklearn.model_selection import cross_val_score
+from sklearn.ensemble import GradientBoostingRegressor
 
 RF = RandomForestClassifier(n_estimators=100)
 gnb = GaussianNB()
@@ -29,14 +30,16 @@ SVM = svm.SVC(kernel='linear', C=1)
 rfr = RandomForestRegressor(max_depth=100, random_state=0)
 reg = LinearRegression()
 mlpr = MLPRegressor(random_state=3, max_iter=2000, activation='tanh', solver='sgd',hidden_layer_sizes=(16))
-mltreg = MultiOutputRegressor(rfr)
-predictor = mlpr
+
+gb = GradientBoostingRegressor(n_estimators=500)
+mltreg = MultiOutputRegressor(gb)
+predictor = mltreg
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
-model_output_columns = ["runs_conceded"]
+model_output_columns = output_bowling_columns#["runs_conceded"]
 training_input_columns = input_bowling_columns.copy()
 training_input_columns.remove("player_name")
 remove_columns = [
@@ -143,6 +146,7 @@ def bowling_predict_test():
     print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
     print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
     print('R2:', metrics.r2_score(y_test, y_pred))
+    print('R2:', metrics.r2_score(y_train, predictor.predict(X_train)))
     #
     # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).mean())
 
