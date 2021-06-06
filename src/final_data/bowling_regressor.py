@@ -33,13 +33,13 @@ mlpr = MLPRegressor(random_state=3, max_iter=2000, activation='tanh', solver='sg
 
 gb = GradientBoostingRegressor(n_estimators=15)
 mltreg = MultiOutputRegressor(gb)
-predictor = gb
+predictor = mltreg
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
-model_output_columns = ["runs_conceded"]
+model_output_columns = output_bowling_columns#["runs_conceded"]
 training_input_columns = input_bowling_columns.copy()
 training_input_columns.remove("player_name")
 remove_columns = [
