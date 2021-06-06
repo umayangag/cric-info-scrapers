@@ -13,13 +13,60 @@ import numpy as np
 clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(43, 11, 1), random_state=1,
                     max_iter=10000)
 gb = GradientBoostingClassifier(n_estimators=1000)
-predictor = gb
+predictor = clf
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "..\\team_selection\\final_dataset.csv")
 
 input_data = pd.read_csv(dataset_source)
-X = input_data[[
+all_columns =[
+    'batting_consistency',
+    'batting_form',
+    'batting_temp',
+    'batting_wind',
+    'batting_rain',
+    'batting_humidity',
+    'batting_cloud',
+    'batting_pressure',
+    'batting_viscosity',
+    'batting_inning',
+    'batting_session',
+    'toss',
+    'venue',
+    'opposition',
+    'season',
+    'runs_scored',
+    'balls_faced',
+    'fours_scored',
+    'sixes_scored',
+    'batting_position',
+    'batting_contribution',
+    'strike_rate',
+    'total_score',
+    'total_wickets',
+    'total_balls',
+    'target',
+    'extras',
+    'match_number',
+    'bowling_consistency',
+    'bowling_form',
+    'bowling_temp',
+    'bowling_wind',
+    'bowling_rain',
+    'bowling_humidity',
+    'bowling_cloud',
+    'bowling_pressure',
+    'bowling_viscosity',
+    'bowling_session',
+    'bowling_venue',
+    'bowling_opposition',
+    'runs_conceded',
+    'deliveries',
+    'wickets_taken',
+    'bowling_contribution',
+    "econ"
+]
+optimum_columns=[
     # 'batting_consistency',
     # 'batting_form',
     # 'batting_temp',
@@ -65,16 +112,17 @@ X = input_data[[
     # 'wickets_taken',
     # 'bowling_contribution',
     # "econ"
-]]
+]
+X = input_data[all_columns]
 # TODO do not scale toss, result, wickets match number, batting position, etc
 print(len(X.columns))
 y = input_data["result"]  # Labels
 oversample = SMOTE()
 X, y = oversample.fit_resample(X, y)
 
-scaler = preprocessing.StandardScaler().fit(X)
-data_scaled = scaler.transform(X)
-X = pd.DataFrame(data=data_scaled, columns=X.columns)
+# scaler = preprocessing.StandardScaler().fit(X)
+# data_scaled = scaler.transform(X)
+# X = pd.DataFrame(data=data_scaled, columns=X.columns)
 train_set = 2423
 
 X_train = X.iloc[:train_set, :]

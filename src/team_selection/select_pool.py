@@ -124,6 +124,7 @@ if __name__ == "__main__":
     #                                 calculated_team_without_names.columns != "season"]
     player_performance_predictions, overall_win_probability = predict_for_team(calculated_team_without_names)
     player_performance_predictions["player_name"] = calculated_team["player_name"]
+    print(player_performance_predictions)
 
     predicted_team = player_performance_predictions.sort_values(
         by="winning_probability", ascending=False)[:11]
