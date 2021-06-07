@@ -35,7 +35,7 @@ all_columns =[
     'toss',
     'venue',
     'opposition',
-    'season',
+    # 'season',
     'runs_scored',
     'balls_faced',
     'fours_scored',
@@ -48,7 +48,7 @@ all_columns =[
     'total_balls',
     'target',
     'extras',
-    'match_number',
+    # 'match_number',
     'bowling_consistency',
     'bowling_form',
     'bowling_temp',
@@ -121,15 +121,15 @@ y = input_data["result"]  # Labels
 oversample = SMOTE()
 X, y = oversample.fit_resample(X, y)
 
-# scaler = preprocessing.StandardScaler().fit(X)
-# data_scaled = scaler.transform(X)
-# X = pd.DataFrame(data=data_scaled, columns=X.columns)
+scaler = preprocessing.StandardScaler().fit(X)
+data_scaled = scaler.transform(X)
+X = pd.DataFrame(data=data_scaled, columns=X.columns)
 train_set = 2423
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-# X_train = X.iloc[:train_set, :]
-# X_test = X.iloc[train_set + 1:, :]
-# y_train = y.iloc[:train_set]
-# y_test = y.iloc[train_set + 1:]
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+X_train = X.iloc[:train_set, :]
+X_test = X.iloc[train_set + 1:, :]
+y_train = y.iloc[:train_set]
+y_test = y.iloc[train_set + 1:]
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 #
@@ -148,9 +148,9 @@ def batting_predict(predictor):
     # for classifiers
     # print("Score:", predictor.score(X_test, y_test))
     accuracy = metrics.accuracy_score(y_test, y_pred)
-    cvs = cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean()
+    # cvs = cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean()
     print("Accuracy:", accuracy)
-    print("Cross Validation Score:", cvs)
+    # print("Cross Validation Score:", cvs)
     print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
     # plt.bar(range(X_train.shape[1]), gb.feature_importances_)
