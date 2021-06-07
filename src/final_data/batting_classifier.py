@@ -27,10 +27,10 @@ dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
+input_data = input_data.sample(frac=1).reset_index(drop=True)
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
-
-X = input_data[[
+input_columns=[
     'batting_consistency',
     'batting_form',
     'batting_temp',
@@ -42,11 +42,12 @@ X = input_data[[
     'batting_viscosity',
     'batting_inning',
     'batting_session',
-    # 'toss',
+    'toss',
     'venue',
     'opposition',
     'season',
-]]
+]
+X = input_data[input_columns]
 y = input_data[output_batting_columns]  # Labels
 y["runs_scored"] = y["runs_scored"].apply(encode_runs)
 y["balls_faced"] = y["balls_faced"].apply(encode_balls_faced)
@@ -54,15 +55,15 @@ y["fours_scored"] = y["fours_scored"].apply(encode_fours)
 y["sixes_scored"] = y["sixes_scored"].apply(encode_sixes)
 
 tempX = X
-tempX["balls_faced"] = y["balls_faced"].apply(encode_balls_faced)
-tempX["fours_scored"] = y["fours_scored"].apply(encode_fours)
-tempX["sixes_scored"] = y["sixes_scored"].apply(encode_sixes)
+tempX["balls_faced"] = y["balls_faced"]
+tempX["fours_scored"] = y["fours_scored"]
+tempX["sixes_scored"] = y["sixes_scored"]
 tempX["batting_position"] = y["batting_position"]
 
 oversample = SMOTE()
-tempX, runs_predicted = oversample.fit_resample(tempX, input_data["runs_scored"].apply(encode_runs))
+tempX, runs_predicted = oversample.fit_resample(tempX, y["runs_scored"])
 tempX["runs_scored"] = runs_predicted
-X = tempX[X.columns]
+X = tempX[input_columns]
 y = tempX[output_batting_columns]
 
 scaler = preprocessing.StandardScaler().fit(X)
@@ -71,7 +72,7 @@ final_df = pd.DataFrame(data=data_scaled, columns=X.columns)
 X = final_df
 X.to_csv("final_batting_2021.csv")
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 # train_set = 2095
 # X_train = X.iloc[:train_set, :]
 # X_test = X.iloc[train_set + 1:, :]
@@ -98,25 +99,17 @@ def predict_batting(dataset):
 def batting_predict_test():
     y_pred = predictor.predict(X_test)
     y_pred = pd.DataFrame(y_pred, columns=output_batting_columns)
-    print(y_pred)
-    # print(X_test)
-    # comparison = {}
-    # comparison["actual"] = y_test.to_numpy()
-    # comparison["predicted"] = y_pred
-    #
-    # for i in range(0, len(y_pred)):
-    #     print(comparison["actual"][i], " ", comparison["predicted"][i], "")
 
-    # plt.figure(figsize=(6 * 1.618, 6))
-    # index = np.arange(len(X.columns))
-    # bar_width = 0.35
-    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    # plt.ylabel('features')
-    # plt.xlabel('importance')
-    # plt.title('Feature importance')
-    # plt.yticks(index, X.columns)
-    # plt.tight_layout()
-    # plt.show()
+    plt.figure(figsize=(6 * 1.618, 6))
+    index = np.arange(len(X.columns))
+    bar_width = 0.35
+    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    plt.ylabel('features')
+    plt.xlabel('importance')
+    plt.title('Feature importance')
+    plt.yticks(index, X.columns)
+    plt.tight_layout()
+    plt.show()
 
     for attribute in output_batting_columns:
         print("Accuracy:" + attribute, metrics.accuracy_score(y_test[attribute], y_pred[attribute]))

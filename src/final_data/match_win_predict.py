@@ -21,6 +21,7 @@ dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "..\\team_selection\\final_dataset.csv")
 
 input_data = pd.read_csv(dataset_source)
+input_data = input_data.sample(frac=1).reset_index(drop=True)
 all_columns = [
     'batting_consistency',
     'batting_form',
@@ -44,10 +45,10 @@ all_columns = [
     'batting_position',
     'batting_contribution',
     'strike_rate',
-    'total_score',
-    'total_wickets',
-    'total_balls',
-    'target',
+    # 'total_score',
+    # 'total_wickets',
+    # 'total_balls',
+    # 'target',
     'extras',
     # 'match_number',
     'bowling_consistency',
@@ -118,6 +119,11 @@ optimum_columns = [
 X = input_data[all_columns]
 X['runs_scored'] = X['runs_scored'].apply(lambda x: encode_runs(x))
 X['balls_faced'] = X['balls_faced'].apply(lambda x: encode_balls_faced(x))
+X['fours_scored'] = X['fours_scored'].apply(lambda x: encode_balls_faced(x))
+X['sixes_scored'] = X['sixes_scored'].apply(lambda x: encode_balls_faced(x))
+X['runs_conceded'] = X['runs_conceded'].apply(lambda x: encode_balls_faced(x))
+X['deliveries'] = X['deliveries'].apply(lambda x: encode_balls_faced(x))
+X['wickets_taken'] = X['wickets_taken'].apply(lambda x: encode_balls_faced(x))
 # TODO do not scale toss, result, wickets match number, batting position, etc
 print(len(X.columns))
 y = input_data["result"]  # Labels

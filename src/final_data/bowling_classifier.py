@@ -27,41 +27,42 @@ dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
+input_data = input_data.sample(frac=1).reset_index(drop=True)
 training_input_columns = input_bowling_columns.copy()
 training_input_columns.remove("player_name")
 
-X = input_data[[
+input_columns=[
     "bowling_consistency",
     "bowling_form",
     "bowling_temp",
     "bowling_wind",
-    "bowling_rain",
+    # "bowling_rain",
     "bowling_humidity",
     "bowling_cloud",
     "bowling_pressure",
-    "bowling_viscosity",
-    "batting_inning",
-    "bowling_session",
-    "toss",
+    # "bowling_viscosity",
+    # "batting_inning",
+    # "bowling_session",
+    # "toss",
     "bowling_venue",
     "bowling_opposition",
     "season",
-]]
+]
+X = input_data[input_columns]
 y = input_data[output_bowling_columns]  # Labels
 y["runs_conceded"] = y["runs_conceded"].apply(encode_runs_conceded)
 y["deliveries"] = y["deliveries"].apply(encode_deliveries_bowled)
 y["wickets_taken"] = y["wickets_taken"].apply(encode_wickets)
 
 tempX = X
-tempX["runs_conceded"] = y["runs_conceded"].apply(encode_runs_conceded)
-tempX["deliveries"] = y["deliveries"].apply(encode_deliveries_bowled)
-tempX["wickets_taken"] = y["wickets_taken"].apply(encode_wickets)
+tempX["deliveries"] = y["deliveries"]
+tempX["wickets_taken"] = y["wickets_taken"]
 
 oversample = SMOTE()
-tempX, runs_predicted = oversample.fit_resample(tempX, input_data["runs_conceded"].apply(encode_runs_conceded))
+tempX, runs_predicted = oversample.fit_resample(tempX, y["runs_conceded"])
 
 tempX["runs_conceded"] = runs_predicted
-X = tempX[X.columns]
+X = tempX[input_columns]
 y = tempX[output_bowling_columns]
 
 scaler = preprocessing.StandardScaler().fit(X)
@@ -70,12 +71,12 @@ final_df = pd.DataFrame(data=data_scaled, columns=X.columns)
 X = final_df
 
 train_set = 1465
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-# X_train = X.iloc[:train_set, :]
-# X_test = X.iloc[train_set + 1:, :]
-# y_train = y.iloc[:train_set]
-# y_test = y.iloc[train_set + 1:]
-# predictor.fit(X_train, y_train)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+X_train = X.iloc[:train_set, :]
+X_test = X.iloc[train_set + 1:, :]
+y_train = y.iloc[:train_set]
+y_test = y.iloc[train_set + 1:]
+predictor.fit(X_train, y_train)
 
 def calculate_econ(row):
     if row["deliveries"] == 0:
@@ -105,16 +106,16 @@ def bowling_predict_test():
     #
     # print("Error:", metrics.mean_absolute_error(y_test, y_pred))
 
-    # plt.figure(figsize=(6 * 1.618, 6))
-    # index = np.arange(len(X.columns))
-    # bar_width = 0.35
-    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    # plt.ylabel('features')
-    # plt.xlabel('importance')
-    # plt.title('Feature importance')
-    # plt.yticks(index, X.columns)
-    # plt.tight_layout()
-    # plt.show()
+    plt.figure(figsize=(6 * 1.618, 6))
+    index = np.arange(len(X.columns))
+    bar_width = 0.35
+    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    plt.ylabel('features')
+    plt.xlabel('importance')
+    plt.title('Feature importance')
+    plt.yticks(index, X.columns)
+    plt.tight_layout()
+    plt.show()
 
     for attribute in output_bowling_columns:
         print("Accuracy:" + attribute, metrics.accuracy_score(y_test[attribute], y_pred[attribute]))
