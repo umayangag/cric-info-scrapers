@@ -9,6 +9,7 @@ from sklearn import preprocessing
 from sklearn.ensemble import GradientBoostingClassifier
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.model_selection import train_test_split
 
 clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(43, 11, 1), random_state=1,
                     max_iter=10000)
@@ -124,11 +125,11 @@ X, y = oversample.fit_resample(X, y)
 # data_scaled = scaler.transform(X)
 # X = pd.DataFrame(data=data_scaled, columns=X.columns)
 train_set = 2423
-
-X_train = X.iloc[:train_set, :]
-X_test = X.iloc[train_set + 1:, :]
-y_train = y.iloc[:train_set]
-y_test = y.iloc[train_set + 1:]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+# X_train = X.iloc[:train_set, :]
+# X_test = X.iloc[train_set + 1:, :]
+# y_train = y.iloc[:train_set]
+# y_test = y.iloc[train_set + 1:]
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 #
@@ -155,16 +156,16 @@ def batting_predict(predictor):
     # plt.bar(range(X_train.shape[1]), gb.feature_importances_)
     # plt.xticks(range(X_train.shape[1]), X.columns)
 
-    plt.figure(figsize=(6 * 1.618, 6))
-    index = np.arange(len(X.columns))
-    bar_width = 0.35
-    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    plt.ylabel('features')
-    plt.xlabel('importance')
-    plt.title('Feature importance: Accuracy:' + str(cvs))
-    plt.yticks(index, X.columns)
-    plt.tight_layout()
-    plt.show()
+    # plt.figure(figsize=(6 * 1.618, 6))
+    # index = np.arange(len(X.columns))
+    # bar_width = 0.35
+    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    # plt.ylabel('features')
+    # plt.xlabel('importance')
+    # plt.title('Feature importance: Accuracy:' + str(cvs))
+    # plt.yticks(index, X.columns)
+    # plt.tight_layout()
+    # plt.show()
     # print(predictor.coefs_)
     # print(predictor.get_params())
     return accuracy

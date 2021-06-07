@@ -21,7 +21,7 @@ rfr = RandomForestRegressor(bootstrap=True, min_impurity_decrease=0.0, min_weigh
                             criterion='mse')
 lr = LinearRegression()
 mlpr = MLPRegressor(random_state=3, max_iter=2000, activation='tanh', solver='sgd', hidden_layer_sizes=(17))
-gb = GradientBoostingRegressor(n_estimators=30, loss='ls', criterion='mse',max_leaf_nodes=100, alpha=0.5)
+gb = GradientBoostingRegressor(n_estimators=30, loss='ls', criterion='mse', max_leaf_nodes=100, alpha=0.5)
 mltreg = MultiOutputRegressor(rfr)
 predictor = rfr
 
@@ -53,12 +53,13 @@ remove_columns = [
 ]
 
 season_index = 18
+# input_data['runs_scored'] = input_data.loc[:, "runs_scored"].apply(lambda x: math.log10(x+1))
 training_data = input_data.loc[input_data["season"] < season_index]
 test_data = input_data.loc[input_data["season"] >= season_index]
 
 X = training_data[training_input_columns].drop(columns=remove_columns)
 y = training_data[model_output_columns]  # Labels
-# y['runs_scored'] = y['runs_scored'].apply(lambda x:x**1/2)
+
 # input_scaler = preprocessing.StandardScaler().fit(X)
 # output_scaler = preprocessing.StandardScaler().fit(y)
 
@@ -155,8 +156,8 @@ def batting_predict_test():
     print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
     print('R2 test:', metrics.r2_score(y_test, y_pred))
     print('R2 train:', metrics.r2_score(y_train, predictor.predict(X_train)))
-    #
-    # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).mean())
+
+    # print("Cross Validation Score:", cross_val_score(predictor, X, y.values.ravel(), cv=10).mean())
 
 
 if __name__ == "__main__":

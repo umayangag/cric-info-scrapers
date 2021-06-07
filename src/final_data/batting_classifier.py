@@ -20,8 +20,8 @@ import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier
 from final_data.encoders import *
 
-RF = RandomForestClassifier(n_estimators=100, criterion='entropy', max_depth=100,
-                            )
+RF = RandomForestClassifier(n_estimators=1000, criterion='entropy', max_depth=1000,
+                            class_weight={0:1, 1: 1, 2: 1, 3: 1})
 gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(4, 3), random_state=1)
 SVM = svm.SVC(kernel='linear', C=1)
@@ -47,25 +47,25 @@ X = input_data[[
     'batting_humidity',
     'batting_cloud',
     'batting_pressure',
-    'batting_viscosity',
-    'batting_inning',
-    'batting_session',
-    'toss',
+    # 'batting_viscosity',
+    # 'batting_inning',
+    # 'batting_session',
+    # 'toss',
     'venue',
     'opposition',
-    # 'season',
+    'season',
 ]]
 y = input_data["runs_scored"]  # Labels
 y = y.apply(encode_runs)
 oversample = SMOTE()
 X, y = oversample.fit_resample(X, y)
 
-scaler = preprocessing.StandardScaler().fit(X)
-data_scaled = scaler.transform(X)
-final_df = pd.DataFrame(data=data_scaled, columns=X.columns)
-X = final_df
+# scaler = preprocessing.StandardScaler().fit(X)
+# data_scaled = scaler.transform(X)
+# final_df = pd.DataFrame(data=data_scaled, columns=X.columns)
+# X = final_df
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 # train_set = 2095
 # X_train = X.iloc[:train_set, :]
 # X_test = X.iloc[train_set + 1:, :]
@@ -99,16 +99,16 @@ def batting_predict_test():
     # for i in range(0, len(y_pred)):
     #     print(comparison["actual"][i], " ", comparison["predicted"][i], "")
 
-    # plt.figure(figsize=(6 * 1.618, 6))
-    # index = np.arange(len(X.columns))
-    # bar_width = 0.35
-    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    # plt.ylabel('features')
-    # plt.xlabel('importance')
-    # plt.title('Feature importance')
-    # plt.yticks(index, X.columns)
-    # plt.tight_layout()
-    # plt.show()
+    plt.figure(figsize=(6 * 1.618, 6))
+    index = np.arange(len(X.columns))
+    bar_width = 0.35
+    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    plt.ylabel('features')
+    plt.xlabel('importance')
+    plt.title('Feature importance')
+    plt.yticks(index, X.columns)
+    plt.tight_layout()
+    plt.show()
     print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
     print(confusion_matrix(y_test, y_pred, labels=[0, 1, 2, 3]))
     # print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean())

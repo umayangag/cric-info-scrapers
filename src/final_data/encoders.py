@@ -50,3 +50,11 @@ def encode_econ(value):
     if value < 12:
         return 2
     return 3
+
+
+def encode_wickets(value):
+    if value < 2:
+        return 0
+    if value < 4:
+        return 1
+    return 2

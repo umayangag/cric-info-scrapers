@@ -1,6 +1,5 @@
 import pandas as pd
 import os
-from final_data.bowling_regressor import predict_bowling
 from team_selection.shared.match_data import *
 from team_selection.dataset_definitions import *
 from config.mysql import get_db_connection
