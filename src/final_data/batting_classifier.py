@@ -40,13 +40,13 @@ X = input_data[[
     'batting_form',
     'batting_temp',
     'batting_wind',
-    # 'batting_rain',
+    'batting_rain',
     'batting_humidity',
     'batting_cloud',
     'batting_pressure',
-    # 'batting_viscosity',
-    # 'batting_inning',
-    # 'batting_session',
+    'batting_viscosity',
+    'batting_inning',
+    'batting_session',
     # 'toss',
     'venue',
     'opposition',
@@ -123,7 +123,7 @@ def batting_predict_test():
 
     for attribute in output_batting_columns:
         print("Accuracy:" + attribute, metrics.accuracy_score(y_test[attribute], y_pred[attribute]))
-        print(attribute, confusion_matrix(y_test[attribute], y_pred[attribute], labels=[0, 1, 2, 3, 4]))
+        print(attribute + '\n', confusion_matrix(y_test[attribute], y_pred[attribute], labels=[0, 1, 2, 3, 4]))
 
     # print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean())
 
