@@ -20,13 +20,8 @@ import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier
 from final_data.encoders import *
 
-RF = RandomForestClassifier(n_estimators=100, criterion='entropy', max_depth=100)
-gnb = GaussianNB()
-clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(4, 3), random_state=1)
-SVM = svm.SVC(kernel='linear', C=1)
-mltreg = MultiOutputClassifier(RF)
-gb = GradientBoostingClassifier(n_estimators=1000)
-predictor = mltreg
+RF = RandomForestClassifier(n_estimators=1000, criterion='entropy', max_depth=1000)
+predictor = RF
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
@@ -74,6 +69,7 @@ scaler = preprocessing.StandardScaler().fit(X)
 data_scaled = scaler.transform(X)
 final_df = pd.DataFrame(data=data_scaled, columns=X.columns)
 X = final_df
+X.to_csv("final_batting_2021.csv")
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 # train_set = 2095
@@ -102,6 +98,7 @@ def predict_batting(dataset):
 def batting_predict_test():
     y_pred = predictor.predict(X_test)
     y_pred = pd.DataFrame(y_pred, columns=output_batting_columns)
+    print(y_pred)
     # print(X_test)
     # comparison = {}
     # comparison["actual"] = y_test.to_numpy()

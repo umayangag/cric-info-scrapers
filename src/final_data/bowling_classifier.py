@@ -21,12 +21,6 @@ import numpy as np
 from final_data.encoders import *
 
 RF = RandomForestClassifier(n_estimators=1000, criterion='entropy', max_depth=1000)
-gnb = GaussianNB()
-clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 5), random_state=1, max_iter=5000)
-SVM = svm.SVC(kernel='linear', C=1)
-regr = RandomForestRegressor(max_depth=2, random_state=0)
-reg = LinearRegression()
-mltreg = MultiOutputRegressor(reg)
 predictor = RF
 
 dirname = os.path.dirname(__file__)
@@ -76,15 +70,12 @@ final_df = pd.DataFrame(data=data_scaled, columns=X.columns)
 X = final_df
 
 train_set = 1465
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-X_train = X.iloc[:train_set, :]
-X_test = X.iloc[train_set + 1:, :]
-y_train = y.iloc[:train_set]
-y_test = y.iloc[train_set + 1:]
-predictor.fit(X_train, y_train)
-
-predictor.fit(X_train, y_train)
-
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+# X_train = X.iloc[:train_set, :]
+# X_test = X.iloc[train_set + 1:, :]
+# y_train = y.iloc[:train_set]
+# y_test = y.iloc[train_set + 1:]
+# predictor.fit(X_train, y_train)
 
 def calculate_econ(row):
     if row["deliveries"] == 0:

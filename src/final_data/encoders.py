@@ -47,15 +47,13 @@ def encode_fours(value):
 
 
 def encode_runs(value):
-    if value < 14:
+    if value < 18:
         return 0
-    if value < 33:
+    if value < 46:
         return 1
-    if value < 59:
+    if value < 85:
         return 2
-    if value < 92:
-        return 3
-    return 4
+    return 3
 
 
 def encode_balls_faced(value):
