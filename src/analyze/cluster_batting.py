@@ -33,7 +33,7 @@ if __name__ == "__main__":
         K = range(1, 10)
         for k in K:
             kmeanModel = KMeans(n_clusters=k)
-            kmeanModel.fit(batting_performance_data)
+            kmeanModel.fit(batting_performance_data[[attribute]])
             distortions.append(kmeanModel.inertia_)
 
         plt.figure(figsize=(16, 8))

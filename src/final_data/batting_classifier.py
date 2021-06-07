@@ -58,13 +58,13 @@ y["balls_faced"] = y["balls_faced"].apply(encode_balls_faced)
 y["fours_scored"] = y["fours_scored"].apply(encode_fours)
 y["sixes_scored"] = y["sixes_scored"].apply(encode_sixes)
 
-oversample = SMOTE()
 tempX = X
 tempX["balls_faced"] = y["balls_faced"].apply(encode_balls_faced)
 tempX["fours_scored"] = y["fours_scored"].apply(encode_fours)
 tempX["sixes_scored"] = y["sixes_scored"].apply(encode_sixes)
 tempX["batting_position"] = y["batting_position"]
 
+oversample = SMOTE()
 tempX, runs_predicted = oversample.fit_resample(tempX, input_data["runs_scored"].apply(encode_runs))
 tempX["runs_scored"] = runs_predicted
 X = tempX[X.columns]

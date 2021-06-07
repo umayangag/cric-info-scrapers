@@ -80,6 +80,16 @@ def encode_runs_conceded(value):
     return 3
 
 
+def encode_deliveries_bowled(value):
+    if value < 22:
+        return 0
+    if value < 38:
+        return 1
+    if value < 52:
+        return 2
+    return 3
+
+
 def encode_econ(value):
     if value < 4:
         return 0
