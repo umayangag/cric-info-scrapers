@@ -43,15 +43,15 @@ if __name__ == "__main__":
         plt.title('The Elbow Method showing the optimal k for batting performance')
         plt.show()
     else:
-        cluster_batting_performance(batting_performance_data)
+        df= cluster_batting_performance(batting_performance_data[[attribute]])
 
         output_file = os.path.join(dirname, 'output\\batting_cluster.csv')
-        batting_performance_data.to_csv(output_file)
-        x = "strike_rate"
-        y = "runs"
+        df.to_csv(output_file)
+        x = attribute
+        y = attribute
 
-        plt.scatter(batting_performance_data[x], batting_performance_data[y],
-                    c=batting_performance_data['batting_performance'])
+        plt.scatter(df[x], df[y],
+                    c=df['batting_performance'])
         plt.title("cluster visualization")
         plt.xlabel(x)
         plt.ylabel(y)

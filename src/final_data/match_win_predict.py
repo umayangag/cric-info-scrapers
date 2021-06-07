@@ -10,6 +10,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
+from final_data.encoders import *
 
 clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(43, 11, 1), random_state=1,
                     max_iter=10000)
@@ -20,7 +21,7 @@ dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "..\\team_selection\\final_dataset.csv")
 
 input_data = pd.read_csv(dataset_source)
-all_columns =[
+all_columns = [
     'batting_consistency',
     'batting_form',
     'batting_temp',
@@ -67,7 +68,7 @@ all_columns =[
     'bowling_contribution',
     "econ"
 ]
-optimum_columns=[
+optimum_columns = [
     # 'batting_consistency',
     # 'batting_form',
     # 'batting_temp',
@@ -115,15 +116,25 @@ optimum_columns=[
     # "econ"
 ]
 X = input_data[all_columns]
+X['runs_scored'] = X['runs_scored'].apply(lambda x: encode_runs(x))
+X['balls_faced'] = X['balls_faced'].apply(lambda x: encode_balls_faced(x))
 # TODO do not scale toss, result, wickets match number, batting position, etc
 print(len(X.columns))
 y = input_data["result"]  # Labels
+
 oversample = SMOTE()
 X, y = oversample.fit_resample(X, y)
 
 scaler = preprocessing.StandardScaler().fit(X)
 data_scaled = scaler.transform(X)
-X = pd.DataFrame(data=data_scaled, columns=X.columns)
+df = pd.DataFrame(data=data_scaled, columns=X.columns)
+
+# df["runs_scored"] = X['runs_scored']
+# df["balls_faced"] = X['balls_faced']
+# df["batting_position"] = X['batting_position']
+
+X=df
+
 train_set = 2423
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 X_train = X.iloc[:train_set, :]
@@ -162,7 +173,7 @@ def batting_predict(predictor):
     # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
     # plt.ylabel('features')
     # plt.xlabel('importance')
-    # plt.title('Feature importance: Accuracy:' + str(cvs))
+    # plt.title('Feature importance: Accuracy:')
     # plt.yticks(index, X.columns)
     # plt.tight_layout()
     # plt.show()

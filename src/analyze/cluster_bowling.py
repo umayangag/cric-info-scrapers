@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import os
 
 find_k = True
-find_k = False
+# find_k = False
 
 
 def cluster_bowling_performance(dataset):
@@ -48,7 +48,7 @@ if __name__ == "__main__":
         output_file = os.path.join(dirname, 'output\\bowling_cluster.csv')
         bowling_performance_data.to_csv(output_file)
 
-        x = "wickets"
+        x = "runs"
         y = "runs"
         plt.scatter(bowling_performance_data[x], bowling_performance_data[y],
                     c=bowling_performance_data['bowling_performance'])

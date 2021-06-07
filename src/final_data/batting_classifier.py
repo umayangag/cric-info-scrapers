@@ -5,7 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPClassifier
-from sklearn.multioutput import MultiOutputRegressor
+from sklearn.multioutput import MultiOutputClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix
@@ -20,16 +20,14 @@ import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier
 from final_data.encoders import *
 
-RF = RandomForestClassifier(n_estimators=1000, criterion='entropy', max_depth=1000,
-                            class_weight={0:1, 1: 1, 2: 1, 3: 1})
+RF = RandomForestClassifier(n_estimators=100, criterion='entropy', max_depth=100,
+                            class_weight={0: 1, 1: 1, 2: 1, 3: 1, 4: 1})
 gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(4, 3), random_state=1)
 SVM = svm.SVC(kernel='linear', C=1)
-regr = RandomForestRegressor(max_depth=4, random_state=0)
-reg = LinearRegression()
-mltreg = MultiOutputRegressor(regr)
+mltreg = MultiOutputClassifier(RF)
 gb = GradientBoostingClassifier(n_estimators=1000)
-predictor = RF
+predictor = mltreg
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
@@ -43,7 +41,7 @@ X = input_data[[
     'batting_form',
     'batting_temp',
     'batting_wind',
-    'batting_rain',
+    # 'batting_rain',
     'batting_humidity',
     'batting_cloud',
     'batting_pressure',
@@ -55,17 +53,17 @@ X = input_data[[
     'opposition',
     'season',
 ]]
-y = input_data["runs_scored"]  # Labels
-y = y.apply(encode_runs)
+y = input_data["balls_faced"]  # Labels
+y = y.apply(encode_balls_faced)
 oversample = SMOTE()
 X, y = oversample.fit_resample(X, y)
 
-# scaler = preprocessing.StandardScaler().fit(X)
-# data_scaled = scaler.transform(X)
-# final_df = pd.DataFrame(data=data_scaled, columns=X.columns)
-# X = final_df
+scaler = preprocessing.StandardScaler().fit(X)
+data_scaled = scaler.transform(X)
+final_df = pd.DataFrame(data=data_scaled, columns=X.columns)
+X = final_df
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 # train_set = 2095
 # X_train = X.iloc[:train_set, :]
 # X_test = X.iloc[train_set + 1:, :]
@@ -110,7 +108,7 @@ def batting_predict_test():
     plt.tight_layout()
     plt.show()
     print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
-    print(confusion_matrix(y_test, y_pred, labels=[0, 1, 2, 3]))
+    print(confusion_matrix(y_test, y_pred, labels=[0, 1, 2, 3, 4]))
     # print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean())
 
 
