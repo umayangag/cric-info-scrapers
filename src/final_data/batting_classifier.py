@@ -20,8 +20,7 @@ import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier
 from final_data.encoders import *
 
-RF = RandomForestClassifier(n_estimators=100, criterion='entropy', max_depth=100,
-                            class_weight={0: 1, 1: 1, 2: 1, 3: 1, 4: 1})
+RF = RandomForestClassifier(n_estimators=100, criterion='entropy', max_depth=100)
 gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(4, 3), random_state=1)
 SVM = svm.SVC(kernel='linear', C=1)
@@ -53,10 +52,23 @@ X = input_data[[
     'opposition',
     'season',
 ]]
-y = input_data["balls_faced"]  # Labels
-y = y.apply(encode_balls_faced)
+y = input_data[output_batting_columns]  # Labels
+y["runs_scored"] = y["runs_scored"].apply(encode_runs)
+y["balls_faced"] = y["balls_faced"].apply(encode_balls_faced)
+y["fours_scored"] = y["fours_scored"].apply(encode_fours)
+y["sixes_scored"] = y["sixes_scored"].apply(encode_sixes)
+
 oversample = SMOTE()
-X, y = oversample.fit_resample(X, y)
+tempX = X
+tempX["balls_faced"] = y["balls_faced"].apply(encode_balls_faced)
+tempX["fours_scored"] = y["fours_scored"].apply(encode_fours)
+tempX["sixes_scored"] = y["sixes_scored"].apply(encode_sixes)
+tempX["batting_position"] = y["batting_position"]
+
+tempX, runs_predicted = oversample.fit_resample(tempX, input_data["runs_scored"].apply(encode_runs))
+tempX["runs_scored"] = runs_predicted
+X = tempX[X.columns]
+y = tempX[output_batting_columns]
 
 scaler = preprocessing.StandardScaler().fit(X)
 data_scaled = scaler.transform(X)
@@ -89,6 +101,7 @@ def predict_batting(dataset):
 
 def batting_predict_test():
     y_pred = predictor.predict(X_test)
+    y_pred = pd.DataFrame(y_pred, columns=output_batting_columns)
     # print(X_test)
     # comparison = {}
     # comparison["actual"] = y_test.to_numpy()
@@ -97,18 +110,21 @@ def batting_predict_test():
     # for i in range(0, len(y_pred)):
     #     print(comparison["actual"][i], " ", comparison["predicted"][i], "")
 
-    plt.figure(figsize=(6 * 1.618, 6))
-    index = np.arange(len(X.columns))
-    bar_width = 0.35
-    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    plt.ylabel('features')
-    plt.xlabel('importance')
-    plt.title('Feature importance')
-    plt.yticks(index, X.columns)
-    plt.tight_layout()
-    plt.show()
-    print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
-    print(confusion_matrix(y_test, y_pred, labels=[0, 1, 2, 3, 4]))
+    # plt.figure(figsize=(6 * 1.618, 6))
+    # index = np.arange(len(X.columns))
+    # bar_width = 0.35
+    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    # plt.ylabel('features')
+    # plt.xlabel('importance')
+    # plt.title('Feature importance')
+    # plt.yticks(index, X.columns)
+    # plt.tight_layout()
+    # plt.show()
+
+    for attribute in output_batting_columns:
+        print("Accuracy:" + attribute, metrics.accuracy_score(y_test[attribute], y_pred[attribute]))
+        print(attribute, confusion_matrix(y_test[attribute], y_pred[attribute], labels=[0, 1, 2, 3, 4]))
+
     # print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean())
 
 

@@ -22,7 +22,7 @@ def encode_how_out(value):
     return 2
 
 
-def encode_fours(value):
+def encode_sixes(value):
     if value < 1:
         return 0
     if value < 2:
