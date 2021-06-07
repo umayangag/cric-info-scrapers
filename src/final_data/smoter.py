@@ -73,6 +73,7 @@ def SmoteR(D, target, th=0.999, o=200, u=100, k=3, categorical_col=[]):
     '''
     # median of the target variable
     y_bar = D[target].median()
+    y_bar =25
 
     # find rare cases where target less than median
     rareL = D[(relevance(D[target], y_bar) > th) & (D[target] > y_bar)]

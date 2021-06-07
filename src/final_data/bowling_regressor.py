@@ -27,19 +27,19 @@ RF = RandomForestClassifier(n_estimators=100)
 gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 5), random_state=1, max_iter=5000)
 SVM = svm.SVC(kernel='linear', C=1)
-rfr = RandomForestRegressor(max_depth=100, random_state=0)
+rfr = RandomForestRegressor(max_depth=10, n_estimators=50, random_state=0)
 reg = LinearRegression()
 mlpr = MLPRegressor(random_state=3, max_iter=2000, activation='tanh', solver='sgd',hidden_layer_sizes=(16))
 
 gb = GradientBoostingRegressor(n_estimators=15)
 mltreg = MultiOutputRegressor(gb)
-predictor = mltreg
+predictor = rfr
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
 
 input_data = pd.read_csv(dataset_source)
-model_output_columns = output_bowling_columns#["runs_conceded"]
+model_output_columns = ["wickets_taken"]
 training_input_columns = input_bowling_columns.copy()
 training_input_columns.remove("player_name")
 remove_columns = [
@@ -50,9 +50,9 @@ remove_columns = [
     # "bowling_cloud",
     # "batting_inning",
     # "bowling_rain",
-    "bowling_session",
-    "bowling_viscosity",
-    "toss",
+    # "bowling_session",
+    # "bowling_viscosity",
+    # "toss",
     # "season",
     # "bowling_pressure",
 ]

@@ -18,6 +18,7 @@ from team_selection.dataset_definitions import *
 from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import numpy as np
+from final_data.encoders import *
 
 RF = RandomForestClassifier(n_estimators=100)
 gnb = GaussianNB()
@@ -37,15 +38,15 @@ training_input_columns.remove("player_name")
 
 X = input_data[training_input_columns]
 y = input_data["runs_conceded"]  # Labels
-
+y = y.apply(encode_runs_conceded)
 oversample = SMOTE()
 X, y = oversample.fit_resample(X, y)
 
-scaler = preprocessing.StandardScaler().fit(X)
-data_scaled = scaler.transform(X)
-final_df = pd.DataFrame(data=data_scaled, columns=training_input_columns)
-X = final_df
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+# scaler = preprocessing.StandardScaler().fit(X)
+# data_scaled = scaler.transform(X)
+# final_df = pd.DataFrame(data=data_scaled, columns=training_input_columns)
+# X = final_df
+
 train_set = 1465
 X_train = X.iloc[:train_set, :]
 X_test = X.iloc[train_set + 1:, :]

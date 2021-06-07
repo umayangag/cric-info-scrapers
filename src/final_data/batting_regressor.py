@@ -14,15 +14,16 @@ import math
 from sklearn.utils import shuffle
 from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.model_selection import train_test_split
 
-rfr = RandomForestRegressor(bootstrap=True, min_impurity_decrease=0.0, min_weight_fraction_leaf=0.0, max_depth=100,
+rfr = RandomForestRegressor(bootstrap=True, min_impurity_decrease=0.0, min_weight_fraction_leaf=0.0, max_depth=5,
                             n_estimators=100, max_features='auto', random_state=0,
                             criterion='mse')
 lr = LinearRegression()
 mlpr = MLPRegressor(random_state=3, max_iter=2000, activation='tanh', solver='sgd', hidden_layer_sizes=(17))
-gb = GradientBoostingRegressor(n_estimators=30, loss='ls', criterion='mse')
+gb = GradientBoostingRegressor(n_estimators=30, loss='ls', criterion='mse',max_leaf_nodes=100, alpha=0.5)
 mltreg = MultiOutputRegressor(rfr)
-predictor = gb
+predictor = rfr
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
@@ -36,19 +37,19 @@ model_output_columns = ["runs_scored"]
 training_input_columns = input_batting_columns.copy()
 training_input_columns.remove("player_name")
 remove_columns = [
-    "batting_consistency",
-    "batting_form",
-    "batting_wind",
-    "batting_rain",
+    # "batting_consistency",
+    # "batting_form",
+    # "batting_wind",
+    # "batting_rain",
     # "batting_session",
     # "season",
-    "batting_viscosity",
-    "batting_inning",
-    "batting_pressure",
-    "batting_temp",
-    "batting_cloud",
-    "batting_humidity",
-    "toss",
+    # "batting_viscosity",
+    # "batting_inning",
+    # "batting_pressure",
+    # "batting_temp",
+    # "batting_cloud",
+    # "batting_humidity",
+    # "toss",
 ]
 
 season_index = 18
@@ -57,10 +58,11 @@ test_data = input_data.loc[input_data["season"] >= season_index]
 
 X = training_data[training_input_columns].drop(columns=remove_columns)
 y = training_data[model_output_columns]  # Labels
-# y['runs_scored'] = y['runs_scored'].apply(lambda x:pow(x,3))
+# y['runs_scored'] = y['runs_scored'].apply(lambda x:x**1/2)
 # input_scaler = preprocessing.StandardScaler().fit(X)
 # output_scaler = preprocessing.StandardScaler().fit(y)
 
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 X_train = pd.DataFrame(data=training_data[X.columns], columns=X.columns)
 y_train = pd.DataFrame(data=training_data[model_output_columns], columns=model_output_columns)
 X_test = pd.DataFrame(data=test_data[X.columns], columns=X.columns)
@@ -70,8 +72,8 @@ y_test = pd.DataFrame(data=test_data[model_output_columns], columns=model_output
 # cols = X_train.columns.tolist()
 # cols.append('runs_scored')
 # D = pd.DataFrame(np.concatenate([X_train, y_train], axis=1), columns=cols)
-# Xs = SmoteR(D, target='runs_scored', th=0.8, o=100, u=50, k=4, categorical_col=[])
-
+# Xs = SmoteR(D, target='runs_scored', th=0.8, o=1000, u=50, k=4, categorical_col=[])
+#
 # X_train = Xs.drop(columns=['runs_scored'])
 # y_train = Xs[['runs_scored']]
 
@@ -122,16 +124,16 @@ def batting_predict_test():
     y_pred = predictor.predict(X_test)
     # print(X_test)
 
-    plt.figure(figsize=(6 * 1.618, 6))
-    index = np.arange(len(X.columns))
-    bar_width = 0.35
-    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    plt.ylabel('features')
-    plt.xlabel('importance')
-    plt.title('Feature importance')
-    plt.yticks(index, X.columns)
-    plt.tight_layout()
-    plt.show()
+    # plt.figure(figsize=(6 * 1.618, 6))
+    # index = np.arange(len(X.columns))
+    # bar_width = 0.35
+    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    # plt.ylabel('features')
+    # plt.xlabel('importance')
+    # plt.title('Feature importance')
+    # plt.yticks(index, X.columns)
+    # plt.tight_layout()
+    # plt.show()
 
     plt.plot(range(0, len(y_test)), y_test, color='blue')
     plt.plot(range(0, len(y_pred)), y_pred, color='red')
@@ -151,8 +153,8 @@ def batting_predict_test():
     print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
     print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
     print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
-    print('R2:', metrics.r2_score(y_test, y_pred))
-    print('R2:', metrics.r2_score(y_train, predictor.predict(X_train)))
+    print('R2 test:', metrics.r2_score(y_test, y_pred))
+    print('R2 train:', metrics.r2_score(y_train, predictor.predict(X_train)))
     #
     # print("Cross Validation Score:", cross_val_score(predictor, X, y, cv=10).mean())
 

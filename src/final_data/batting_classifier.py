@@ -20,8 +20,8 @@ import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier
 from final_data.encoders import *
 
-RF = RandomForestClassifier(n_estimators=100, criterion='entropy', bootstrap=False, max_depth=100,
-                            class_weight={0: 4, 1: 1, 2: 2})
+RF = RandomForestClassifier(n_estimators=100, criterion='entropy', max_depth=100,
+                            )
 gnb = GaussianNB()
 clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(4, 3), random_state=1)
 SVM = svm.SVC(kernel='linear', C=1)
@@ -29,7 +29,7 @@ regr = RandomForestRegressor(max_depth=4, random_state=0)
 reg = LinearRegression()
 mltreg = MultiOutputRegressor(regr)
 gb = GradientBoostingClassifier(n_estimators=1000)
-predictor = gb
+predictor = RF
 
 dirname = os.path.dirname(__file__)
 dataset_source = os.path.join(dirname, "output\\batting_encoded.csv")
@@ -57,20 +57,20 @@ X = input_data[[
 ]]
 y = input_data["runs_scored"]  # Labels
 y = y.apply(encode_runs)
-# oversample = SMOTE()
-# X, y = oversample.fit_resample(X, y)
+oversample = SMOTE()
+X, y = oversample.fit_resample(X, y)
 
 scaler = preprocessing.StandardScaler().fit(X)
 data_scaled = scaler.transform(X)
 final_df = pd.DataFrame(data=data_scaled, columns=X.columns)
 X = final_df
 
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-train_set = 2095
-X_train = X.iloc[:train_set, :]
-X_test = X.iloc[train_set + 1:, :]
-y_train = y.iloc[:train_set]
-y_test = y.iloc[train_set + 1:]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+# train_set = 2095
+# X_train = X.iloc[:train_set, :]
+# X_test = X.iloc[train_set + 1:, :]
+# y_train = y.iloc[:train_set]
+# y_test = y.iloc[train_set + 1:]
 predictor.fit(X_train, y_train)
 
 
