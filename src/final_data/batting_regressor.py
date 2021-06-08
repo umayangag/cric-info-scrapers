@@ -20,6 +20,8 @@ import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier
 from final_data.encoders import *
 import pickle
+from sklearn.calibration import calibration_curve
+from sklearn.linear_model import LogisticRegression
 
 model_file = "batting_performance_predictor.sav"
 scaler_file = "batting_scaler.sav"
@@ -83,7 +85,10 @@ def batting_predict_test():
     plt.ylabel('Runs Scored')
     plt.show()
 
-    plt.scatter(y_train["runs_scored"], train_predict["runs_scored"], color='red')
+    gradient_corrected = train_predict["runs_scored"]
+    gradient_corrected = train_predict["runs_scored"]
+
+    plt.scatter(y_train["runs_scored"], gradient_corrected, color='red')
     plt.plot(y_train["runs_scored"], y_train["runs_scored"], color='blue')
     plt.scatter(y_test["runs_scored"], y_pred["runs_scored"], color='green')
     plt.title('Actual vs Predicted')
@@ -102,7 +107,7 @@ def batting_predict_test():
 
 
 if __name__ == "__main__":
-    RFR = RandomForestRegressor(max_depth=50, n_estimators=50, random_state=0)
+    RFR = RandomForestRegressor(max_depth=1000, n_estimators=1000, random_state=1, max_features="auto", n_jobs=-1)
     predictor = RFR
 
     dirname = os.path.dirname(__file__)

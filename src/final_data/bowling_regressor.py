@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier
 from final_data.encoders import *
+from sklearn.ensemble import GradientBoostingRegressor
 import pickle
 
 model_file = "bowling_performance_predictor.sav"
@@ -102,7 +103,7 @@ def bowling_predict_test():
 
 
 if __name__ == "__main__":
-    RFR = RandomForestRegressor(max_depth=50, n_estimators=50, random_state=0)
+    RFR = RandomForestRegressor(max_depth=1000, n_estimators=1000, random_state=0, n_jobs=-1)
     predictor = RFR
 
     dirname = os.path.dirname(__file__)

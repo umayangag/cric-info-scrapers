@@ -141,7 +141,7 @@ if __name__ == "__main__":
         bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
         final_df = pd.merge(batting_df, bowling_df, on="player_name", how="left")
         final_df["target"] = final_df["target"].fillna(final_df["total_score"].mean())
-        final_df["batting_position"].replace(0, 10, inplace=True)
+        # final_df["batting_position"].replace(0, 10, inplace=True)
         final_df = fill_missing_attributes(final_df)
         df_array.append(final_df)
     parent_df = pd.concat(df_array, ignore_index=True)

@@ -31,7 +31,7 @@ all_columns = [
     'toss',
     'venue',
     'opposition',
-    'season',
+    # 'season',
     'runs_scored',
     'balls_faced',
     'fours_scored',
@@ -69,8 +69,8 @@ def predict_for_team(input_team_data):
     team_data = input_team_data[all_columns].copy()
     loaded_predictor = pickle.load(open(model_file, 'rb'))
     loaded_scaler = pickle.load(open(scaler_file, 'rb'))
-    team_performance = loaded_scaler.transform(team_data)
-    predicted = loaded_predictor.predict_proba(team_performance)
+    # team_performance = loaded_scaler.transform(team_data)
+    predicted = loaded_predictor.predict_proba(team_data)
     df = pd.DataFrame(predicted, columns=["lose", "win"])
     team_data["winning_probability"] = df["win"].to_numpy()
     return team_data, df["win"].mean()
@@ -113,8 +113,7 @@ def win_predict(predictor):
 
 if __name__ == "__main__":
     clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(43, 11, 1), random_state=1,
-                        max_iter=10000)
-    gb = GradientBoostingClassifier(n_estimators=1000)
+                        max_iter=1000)
     predictor = clf
 
     dirname = os.path.dirname(__file__)
