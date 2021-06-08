@@ -33,6 +33,15 @@ hash_economy = {0: 4, 1: 8, 2: 20}
 hash_deliveries = {0: 30, 1: 61}
 
 
+def decode_value(value_array, value):
+    count = len(value_array) - 1
+    if value > count:
+        return value_array[count]
+    if value == 0:
+        return value_array[0] / 2
+    return (value_array[value - 1] + value_array[value]) / 2
+
+
 def encode_value(value_array, value):
     count = len(value_array)
     for i in range(count):

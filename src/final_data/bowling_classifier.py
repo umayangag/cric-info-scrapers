@@ -19,20 +19,9 @@ from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import numpy as np
 from final_data.encoders import *
+import pickle
 
-RF = RandomForestClassifier(n_estimators=1000, criterion='entropy', max_depth=1000,
-                            # class_weight=[{0: 1, 1: 1, 2: 1}, {0: 1, 1: 1}, {0: 1, 1: 1, 2: 1}]
-                            class_weight="balanced"
-                            )
-predictor = RF
-
-dirname = os.path.dirname(__file__)
-dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
-
-input_data = pd.read_csv(dataset_source)
-input_data = input_data.sample(frac=1).reset_index(drop=True)
-training_input_columns = input_bowling_columns.copy()
-training_input_columns.remove("player_name")
+model_file = "bowling_performance_predictor.sav"
 
 input_columns = [
     "bowling_consistency",
@@ -51,50 +40,22 @@ input_columns = [
     "bowling_opposition",
     "season",
 ]
-X = input_data[input_columns]
-y = input_data[output_bowling_columns].copy()  # Labels
-y["economy"] = y["economy"].apply(encode_econ)
-y["deliveries"] = y["deliveries"].apply(encode_deliveries_bowled)
-y["wickets_taken"] = y["wickets_taken"].apply(encode_wickets)
-
-tempX = X.copy()
-tempX["deliveries"] = y["deliveries"]
-tempX["wickets_taken"] = y["wickets_taken"]
-
-oversample = SMOTE()
-tempX, runs_predicted = oversample.fit_resample(tempX, y["economy"])
-
-tempX["economy"] = runs_predicted
-X = tempX[input_columns]
-y = tempX[output_bowling_columns]
-
-# scaler = preprocessing.StandardScaler().fit(X)
-# data_scaled = scaler.transform(X)
-# final_df = pd.DataFrame(data=data_scaled, columns=X.columns)
-# X = final_df
-
-train_set = 1465
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-# X_train = X.iloc[:train_set, :]
-# X_test = X.iloc[train_set + 1:, :]
-# y_train = y.iloc[:train_set]
-# y_test = y.iloc[train_set + 1:]
-predictor.fit(X_train, y_train)
-
-
-def calculate_econ(row):
-    if row["deliveries"] == 0:
-        return 0
-    return row["runs_conceded"] * 6 / row["deliveries"]
 
 
 def predict_bowling(dataset):
-    predicted = predictor.predict(dataset[input_columns])
+    loaded_predictor = pickle.load(open(model_file, 'rb'))
+    predicted = loaded_predictor.predict(dataset[input_columns])
     result = pd.DataFrame(predicted, columns=y.columns)
     for column in y.columns:
         dataset[column] = result[column]
-    # dataset["econ"] = dataset.apply(lambda row: calculate_econ(row), axis=1)
+    dataset["runs_conceded"] = dataset.apply(lambda row: calculate_runs_conceded(row), axis=1)
     return dataset
+
+
+def calculate_runs_conceded(row):
+    if row["bowling_consistency"] == 0:
+        return 0
+    return decode_value(hash_economy, row["economy"]) * decode_value(hash_deliveries, row["deliveries"]) / 6
 
 
 def bowling_predict_test():
@@ -129,4 +90,48 @@ def bowling_predict_test():
 
 
 if __name__ == "__main__":
+    RF = RandomForestClassifier(n_estimators=1000, criterion='entropy', max_depth=1000,
+                                # class_weight=[{0: 1, 1: 1, 2: 1}, {0: 1, 1: 1}, {0: 1, 1: 1, 2: 1}]
+                                class_weight="balanced"
+                                )
+    predictor = RF
+
+    dirname = os.path.dirname(__file__)
+    dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
+
+    input_data = pd.read_csv(dataset_source)
+    input_data = input_data.sample(frac=1).reset_index(drop=True)
+    training_input_columns = input_bowling_columns.copy()
+    training_input_columns.remove("player_name")
+
+    X = input_data[input_columns]
+    y = input_data[output_bowling_columns].copy()  # Labels
+    y["economy"] = y["economy"].apply(encode_econ)
+    y["deliveries"] = y["deliveries"].apply(encode_deliveries_bowled)
+    y["wickets_taken"] = y["wickets_taken"].apply(encode_wickets)
+
+    tempX = X.copy()
+    tempX["deliveries"] = y["deliveries"]
+    tempX["wickets_taken"] = y["wickets_taken"]
+
+    oversample = SMOTE()
+    tempX, runs_predicted = oversample.fit_resample(tempX, y["economy"])
+
+    tempX["economy"] = runs_predicted
+    X = tempX[input_columns]
+    y = tempX[output_bowling_columns]
+
+    # scaler = preprocessing.StandardScaler().fit(X)
+    # data_scaled = scaler.transform(X)
+    # final_df = pd.DataFrame(data=data_scaled, columns=X.columns)
+    # X = final_df
+
+    train_set = 1465
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    # X_train = X.iloc[:train_set, :]
+    # X_test = X.iloc[train_set + 1:, :]
+    # y_train = y.iloc[:train_set]
+    # y_test = y.iloc[train_set + 1:]
+    predictor.fit(X_train, y_train)
+    pickle.dump(predictor, open(model_file, 'wb'))
     bowling_predict_test()

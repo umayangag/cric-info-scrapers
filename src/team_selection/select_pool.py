@@ -68,22 +68,22 @@ def get_batting_performance(player_list, match_id):
 
         data_array.append([
             player[1]["batting_consistency"],
-                           player_form,
-                           temp,
-                           wind,
-                           rain,
-                           humidity,
-                           cloud,
-                           pressure,
-                           encode_viscosity(viscosity),
-                           inning,
-                           encode_session(session),
-                           toss,
-                           player_venue,
-                           player_opposition,
-                           season_id,
-                           player_name
-                           ])
+            player_form,
+            temp,
+            wind,
+            rain,
+            humidity,
+            cloud,
+            pressure,
+            encode_viscosity(viscosity),
+            inning,
+            encode_session(session),
+            toss,
+            player_venue,
+            player_opposition,
+            season_id,
+            player_name
+        ])
     dataset = pd.DataFrame(data_array, columns=input_batting_columns)
     predicted = predict_batting(dataset.loc[:, dataset.columns != "player_name"])
     predicted["player_name"] = dataset["player_name"]
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     calculated_team = calculate_overall_performance(predicted_team, match_id)
 
     print(calculated_team.sort_values(by="batting_position", ascending=True)[
-              ["player_name", "runs_scored", "economy", "wickets_taken", "winning_probability"]])
+              ["player_name", "runs_scored", "runs_conceded", "economy", "wickets_taken", "winning_probability"]])
 
     # ---------------------------------------------------------------
 
@@ -141,4 +141,4 @@ if __name__ == "__main__":
     actual_team = calculate_overall_performance(actual_team, match_id)
 
     print(actual_team.sort_values(by="batting_position", ascending=True)[
-              ["player_name", "runs_scored", "econ", "wickets_taken", "winning_probability"]])
+              ["player_name", "runs_scored", "runs_conceded", "economy", "wickets_taken", "winning_probability"]])

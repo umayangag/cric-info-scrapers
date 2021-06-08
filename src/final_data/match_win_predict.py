@@ -63,7 +63,7 @@ all_columns = [
     'bowling_session',
     'bowling_venue',
     'bowling_opposition',
-    # 'runs_conceded',
+    'runs_conceded',
     'deliveries',
     'wickets_taken',
     'bowling_contribution',
@@ -193,7 +193,7 @@ def batting_predict(predictor):
 def predict_for_team(team_data):
     print(set(X.columns) - set(team_data.columns))
     team_performance = team_data.copy()
-    predicted = predictor.predict_proba(team_performance)
+    predicted = predictor.predict_proba(team_performance[all_columns])
     df = pd.DataFrame(predicted, columns=["lose", "win"])
     team_performance["winning_probability"] = df["win"].to_numpy()
     return team_performance, df["win"].mean()

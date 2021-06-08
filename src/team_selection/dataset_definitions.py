@@ -49,7 +49,7 @@ input_bowling_columns = [
     "player_name",
 ]
 output_bowling_columns = ["economy", "deliveries", "wickets_taken"]
-derived_bowling_columns = ["bowling_contribution", "econ"]
+derived_bowling_columns = ["bowling_contribution", "runs_conceded"]
 match_summary_columns = ["total_score", "total_wickets", "total_balls", "target", "extras", "match_number", "result"]
 
 all_batting_columns = np.concatenate((input_batting_columns, output_batting_columns, derived_batting_columns))

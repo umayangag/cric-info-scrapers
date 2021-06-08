@@ -50,11 +50,11 @@ def get_bowling_df(player_list, match_id):
                                player_opposition,
                                season_id,
                                player_name,
-                               runs,
+                               econ,
                                deliveries,
                                wickets,
                                contribution,
-                               econ
+                               runs
                                ])
     return pd.DataFrame(data_array, columns=all_bowling_columns)
 
