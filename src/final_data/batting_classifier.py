@@ -48,7 +48,7 @@ input_columns=[
     'season',
 ]
 X = input_data[input_columns]
-y = input_data[output_batting_columns]  # Labels
+y = input_data[output_batting_columns].copy()  # Labels
 y["runs_scored"] = y["runs_scored"].apply(encode_runs)
 y["balls_faced"] = y["balls_faced"].apply(encode_balls_faced)
 y["fours_scored"] = y["fours_scored"].apply(encode_fours)
@@ -56,7 +56,7 @@ y["sixes_scored"] = y["sixes_scored"].apply(encode_sixes)
 y["batting_position"] = y["batting_position"].apply(encode_batting_position)
 
 
-tempX = X
+tempX = X.copy()
 tempX["balls_faced"] = y["balls_faced"]
 tempX["fours_scored"] = y["fours_scored"]
 tempX["sixes_scored"] = y["sixes_scored"]
@@ -68,13 +68,13 @@ tempX["runs_scored"] = runs_predicted
 X = tempX[input_columns]
 y = tempX[output_batting_columns]
 
-scaler = preprocessing.StandardScaler().fit(X)
-data_scaled = scaler.transform(X)
-final_df = pd.DataFrame(data=data_scaled, columns=input_columns)
-X = final_df
-# X.to_csv("final_batting_2021.csv")
+# scaler = preprocessing.StandardScaler().fit(X)
+# data_scaled = scaler.transform(X)
+# final_df = pd.DataFrame(data=data_scaled, columns=input_columns)
+# X = final_df
+X.to_csv("final_batting_2021.csv")
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.37)
 # train_set = 5000
 # X_train = X.iloc[:train_set, :]
 # X_test = X.iloc[train_set + 1:, :]
@@ -117,7 +117,7 @@ def batting_predict_test():
         print("Accuracy:" + attribute, metrics.accuracy_score(y_test[attribute], y_pred[attribute]))
         print(attribute + '\n', confusion_matrix(y_test[attribute], y_pred[attribute], labels=[0, 1, 2, 3, 4]))
 
-    print("Cross Validation Score:", cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean())
+    # print("Cross Validation Score:", cross_val_score(predictor, X, y["runs_scored"], scoring='accuracy', cv=10).mean())
 
 
 if __name__ == "__main__":
