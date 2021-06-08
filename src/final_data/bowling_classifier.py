@@ -45,8 +45,8 @@ input_columns = [
 def predict_bowling(dataset):
     loaded_predictor = pickle.load(open(model_file, 'rb'))
     predicted = loaded_predictor.predict(dataset[input_columns])
-    result = pd.DataFrame(predicted, columns=y.columns)
-    for column in y.columns:
+    result = pd.DataFrame(predicted, columns=output_bowling_columns)
+    for column in output_bowling_columns:
         dataset[column] = result[column]
     dataset["runs_conceded"] = dataset.apply(lambda row: calculate_runs_conceded(row), axis=1)
     return dataset

@@ -33,10 +33,30 @@ hash_economy = {0: 4, 1: 8, 2: 20}
 hash_deliveries = {0: 30, 1: 61}
 
 
+def decode_deliveries(value):
+    return decode_value(hash_deliveries, value)
+
+
+def decode_runs_conceded(value):
+    return decode_value(hash_runs_conceded, value)
+
+
+def decode_wickets_taken(value):
+    return decode_value(hash_wickets_taken, value)
+
+
+def decode_balls_faced(value):
+    return decode_value(hash_balls_faced, value)
+
+
+def decode_runs(value):
+    return decode_value(hash_runs, value)
+
+
 def decode_value(value_array, value):
     count = len(value_array) - 1
     if value > count:
-        return value_array[count]
+        return value_array[count-1]
     if value == 0:
         return value_array[0] / 2
     return (value_array[value - 1] + value_array[value]) / 2

@@ -11,17 +11,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 from final_data.encoders import *
+import pickle
 
-clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(43, 11, 1), random_state=1,
-                    max_iter=10000)
-gb = GradientBoostingClassifier(n_estimators=1000)
-predictor = clf
+model_file = "win_predictor.sav"
+scaler_file = "win_predictor_scaler.sav"
 
-dirname = os.path.dirname(__file__)
-dataset_source = os.path.join(dirname, "..\\team_selection\\final_dataset.csv")
-
-input_data = pd.read_csv(dataset_source)
-input_data = input_data.sample(frac=1).reset_index(drop=True)
 all_columns = [
     'batting_consistency',
     'batting_form',
@@ -37,7 +31,7 @@ all_columns = [
     'toss',
     'venue',
     'opposition',
-    # 'season',
+    'season',
     'runs_scored',
     'balls_faced',
     'fours_scored',
@@ -69,93 +63,20 @@ all_columns = [
     'bowling_contribution',
     "economy"
 ]
-optimum_columns = [
-    # 'batting_consistency',
-    # 'batting_form',
-    # 'batting_temp',
-    'batting_wind',
-    'batting_rain',
-    # 'batting_humidity',
-    'batting_cloud',
-    'batting_pressure',
-    'batting_viscosity',
-    'batting_inning',
-    # 'batting_session',
-    # 'toss',
-    # 'venue',
-    # 'opposition',
-    # 'season',
-    # 'runs_scored',
-    # 'balls_faced',
-    # 'fours_scored',
-    # 'sixes_scored',
-    # 'batting_position',
-    # 'batting_contribution',
-    # 'strike_rate',
-    'total_score',
-    'total_wickets',
-    'total_balls',
-    'target',
-    'extras',
-    # 'match_number',
-    # 'bowling_consistency',
-    # 'bowling_form',
-    'bowling_temp',
-    # 'bowling_wind',
-    # 'bowling_rain',
-    'bowling_humidity',
-    'bowling_cloud',
-    # 'bowling_pressure',
-    # 'bowling_viscosity',
-    # 'bowling_session',
-    # 'bowling_venue',
-    # 'bowling_opposition',
-    # 'runs_conceded',
-    # 'deliveries',
-    # 'wickets_taken',
-    # 'bowling_contribution',
-    # "econ"
-]
-X = input_data[all_columns].copy()
-X['runs_scored'] = X['runs_scored'].apply(lambda x: encode_runs(x))
-X['balls_faced'] = X['balls_faced'].apply(lambda x: encode_balls_faced(x))
-X['fours_scored'] = X['fours_scored'].apply(lambda x: encode_fours(x))
-X['sixes_scored'] = X['sixes_scored'].apply(lambda x: encode_sixes(x))
-X['batting_position'] = X['batting_position'].apply(lambda x: encode_batting_position(x))
-X['economy'] = X['economy'].apply(lambda x: encode_econ(x))
-X['deliveries'] = X['deliveries'].apply(lambda x: encode_deliveries_bowled(x))
-X['wickets_taken'] = X['wickets_taken'].apply(lambda x: encode_wickets(x))
-# TODO do not scale toss, result, wickets match number, batting position, etc
-print(len(X.columns))
-y = input_data["result"]  # Labels
-X.to_csv("match_win.csv")
-oversample = SMOTE()
-X, y = oversample.fit_resample(X, y)
-
-scaler = preprocessing.StandardScaler().fit(X)
-data_scaled = scaler.transform(X)
-df = pd.DataFrame(data=data_scaled, columns=X.columns)
-
-# df["runs_scored"] = X['runs_scored']
-# df["balls_faced"] = X['balls_faced']
-# df["batting_position"] = X['batting_position']
-
-X=df
-
-train_set = 2423
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-X_train = X.iloc[:train_set, :]
-X_test = X.iloc[train_set + 1:, :]
-y_train = y.iloc[:train_set]
-y_test = y.iloc[train_set + 1:]
-
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-#
-
-predictor.fit(X_train, y_train)
 
 
-def batting_predict(predictor):
+def predict_for_team(input_team_data):
+    team_data = input_team_data[all_columns].copy()
+    loaded_predictor = pickle.load(open(model_file, 'rb'))
+    loaded_scaler = pickle.load(open(scaler_file, 'rb'))
+    team_performance = loaded_scaler.transform(team_data)
+    predicted = loaded_predictor.predict_proba(team_performance)
+    df = pd.DataFrame(predicted, columns=["lose", "win"])
+    team_data["winning_probability"] = df["win"].to_numpy()
+    return team_data, df["win"].mean()
+
+
+def win_predict(predictor):
     y_pred = predictor.predict(X_test)
     # probability = predictor.predict_proba(X_test)
     # print(type(y_pred), type(y_test))
@@ -190,17 +111,58 @@ def batting_predict(predictor):
     return accuracy
 
 
-def predict_for_team(team_data):
-    print(set(X.columns) - set(team_data.columns))
-    team_performance = team_data.copy()
-    predicted = predictor.predict_proba(team_performance[all_columns])
-    df = pd.DataFrame(predicted, columns=["lose", "win"])
-    team_performance["winning_probability"] = df["win"].to_numpy()
-    return team_performance, df["win"].mean()
-
-
 if __name__ == "__main__":
-    batting_predict(predictor)
+    clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(43, 11, 1), random_state=1,
+                        max_iter=10000)
+    gb = GradientBoostingClassifier(n_estimators=1000)
+    predictor = clf
+
+    dirname = os.path.dirname(__file__)
+    dataset_source = os.path.join(dirname, "..\\team_selection\\final_dataset.csv")
+
+    input_data = pd.read_csv(dataset_source)
+    # input_data = input_data.sample(frac=1).reset_index(drop=True)
+
+    X = input_data[all_columns].copy()
+    X['runs_scored'] = X['runs_scored'].apply(lambda x: encode_runs(x))
+    X['balls_faced'] = X['balls_faced'].apply(lambda x: encode_balls_faced(x))
+    X['fours_scored'] = X['fours_scored'].apply(lambda x: encode_fours(x))
+    X['sixes_scored'] = X['sixes_scored'].apply(lambda x: encode_sixes(x))
+    X['batting_position'] = X['batting_position'].apply(lambda x: encode_batting_position(x))
+    X['economy'] = X['economy'].apply(lambda x: encode_econ(x))
+    X['deliveries'] = X['deliveries'].apply(lambda x: encode_deliveries_bowled(x))
+    X['wickets_taken'] = X['wickets_taken'].apply(lambda x: encode_wickets(x))
+    # TODO do not scale toss, result, wickets match number, batting position, etc
+    print(len(X.columns))
+    y = input_data["result"]  # Labels
+    X.to_csv("match_win.csv")
+    # oversample = SMOTE()
+    # X, y = oversample.fit_resample(X, y)
+
+    scaler = preprocessing.StandardScaler().fit(X)
+    data_scaled = scaler.transform(X)
+    df = pd.DataFrame(data=data_scaled, columns=X.columns)
+    pickle.dump(scaler, open(scaler_file, 'wb'))
+    # df["runs_scored"] = X['runs_scored']
+    # df["balls_faced"] = X['balls_faced']
+    # df["batting_position"] = X['batting_position']
+
+    X = df
+    print(X)
+
+    train_set = 2300
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    X_train = X.iloc[:train_set, :]
+    X_test = X.iloc[train_set + 1:, :]
+    y_train = y.iloc[:train_set]
+    y_test = y.iloc[train_set + 1:]
+
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    #
+
+    predictor.fit(X_train, y_train)
+    pickle.dump(predictor, open(model_file, 'wb'))
+    win_predict(predictor)
     # values = []
     # for i in range(1, 20):
     #     for j in range(1, 20):

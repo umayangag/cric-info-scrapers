@@ -46,7 +46,7 @@ def predict_batting(dataset):
     loaded_predictor = pickle.load(open(model_file, 'rb'))
     predicted = loaded_predictor.predict(dataset[input_columns])
     result = pd.DataFrame(predicted, columns=output_batting_columns)
-    for column in y.columns:
+    for column in output_batting_columns:
         dataset[column] = result[column]
     dataset["strike_rate"] = dataset.apply(lambda row: calculate_strike_rate(row), axis=1)
     return dataset
