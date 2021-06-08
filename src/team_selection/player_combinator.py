@@ -19,12 +19,16 @@ def calculate_overall_performance(input_df, match_id):
     runs_conceded = team_df["runs_conceded"]
     deliveries = team_df["deliveries"]
 
-    total_score = runs_scored.sum() * magic_number + extras
-    target = runs_conceded.sum() * magic_number
-    total_balls_faced = balls_faced.sum() * magic_number
+    # total_score = runs_scored.sum() * magic_number + extras
+    # target = runs_conceded.sum() * magic_number
+    # total_balls_faced = balls_faced.sum() * magic_number
 
-    team_df["total_score"] = total_score * magic_number
-    team_df["total_wickets"] = 10
+    total_score = get_total_score(balls_faced, runs_scored, extras, magic_number)
+    target = get_total_conceded(deliveries, runs_conceded, wickets_taken)
+    total_balls_faced = calculate_total_balls_faced(balls_faced, magic_number)
+
+    team_df["total_score"] = total_score
+    team_df["total_wickets"] = 7
     team_df["total_balls"] = total_balls_faced
     team_df["target"] = target
     team_df["extras"] = extras
@@ -59,7 +63,9 @@ def calculate_overall_performance(input_df, match_id):
 def get_total_score(balls_faced, runs_scored, extras, magic_number):
     if balls_faced.sum() > 300:
         return (runs_scored.sum() * 300 / balls_faced.sum()) + extras
-    return (runs_scored.sum() * magic_number) + extras
+    if magic_number < 1:
+        return (runs_scored.sum() * magic_number) + extras
+    return runs_scored.sum() + extras
 
 
 def get_total_conceded(deliveries, runs_conceded, wickets_taken):
@@ -69,3 +75,10 @@ def get_total_conceded(deliveries, runs_conceded, wickets_taken):
         return runs_conceded.sum() * 10 / wickets_taken.sum()
 
     return runs_conceded.sum()
+
+
+def calculate_total_balls_faced(balls_faced, magic_number):
+    sum = balls_faced.sum() * magic_number
+    if sum > 300:
+        return 300
+    return sum
