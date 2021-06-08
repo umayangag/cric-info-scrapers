@@ -23,10 +23,14 @@ def encode_how_out(value):
 
 
 hash_runs = {0: 30, 1: 60, 2: 90, 3: 200}
+hash_runs_conceded = {0: 30, 1: 60, 2: 120}
 hash_balls_faced = {0: 30, 1: 60, 2: 90, 3: 200}
 hash_batting_position = {0: 4, 1: 7, 2: 12}
 hash_fours = {0: 4, 1: 8, 2: 12}
 hash_sixes = {0: 2, 1: 4, 2: 6}
+hash_wickets_taken = {0: 2, 1: 6, 2: 10}
+hash_economy = {0: 4, 1: 8, 2: 20}
+hash_deliveries = {0: 30, 1: 61}
 
 
 def encode_value(value_array, value):
@@ -58,42 +62,16 @@ def encode_fours(value):
 
 
 def encode_runs_conceded(value):
-    if value < 25:
-        return 0
-    if value < 43:
-        return 1
-    if value < 61:
-        return 2
-    return 3
+    return encode_value(hash_runs_conceded, value)
 
 
 def encode_deliveries_bowled(value):
-    if value < 22:
-        return 0
-    if value < 38:
-        return 1
-    if value < 52:
-        return 2
-    return 3
+    return encode_value(hash_deliveries, value)
 
 
 def encode_econ(value):
-    if value < 4:
-        return 0
-    if value < 8:
-        return 1
-    if value < 12:
-        return 2
-    return 3
+    return encode_value(hash_economy, value)
 
 
 def encode_wickets(value):
-    if value < 1:
-        return 0
-    if value < 2:
-        return 1
-    if value < 3:
-        return 2
-    if value < 4:
-        return 3
-    return 4
+    return encode_value(hash_wickets_taken, value)

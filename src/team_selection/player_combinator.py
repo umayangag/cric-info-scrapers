@@ -28,6 +28,8 @@ def calculate_overall_performance(input_df, match_id):
     def calculate_bowling_contribution(row, key):
         return row[key] / target
 
+    team_df.to_csv("final_team.csv")
+
     team_df["bowling_contribution"] = team_df.apply(lambda row: calculate_bowling_contribution(row, "runs_conceded"),
                                                     axis=1)
     team_df["batting_contribution"] = team_df.apply(lambda row: calculate_batting_contribution(row, "runs_scored"),

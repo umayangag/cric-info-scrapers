@@ -1,6 +1,6 @@
 import pandas as pd
-from final_data.batting_regressor_multilcass import predict_batting
-from final_data.bowling_regressor import predict_bowling
+from final_data.batting_classifier import predict_batting
+from final_data.bowling_classifier import predict_bowling
 from team_selection.dataset_definitions import *
 from team_selection.shared.match_data import *
 from team_selection.player_combinator import *
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     calculated_team = calculate_overall_performance(predicted_team, match_id)
 
     print(calculated_team.sort_values(by="batting_position", ascending=True)[
-              ["player_name", "runs_scored", "runs_conceded", "econ", "wickets_taken", "winning_probability"]])
+              ["player_name", "runs_scored", "economy", "wickets_taken", "winning_probability"]])
 
     # ---------------------------------------------------------------
 
@@ -141,4 +141,4 @@ if __name__ == "__main__":
     actual_team = calculate_overall_performance(actual_team, match_id)
 
     print(actual_team.sort_values(by="batting_position", ascending=True)[
-              ["player_name", "runs_scored", "runs_conceded", "econ", "wickets_taken", "winning_probability"]])
+              ["player_name", "runs_scored", "econ", "wickets_taken", "winning_probability"]])

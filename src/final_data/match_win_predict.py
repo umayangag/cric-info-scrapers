@@ -45,10 +45,10 @@ all_columns = [
     'batting_position',
     'batting_contribution',
     'strike_rate',
-    # 'total_score',
-    # 'total_wickets',
-    # 'total_balls',
-    # 'target',
+    'total_score',
+    'total_wickets',
+    'total_balls',
+    'target',
     'extras',
     # 'match_number',
     'bowling_consistency',
@@ -63,11 +63,11 @@ all_columns = [
     'bowling_session',
     'bowling_venue',
     'bowling_opposition',
-    'runs_conceded',
+    # 'runs_conceded',
     'deliveries',
     'wickets_taken',
     'bowling_contribution',
-    "econ"
+    "economy"
 ]
 optimum_columns = [
     # 'batting_consistency',
@@ -116,18 +116,19 @@ optimum_columns = [
     # 'bowling_contribution',
     # "econ"
 ]
-X = input_data[all_columns]
+X = input_data[all_columns].copy()
 X['runs_scored'] = X['runs_scored'].apply(lambda x: encode_runs(x))
 X['balls_faced'] = X['balls_faced'].apply(lambda x: encode_balls_faced(x))
-X['fours_scored'] = X['fours_scored'].apply(lambda x: encode_balls_faced(x))
-X['sixes_scored'] = X['sixes_scored'].apply(lambda x: encode_balls_faced(x))
-X['runs_conceded'] = X['runs_conceded'].apply(lambda x: encode_balls_faced(x))
-X['deliveries'] = X['deliveries'].apply(lambda x: encode_balls_faced(x))
-X['wickets_taken'] = X['wickets_taken'].apply(lambda x: encode_balls_faced(x))
+X['fours_scored'] = X['fours_scored'].apply(lambda x: encode_fours(x))
+X['sixes_scored'] = X['sixes_scored'].apply(lambda x: encode_sixes(x))
+X['batting_position'] = X['batting_position'].apply(lambda x: encode_batting_position(x))
+X['economy'] = X['economy'].apply(lambda x: encode_econ(x))
+X['deliveries'] = X['deliveries'].apply(lambda x: encode_deliveries_bowled(x))
+X['wickets_taken'] = X['wickets_taken'].apply(lambda x: encode_wickets(x))
 # TODO do not scale toss, result, wickets match number, batting position, etc
 print(len(X.columns))
 y = input_data["result"]  # Labels
-
+X.to_csv("match_win.csv")
 oversample = SMOTE()
 X, y = oversample.fit_resample(X, y)
 
@@ -150,6 +151,7 @@ y_test = y.iloc[train_set + 1:]
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 #
+
 predictor.fit(X_train, y_train)
 
 

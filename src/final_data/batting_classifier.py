@@ -20,7 +20,9 @@ import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier
 from final_data.encoders import *
 
-RF = RandomForestClassifier(n_estimators=1000, criterion='entropy', max_depth=1000)
+RF = RandomForestClassifier(n_estimators=1000, criterion='entropy', max_depth=1000,
+                            class_weight="balanced"
+                            )
 predictor = RF
 
 dirname = os.path.dirname(__file__)
@@ -90,11 +92,11 @@ def calculate_strike_rate(row):
 
 
 def predict_batting(dataset):
-    predicted = predictor.predict(dataset)
+    predicted = predictor.predict(dataset[input_columns])
     result = pd.DataFrame(predicted, columns=y.columns)
     for column in y.columns:
         dataset[column] = result[column]
-    dataset["strike_rate"] = dataset.apply(lambda row: calculate_strike_rate(row), axis=1)
+    # dataset["strike_rate"] = dataset.apply(lambda row: calculate_strike_rate(row), axis=1)
     return dataset
 
 
