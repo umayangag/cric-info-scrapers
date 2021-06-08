@@ -10,7 +10,7 @@ import os
 # find_k = True
 find_k = False
 
-attribute="runs"
+attribute="batting_position"
 def cluster_batting_performance(dataset):
     kmeanModel = KMeans(n_clusters=4)
     kmeanModel.fit(dataset)
