@@ -74,7 +74,7 @@ y = tempX[output_batting_columns]
 # X = final_df
 X.to_csv("final_batting_2021.csv")
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.37)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 # train_set = 5000
 # X_train = X.iloc[:train_set, :]
 # X_test = X.iloc[train_set + 1:, :]
