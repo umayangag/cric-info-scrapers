@@ -124,14 +124,6 @@ if __name__ == "__main__":
     # input_data = input_data.sample(frac=1).reset_index(drop=True)
 
     X = input_data[all_columns].copy()
-    X['runs_scored'] = X['runs_scored'].apply(lambda x: encode_runs(x))
-    X['balls_faced'] = X['balls_faced'].apply(lambda x: encode_balls_faced(x))
-    X['fours_scored'] = X['fours_scored'].apply(lambda x: encode_fours(x))
-    X['sixes_scored'] = X['sixes_scored'].apply(lambda x: encode_sixes(x))
-    X['batting_position'] = X['batting_position'].apply(lambda x: encode_batting_position(x))
-    X['economy'] = X['economy'].apply(lambda x: encode_econ(x))
-    X['deliveries'] = X['deliveries'].apply(lambda x: encode_deliveries_bowled(x))
-    X['wickets_taken'] = X['wickets_taken'].apply(lambda x: encode_wickets(x))
     # TODO do not scale toss, result, wickets match number, batting position, etc
     print(len(X.columns))
     y = input_data["result"]  # Labels
@@ -148,17 +140,12 @@ if __name__ == "__main__":
     # df["batting_position"] = X['batting_position']
 
     X = df
-    print(X)
-
-    train_set = 2300
+    train_set = 2423
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
     X_train = X.iloc[:train_set, :]
     X_test = X.iloc[train_set + 1:, :]
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
-
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-    #
 
     predictor.fit(X_train, y_train)
     pickle.dump(predictor, open(model_file, 'wb'))

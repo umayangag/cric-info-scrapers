@@ -13,11 +13,11 @@ def calculate_overall_performance(input_df, match_id):
     magic_number = 11 / len(team_df)  # this is to compensate players missing from actual 11
     extras = 14.26
 
-    runs_scored = team_df["runs_scored"].apply(decode_runs)
-    balls_faced = team_df["balls_faced"].apply(decode_balls_faced)
-    wickets_taken = team_df["wickets_taken"].apply(decode_wickets_taken)
-    runs_conceded = team_df["runs_conceded"].apply(decode_runs_conceded)
-    deliveries = team_df["deliveries"].apply(decode_deliveries)
+    runs_scored = team_df["runs_scored"]
+    balls_faced = team_df["balls_faced"]
+    wickets_taken = team_df["wickets_taken"]
+    runs_conceded = team_df["runs_conceded"]
+    deliveries = team_df["deliveries"]
 
     total_score = runs_scored.sum() * magic_number + extras
     target = runs_conceded.sum() * magic_number
