@@ -45,17 +45,8 @@ def calculate_overall_performance(input_df, match_id):
 
     print(magic_number, runs_scored.sum(), balls_faced.sum(), extras)
     print(magic_number, runs_conceded.sum(), deliveries.sum(), wickets_taken.sum())
-    if balls_faced.sum() > 300:
-        print("Total Score:", (runs_scored.sum() * 300 / balls_faced.sum()) + extras)
-    else:
-        print("Total Score:", (runs_scored.sum() * magic_number) + extras)
-
-    if deliveries.sum() > 300:
-        print("Runs given:", runs_conceded.sum() * 300 / deliveries.sum())
-    elif team_df["wickets_taken"].sum() > 10:
-        print("Runs given:", runs_conceded.sum() * 10 / wickets_taken.sum())
-    else:
-        print("Runs given:", runs_conceded.sum())
+    print("Total Score:", get_total_score(balls_faced, runs_scored, extras, magic_number))
+    print("Runs given:", get_total_conceded(deliveries, runs_conceded, wickets_taken))
 
     # TODO: for evaluation
     # SELECT * FROM `match_details` WHERE `wickets` < 10 AND `balls` < 300 AND `target` IS NOT NULL
@@ -63,3 +54,18 @@ def calculate_overall_performance(input_df, match_id):
     # need to compare predicted score with score for 50 overs. because the predicted score will always be high
 
     return team_df
+
+
+def get_total_score(balls_faced, runs_scored, extras, magic_number):
+    if balls_faced.sum() > 300:
+        return (runs_scored.sum() * 300 / balls_faced.sum()) + extras
+    return (runs_scored.sum() * magic_number) + extras
+
+
+def get_total_conceded(deliveries, runs_conceded, wickets_taken):
+    if deliveries.sum() > 300:
+        return runs_conceded.sum() * 300 / deliveries.sum()
+    elif wickets_taken.sum() > 10:
+        return runs_conceded.sum() * 10 / wickets_taken.sum()
+
+    return runs_conceded.sum()
