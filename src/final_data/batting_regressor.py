@@ -136,12 +136,12 @@ if __name__ == "__main__":
     X = final_df
     X.to_csv("final_batting_2021.csv")
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-    # train_set = 2107
-    # X_train = X.iloc[:train_set, :]
-    # X_test = X.iloc[train_set + 1:, :]
-    # y_train = y.iloc[:train_set]
-    # y_test = y.iloc[train_set + 1:]
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+    train_set = 2106
+    X_train = X.iloc[:train_set, :]
+    X_test = X.iloc[train_set + 1:, :]
+    y_train = y.iloc[:train_set]
+    y_test = y.iloc[train_set + 1:]
     predictor.fit(X_train, y_train)
     pickle.dump(predictor, open(model_file, 'wb'))
     batting_predict_test()

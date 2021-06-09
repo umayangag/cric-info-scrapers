@@ -125,7 +125,7 @@ if __name__ == "__main__":
     X.to_csv("final_bowling_2021.csv")
 
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-    train_set = 1466
+    train_set = 1465
     X_train = X.iloc[:train_set, :]
     X_test = X.iloc[train_set + 1:, :]
     y_train = y.iloc[:train_set]

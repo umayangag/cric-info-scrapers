@@ -32,7 +32,7 @@ all_columns = [
     'toss',
     'venue',
     'opposition',
-    # 'season',
+    'season',
     'runs_scored',
     'balls_faced',
     'fours_scored',
@@ -70,8 +70,8 @@ def predict_for_team(input_team_data):
     team_data = input_team_data[all_columns].copy()
     loaded_predictor = pickle.load(open(model_file, 'rb'))
     loaded_scaler = pickle.load(open(scaler_file, 'rb'))
-    # team_performance = loaded_scaler.transform(team_data)
-    predicted = loaded_predictor.predict_proba(team_data)
+    team_performance = loaded_scaler.transform(team_data)
+    predicted = loaded_predictor.predict_proba(team_performance)
     df = pd.DataFrame(predicted, columns=["lose", "win"])
     team_data["winning_probability"] = df["win"].to_numpy()
     return team_data, df["win"].mean()
@@ -96,9 +96,9 @@ def win_predict(predictor):
     # for classifiers
     # print("Score:", predictor.score(X_test, y_test))
     accuracy = metrics.accuracy_score(y_test, y_pred)
-    cvs = cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean()
+    # cvs = cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean()
     print("Accuracy:", accuracy)
-    print("Cross Validation Score:", cvs)
+    # print("Cross Validation Score:", cvs)
     print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
     # plt.bar(range(X_train.shape[1]), gb.feature_importances_)
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     # df["batting_position"] = X['batting_position']
 
     X = df
-    train_set = 2423
+    train_set = 2422
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
     X_train = X.iloc[:train_set, :]
     X_test = X.iloc[train_set + 1:, :]
