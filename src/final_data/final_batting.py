@@ -31,7 +31,7 @@ def final_batting_dataset(conn):
     db_cursor = conn.cursor()
     db_cursor.execute(batting_dataset_query)
     data_list = db_cursor.fetchall()
-    df_encoded = pd.DataFrame(data_list, columns=batting_columns)
+    df_encoded = pd.DataFrame(data_list, columns=np.concatenate([batting_columns,["result"]]))
     # df_encoded = df_encoded.loc[df_encoded['runs_scored'] > 0]
 
     df_encoded["batting_session"] = df_encoded["batting_session"].apply(encode_session)

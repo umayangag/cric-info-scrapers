@@ -28,7 +28,7 @@ def final_bowling_dataset(conn):
     db_cursor = conn.cursor()
     db_cursor.execute(bowling_dataset_query)
     data_list = db_cursor.fetchall()
-    df_encoded = pd.DataFrame(data_list, columns=bowling_columns)
+    df_encoded = pd.DataFrame(data_list, columns=np.concatenate([bowling_columns, ["result"]]))
 
     df_encoded["bowling_session"] = df_encoded["bowling_session"].apply(encode_session)
     df_encoded["bowling_viscosity"] = df_encoded["bowling_viscosity"].apply(encode_viscosity)
