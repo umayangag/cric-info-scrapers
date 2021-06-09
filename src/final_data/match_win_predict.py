@@ -12,6 +12,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from final_data.encoders import *
 import pickle
+from sklearn.metrics import accuracy_score
 
 model_file = "win_predictor.sav"
 scaler_file = "win_predictor_scaler.sav"
@@ -31,7 +32,7 @@ all_columns = [
     'toss',
     'venue',
     'opposition',
-    'season',
+    # 'season',
     'runs_scored',
     'balls_faced',
     'fours_scored',
@@ -112,8 +113,8 @@ def win_predict(predictor):
 
 
 if __name__ == "__main__":
-    clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(43, 11, 1), random_state=1,
-                        max_iter=10000)
+    clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(len(all_columns), 11, 1),
+                        random_state=1, max_iter=10000)
     gb = GradientBoostingClassifier(n_estimators=1000)
     predictor = clf
 
