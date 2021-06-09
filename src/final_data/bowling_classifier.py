@@ -21,7 +21,7 @@ import numpy as np
 from final_data.encoders import *
 import pickle
 
-model_file = "bowling_performance_predictor.sav"
+model_file = "bowling_performance_classifier.sav"
 
 input_columns = [
     "bowling_consistency",

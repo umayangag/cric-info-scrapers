@@ -21,7 +21,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 from final_data.encoders import *
 import pickle
 
-model_file = "batting_performance_predictor.sav"
+model_file = "batting_performance_classifier.sav"
 
 input_columns = [
     'batting_consistency',
@@ -39,6 +39,7 @@ input_columns = [
     'venue',
     'opposition',
     'season',
+    # 'weather',
 ]
 
 

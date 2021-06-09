@@ -38,7 +38,7 @@ if __name__ == "__main__":
         kmeanModel.fit(bowling_performance_data)
 
         bowling_performance_data['weather'] = kmeanModel.predict(bowling_performance_data)
-        output_file = os.path.join(dirname, 'output\\batting_weather.csv')
+        output_file = os.path.join(dirname, 'output\\bowling_weather.csv')
         bowling_performance_data.to_csv(output_file)
 
         # humidity, cloud, pressure

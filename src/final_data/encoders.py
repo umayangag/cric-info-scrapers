@@ -23,7 +23,7 @@ def encode_how_out(value):
 
 
 hash_runs = {0: 30, 1: 60, 2: 90, 3: 120}
-hash_runs_conceded = {0: 30, 1: 60, 2: 80}
+hash_runs_conceded = {0: 40, 1: 60, 2: 80}
 hash_balls_faced = {0: 30, 1: 60, 2: 90, 3: 120}
 hash_batting_position = {0: 4, 1: 7, 2: 12}
 hash_fours = {0: 4, 1: 8, 2: 12}

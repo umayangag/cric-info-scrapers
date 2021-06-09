@@ -42,7 +42,7 @@ if __name__ == "__main__":
         batting_performance_data.to_csv(output_file)
 
         # humidity, cloud, pressure
-        x = "runs_scored"
+        x = "weather"
         y = "batting_cloud"
 
         plt.scatter(batting_performance_data[x], batting_performance_data[y], c=batting_performance_data['weather'])
