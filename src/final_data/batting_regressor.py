@@ -22,7 +22,7 @@ from final_data.encoders import *
 import pickle
 from sklearn.calibration import calibration_curve
 from sklearn.linear_model import LogisticRegression
-
+from sklearn.feature_selection import RFE
 model_file = "batting_performance_predictor.sav"
 scaler_file = "batting_scaler.sav"
 
@@ -31,14 +31,14 @@ input_columns = [
     'batting_form',
     'batting_temp',
     'batting_wind',
-    'batting_rain',
+    # 'batting_rain',
     'batting_humidity',
     'batting_cloud',
     'batting_pressure',
-    'batting_viscosity',
-    'batting_inning',
-    'batting_session',
-    'toss',
+    # 'batting_viscosity',
+    # 'batting_inning',
+    # 'batting_session',
+    # 'toss',
     'venue',
     'opposition',
     'season',
@@ -88,13 +88,20 @@ def batting_predict_test():
     gradient_corrected = train_predict["runs_scored"]
     gradient_corrected = train_predict["runs_scored"]
 
-    plt.scatter(y_train["runs_scored"], gradient_corrected, color='red')
+    plt.scatter(y_train["runs_scored"], gradient_corrected, color='red', s=2)
     plt.plot(y_train["runs_scored"], y_train["runs_scored"], color='blue')
-    plt.scatter(y_test["runs_scored"], y_pred["runs_scored"], color='green')
+    plt.scatter(y_test["runs_scored"], y_pred["runs_scored"], color='green', s=4)
     plt.title('Actual vs Predicted')
     plt.xlabel('Actual Runs Scored')
     plt.ylabel('Predicted Runs Scored')
     plt.show()
+
+    # rfe = RFE(predictor, 10)
+    # fit = rfe.fit(X, y["runs_scored"])
+    # print(input_columns)
+    # print("Num Features: %d" % fit.n_features_)
+    # print("Selected Features: %s" % fit.support_)
+    # print("Feature Ranking: %s" % fit.ranking_)
 
     for attribute in output_batting_columns:
         print(attribute)
@@ -104,6 +111,7 @@ def batting_predict_test():
         print('R2:', metrics.r2_score(y_test[attribute], y_pred[attribute]))
         print('R2:', metrics.r2_score(y_train[attribute], train_predict[attribute]))
         print("-----------------------------------------------------------------------------------")
+        exit()
 
 
 if __name__ == "__main__":
@@ -128,12 +136,12 @@ if __name__ == "__main__":
     X = final_df
     X.to_csv("final_batting_2021.csv")
 
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-    train_set = 2107
-    X_train = X.iloc[:train_set, :]
-    X_test = X.iloc[train_set + 1:, :]
-    y_train = y.iloc[:train_set]
-    y_test = y.iloc[train_set + 1:]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+    # train_set = 2107
+    # X_train = X.iloc[:train_set, :]
+    # X_test = X.iloc[train_set + 1:, :]
+    # y_train = y.iloc[:train_set]
+    # y_test = y.iloc[train_set + 1:]
     predictor.fit(X_train, y_train)
     pickle.dump(predictor, open(model_file, 'wb'))
     batting_predict_test()

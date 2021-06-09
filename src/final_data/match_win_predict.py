@@ -12,6 +12,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from final_data.encoders import *
 import pickle
+from sklearn.feature_selection import RFE
 
 model_file = "win_predictor.sav"
 scaler_file = "win_predictor_scaler.sav"
@@ -85,12 +86,19 @@ def win_predict(predictor):
     #     index=i-(train_set+1)
     #     print(i, row, y_pred[index], probability[index])
 
+    # rfe = RFE(predictor, 10)
+    # fit = rfe.fit(X, y)
+    # print(all_columns)
+    # print("Num Features: %d" % fit.n_features_)
+    # print("Selected Features: %s" % fit.support_)
+    # print("Feature Ranking: %s" % fit.ranking_)
+
     # for classifiers
     # print("Score:", predictor.score(X_test, y_test))
     accuracy = metrics.accuracy_score(y_test, y_pred)
-    # cvs = cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean()
+    cvs = cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean()
     print("Accuracy:", accuracy)
-    # print("Cross Validation Score:", cvs)
+    print("Cross Validation Score:", cvs)
     print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
     # plt.bar(range(X_train.shape[1]), gb.feature_importances_)
@@ -113,7 +121,7 @@ def win_predict(predictor):
 
 if __name__ == "__main__":
     clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(43, 11, 1), random_state=1,
-                        max_iter=1000)
+                        max_iter=10000)
     predictor = clf
 
     dirname = os.path.dirname(__file__)
