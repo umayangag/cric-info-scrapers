@@ -55,11 +55,11 @@ def decode_runs(value):
 
 def decode_value(value_array, value):
     count = len(value_array) - 1
-    if value > count:
-        return value_array[count]/2
+    # if value > count:
+    #     return value_array[count]
     if value == 0:
         return value_array[0] / 2
-    return value_array[value-1] / 2
+    return value_array[value] / 2
 
 
 def encode_value(value_array, value):
