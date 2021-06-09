@@ -48,14 +48,14 @@ def predict_bowling(dataset):
     result = pd.DataFrame(predicted, columns=output_bowling_columns)
     for column in output_bowling_columns:
         dataset[column] = result[column]
-    dataset["runs_conceded"] = dataset.apply(lambda row: calculate_runs_conceded(row), axis=1)
+    dataset["economy"] = dataset.apply(lambda row: calculate_economy(row), axis=1)
     return dataset
 
 
-def calculate_runs_conceded(row):
+def calculate_economy(row):
     if row["bowling_consistency"] == 0:
         return 0
-    return decode_value(hash_economy, row["economy"]) * decode_value(hash_deliveries, row["deliveries"]) / 6
+    return decode_value(hash_runs_conceded, row["runs_conceded"]) * 6 / decode_value(hash_deliveries, row["deliveries"])
 
 
 def bowling_predict_test():
@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
     X = input_data[input_columns]
     y = input_data[output_bowling_columns].copy()  # Labels
-    y["economy"] = y["economy"].apply(encode_econ)
+    y["runs_conceded"] = y["runs_conceded"].apply(encode_runs_conceded)
     y["deliveries"] = y["deliveries"].apply(encode_deliveries_bowled)
     y["wickets_taken"] = y["wickets_taken"].apply(encode_wickets)
 
@@ -115,9 +115,9 @@ if __name__ == "__main__":
     tempX["wickets_taken"] = y["wickets_taken"]
 
     oversample = SMOTE()
-    tempX, runs_predicted = oversample.fit_resample(tempX, y["economy"])
+    tempX, runs_predicted = oversample.fit_resample(tempX, y["runs_conceded"])
 
-    tempX["economy"] = runs_predicted
+    tempX["runs_conceded"] = runs_predicted
     X = tempX[input_columns]
     y = tempX[output_bowling_columns]
 

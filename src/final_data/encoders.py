@@ -23,7 +23,7 @@ def encode_how_out(value):
 
 
 hash_runs = {0: 30, 1: 60, 2: 90, 3: 120}
-hash_runs_conceded = {0: 30, 1: 60, 2: 120}
+hash_runs_conceded = {0: 30, 1: 60, 2: 80}
 hash_balls_faced = {0: 30, 1: 60, 2: 90, 3: 120}
 hash_batting_position = {0: 4, 1: 7, 2: 12}
 hash_fours = {0: 4, 1: 8, 2: 12}
@@ -56,10 +56,10 @@ def decode_runs(value):
 def decode_value(value_array, value):
     count = len(value_array) - 1
     if value > count:
-        return value_array[count - 1]
+        return value_array[count]/2
     if value == 0:
         return value_array[0] / 2
-    return value_array[value - 1]
+    return value_array[value-1] / 2
 
 
 def encode_value(value_array, value):

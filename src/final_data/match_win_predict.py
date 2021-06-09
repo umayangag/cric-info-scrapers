@@ -69,8 +69,8 @@ def predict_for_team(input_team_data):
     team_data = input_team_data[all_columns].copy()
     loaded_predictor = pickle.load(open(model_file, 'rb'))
     loaded_scaler = pickle.load(open(scaler_file, 'rb'))
-    team_performance = loaded_scaler.transform(team_data)
-    predicted = loaded_predictor.predict_proba(team_performance)
+    # team_performance = loaded_scaler.transform(team_data)
+    predicted = loaded_predictor.predict_proba(team_data)
     df = pd.DataFrame(predicted, columns=["lose", "win"])
     team_data["winning_probability"] = df["win"].to_numpy()
     return team_data, df["win"].mean()
@@ -136,8 +136,8 @@ if __name__ == "__main__":
     print(len(X.columns))
     y = input_data["result"]  # Labels
     X.to_csv("match_win.csv")
-    # oversample = SMOTE()
-    # X, y = oversample.fit_resample(X, y)
+    oversample = SMOTE()
+    X, y = oversample.fit_resample(X, y)
 
     scaler = preprocessing.StandardScaler().fit(X)
     data_scaled = scaler.transform(X)
