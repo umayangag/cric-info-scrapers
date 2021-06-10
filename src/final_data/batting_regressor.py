@@ -24,6 +24,7 @@ import pickle
 from sklearn.calibration import calibration_curve
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_selection import RFE
+from analyze.error_curves import get_error_curves
 
 model_file = "batting_performance_predictor.sav"
 scaler_file = "batting_scaler.sav"
@@ -33,14 +34,14 @@ input_columns = [
     'batting_form',
     'batting_temp',
     'batting_wind',
-    # 'batting_rain',
+    'batting_rain',
     'batting_humidity',
     'batting_cloud',
     'batting_pressure',
-    # 'batting_viscosity',
-    # 'batting_inning',
-    # 'batting_session',
-    # 'toss',
+    'batting_viscosity',
+    'batting_inning',
+    'batting_session',
+    'toss',
     'venue',
     'opposition',
     'season',
@@ -98,13 +99,6 @@ def batting_predict_test():
     plt.ylabel('Predicted Runs Scored')
     plt.show()
 
-    # rfe = RFE(predictor, 10)
-    # fit = rfe.fit(X, y["runs_scored"])
-    # print(input_columns)
-    # print("Num Features: %d" % fit.n_features_)
-    # print("Selected Features: %s" % fit.support_)
-    # print("Feature Ranking: %s" % fit.ranking_)
-
     for attribute in output_batting_columns:
         print(attribute)
         print('Mean Absolute Error:', metrics.mean_absolute_error(y_test[attribute], y_pred[attribute]))
@@ -137,54 +131,16 @@ if __name__ == "__main__":
     X = final_df
     X.to_csv("final_batting_2021.csv")
 
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-    train_set = 2106
-    train_set = 1500
-    X_train = X.iloc[:train_set, :]
-    X_test = X.iloc[train_set + 1:, :]
-    y_train = y.iloc[:train_set]
-    y_test = y.iloc[train_set + 1:]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    # train_set = 2106
+    # X_train = X.iloc[:train_set, :]
+    # X_test = X.iloc[train_set + 1:, :]
+    # y_train = y.iloc[:train_set]
+    # y_test = y.iloc[train_set + 1:]
 
-    RMSE_train_array = []
-    RMSE_test_array = []
-    R2_test_array = []
-    R2_train_array = []
-    iter_range = range(1, 200)
-    for n_i in iter_range:
-        print(n_i)
-        predictor = RandomForestRegressor(max_depth=1000, n_estimators=n_i, random_state=1, max_features="auto",
-                                          n_jobs=-1)
-        predictor.fit(X_train, y_train)
-        train_pred = pd.DataFrame(predictor.predict(X_train), columns=output_batting_columns)
-        test_pred = pd.DataFrame(predictor.predict(X_test), columns=output_batting_columns)
-
-        rmse_train = np.sqrt(metrics.mean_squared_error(y_train["runs_scored"], train_pred["runs_scored"]))
-        rmse_test = np.sqrt(metrics.mean_squared_error(y_test["runs_scored"], test_pred["runs_scored"]))
-
-        r2_train = metrics.r2_score(y_train["runs_scored"], train_pred["runs_scored"])
-        r2_test = metrics.r2_score(y_test["runs_scored"], test_pred["runs_scored"])
-
-        RMSE_train_array.append(rmse_train)
-        RMSE_test_array.append(rmse_test)
-
-        R2_train_array.append(r2_train)
-        R2_test_array.append(r2_test)
-
-    plt.plot(iter_range, RMSE_test_array, color='blue', label="test_data")
-    plt.plot(iter_range, RMSE_train_array, color='red', label="train_data")
-    plt.title('RMSE vs Estimators')
-    plt.xlabel('Estimators')
-    plt.ylabel('RMSE')
-    plt.legend()
-    plt.show()
-
-    plt.plot(iter_range, R2_test_array, color='blue', label="test_data")
-    plt.plot(iter_range, R2_train_array, color='red', label="train_data")
-    plt.title('R2 vs Estimators')
-    plt.xlabel('Estimators')
-    plt.ylabel('R2')
-    plt.legend()
-    plt.show()
-
+    predictor = RandomForestRegressor(max_depth=1000, n_estimators=1000, random_state=1, max_features="auto",
+                                      n_jobs=-1)
+    predictor.fit(X_train, y_train)
+    get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 50)
     # pickle.dump(predictor, open(model_file, 'wb'))
     # batting_predict_test()
