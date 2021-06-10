@@ -32,7 +32,7 @@ all_columns = [
     'toss',
     'venue',
     'opposition',
-    'season',
+    # 'season',
     'runs_scored',
     'balls_faced',
     'fours_scored',
@@ -120,8 +120,8 @@ def win_predict(predictor):
 
 
 if __name__ == "__main__":
-    clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(43, 11, 1), random_state=1,
-                        max_iter=10000)
+    clf = MLPClassifier(solver='sgd', activation='tanh', alpha=1e-5, hidden_layer_sizes=(len(all_columns), 11, 11, 1),
+                        random_state=1, max_iter=10000)
     predictor = clf
 
     dirname = os.path.dirname(__file__)

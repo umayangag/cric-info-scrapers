@@ -126,15 +126,18 @@ def get_player_pool_with_predicted_performance(match_id, players, bowlers_list):
 def get_optimal_team_predicted_performance(player_performance_predictions, match_id):
     predicted_team = player_performance_predictions.sort_values(
         by="winning_probability", ascending=False)[:11]
+
+    # COMBINATION ALGORITHM
     predicted_team = player_performance_predictions.copy()
     batsmen_df = predicted_team.loc[predicted_team['bowling_consistency'] == 0]
-    batsmen_df = batsmen_df.sort_values(by=["winning_probability"], ascending=[False])[:6]
+    batsmen_df = batsmen_df.sort_values(by=["winning_probability", "runs_scored"], ascending=[False, False])[:6]
     bowler_df = predicted_team.loc[predicted_team['deliveries'] > 30].sort_values(
-        by=["winning_probability"], ascending=[False])[:5]
+        by=["winning_probability", "bowling_contribution"], ascending=[False, True])[:5]
 
     predicted_team = pd.concat([batsmen_df, bowler_df]).drop_duplicates().reset_index(drop=True)
     predicted_team, win_percent = predict_for_team(predicted_team)
     print("WIN % :", win_percent)
+
     return calculate_overall_performance(predicted_team, match_id)
 
 
@@ -167,7 +170,7 @@ if __name__ == "__main__":
         optimal_team, optimal_score, optimal_target = get_optimal_team_predicted_performance(
             player_pool_with_predicted_performance, match_id)
 
-        print("Score:", optimal_score, "Target:", optimal_target)
+        print("Match_ID", match_id, "Score:", optimal_score, "Target:", optimal_target)
         print(optimal_team.sort_values(by="batting_position", ascending=True)[
                   [
                       "player_name",
@@ -248,4 +251,4 @@ if __name__ == "__main__":
     plt.grid()
     plt.show()
 
-    print(matches_df.loc[matches_df["optimal_score"] >= matches_df["optimal_target"]])
+    print("Matches Lost:", matches_df.loc[matches_df["optimal_score"] < matches_df["optimal_target"]])
