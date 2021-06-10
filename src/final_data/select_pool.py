@@ -188,7 +188,7 @@ if __name__ == "__main__":
     predicted_totals = pd.DataFrame(predicted_score_array,
                                     columns=["predicted_score", "predicted_target", "optimal_score", "optimal_target"])
     matches_df = pd.concat([matches_df, predicted_totals], axis=1)
-    print(matches_df[["target", "predicted_target"]])
+    print(matches_df[["score", "balls", "target", "predicted_target"]])
 
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["score"], color='red', label="actual score")
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["predicted_score"], color='blue',
