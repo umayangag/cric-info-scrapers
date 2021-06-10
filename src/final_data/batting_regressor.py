@@ -141,6 +141,6 @@ if __name__ == "__main__":
     predictor = RandomForestRegressor(max_depth=1000, n_estimators=1000, random_state=1, max_features="auto",
                                       n_jobs=-1)
     predictor.fit(X_train, y_train)
-    get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 500)
-    # pickle.dump(predictor, open(model_file, 'wb'))
+    # get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 500)
+    pickle.dump(predictor, open(model_file, 'wb'))
     # batting_predict_test()

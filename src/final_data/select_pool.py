@@ -191,10 +191,10 @@ if __name__ == "__main__":
     # print(matches_df[["score", "wickets", "balls", "predicted_score"]])
     print(matches_df[["target", "predicted_target"]])
 
-    plt.plot(range(0, len(matches_df["match_id"])), matches_df["score"], color='red', label="actual score")
+    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["score"], color='red', label="actual score")
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["predicted_score"], color='blue',
              label="predicted score")
-    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_score"], color='green', label="optimal score")
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_score"], color='green', label="optimal score")
     plt.title('Actual vs Predicted')
     plt.xlabel('Match Id')
     plt.ylabel('Runs Scored')
@@ -202,13 +202,27 @@ if __name__ == "__main__":
     plt.grid()
     plt.show()
 
-    plt.plot(range(0, len(matches_df["match_id"])), matches_df["target"], color='red', label="actual target")
+    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["target"], color='red', label="actual target")
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["predicted_target"], color='blue',
              label="predicted target")
-    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_target"], color='green', label="optimal target")
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_target"], color='green', label="optimal target")
     plt.title('Actual vs Predicted')
     plt.xlabel('Match Id')
     plt.ylabel('Runs Conceded')
     plt.legend()
     plt.grid()
     plt.show()
+
+    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["score"] - matches_df["target"], color='red',
+    #          label="actual margin")
+    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["predicted_score"] - matches_df["predicted_target"],
+    #          color='blue',
+    #          label="predicted margin")
+    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_score"] - matches_df["optimal_target"],
+    #          color='green', label="optimal margin")
+    # plt.title('Actual vs Predicted')
+    # plt.xlabel('Match Id')
+    # plt.ylabel('Winning Margin')
+    # plt.legend()
+    # plt.grid()
+    # plt.show()
