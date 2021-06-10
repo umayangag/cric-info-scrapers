@@ -156,17 +156,17 @@ if __name__ == "__main__":
 
         optimal_team, optimal_score, optimal_target = get_optimal_team_predicted_performance(
             player_pool_with_predicted_performance, match_id)
-        #
-        # print("Score:", optimal_score, "Target:", optimal_target)
-        # print(optimal_team.sort_values(by="batting_position", ascending=True)[
-        #           [
-        #               "player_name",
-        #               "runs_scored",
-        #               "runs_conceded",
-        #               "economy",
-        #               "wickets_taken",
-        #               "winning_probability"
-        #           ]])
+
+        print("Score:", optimal_score, "Target:", optimal_target)
+        print(optimal_team.sort_values(by="batting_position", ascending=True)[
+                  [
+                      "player_name",
+                      "runs_scored",
+                      "runs_conceded",
+                      "economy",
+                      "wickets_taken",
+                      "winning_probability"
+                  ]])
 
         # ---------------------------------------------------------------
 
@@ -176,25 +176,24 @@ if __name__ == "__main__":
         predicted_score_array.append([predicted_score, predicted_target, optimal_score, optimal_target])
 
         print("Score:", predicted_score, "Target:", predicted_target)
-        # print(actual_team.sort_values(by="batting_position", ascending=True)[
-        #           [
-        #               "player_name",
-        #               "runs_scored",
-        #               "runs_conceded",
-        #               "economy",
-        #               "wickets_taken",
-        #               "winning_probability"
-        #           ]])
+        print(actual_team.sort_values(by="batting_position", ascending=True)[
+                  [
+                      "player_name",
+                      "runs_scored",
+                      "runs_conceded",
+                      "economy",
+                      "wickets_taken",
+                      "winning_probability"
+                  ]])
     predicted_totals = pd.DataFrame(predicted_score_array,
                                     columns=["predicted_score", "predicted_target", "optimal_score", "optimal_target"])
     matches_df = pd.concat([matches_df, predicted_totals], axis=1)
-    # print(matches_df[["score", "wickets", "balls", "predicted_score"]])
     print(matches_df[["target", "predicted_target"]])
 
-    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["score"], color='red', label="actual score")
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["score"], color='red', label="actual score")
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["predicted_score"], color='blue',
              label="predicted score")
-    plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_score"], color='green', label="optimal score")
+    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_score"], color='green', label="optimal score")
     plt.title('Actual vs Predicted')
     plt.xlabel('Match Id')
     plt.ylabel('Runs Scored')
@@ -202,10 +201,10 @@ if __name__ == "__main__":
     plt.grid()
     plt.show()
 
-    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["target"], color='red', label="actual target")
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["target"], color='red', label="actual target")
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["predicted_target"], color='blue',
              label="predicted target")
-    plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_target"], color='green', label="optimal target")
+    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_target"], color='green', label="optimal target")
     plt.title('Actual vs Predicted')
     plt.xlabel('Match Id')
     plt.ylabel('Runs Conceded')
