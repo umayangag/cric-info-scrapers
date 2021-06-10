@@ -153,7 +153,7 @@ if __name__ == "__main__":
     db_cursor.execute(
         f'SELECT match_details.match_id, score, wickets, balls, total_target FROM match_details '
         f'left join (select match_id, sum(runs) as total_target from bowling_data group by match_id) as runs_conceded '
-        f'on match_details.match_id=runs_conceded.match_id WHERE season_id>19')
+        f'on match_details.match_id=runs_conceded.match_id WHERE season_id>16 and result !=-1')
     match_list = db_cursor.fetchall()
     matches_df = pd.DataFrame(match_list, columns=["match_id", "score", "wickets", "balls", "target"])
     for match_row in matches_df.iterrows():
@@ -238,7 +238,7 @@ if __name__ == "__main__":
 
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_score"], color='red',
              label="score")
-    plt.plot(range(0, len(matches_df["match_id"])),matches_df["optimal_target"],
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_target"],
              color='blue',
              label="runs conceded")
     plt.title('Score vs Target')
@@ -247,3 +247,5 @@ if __name__ == "__main__":
     plt.legend()
     plt.grid()
     plt.show()
+
+    print(matches_df.loc[matches_df["optimal_score"] >= matches_df["optimal_target"]])

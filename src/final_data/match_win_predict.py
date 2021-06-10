@@ -148,6 +148,7 @@ if __name__ == "__main__":
 
     X = df
     train_set = 2422
+    train_set = 2077
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
     X_train = X.iloc[:train_set, :]
     X_test = X.iloc[train_set + 1:, :]
