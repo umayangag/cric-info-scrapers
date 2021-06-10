@@ -34,14 +34,14 @@ input_columns = [
     'batting_form',
     'batting_temp',
     'batting_wind',
-    'batting_rain',
+    # 'batting_rain',
     'batting_humidity',
     'batting_cloud',
     'batting_pressure',
-    'batting_viscosity',
-    'batting_inning',
-    'batting_session',
-    'toss',
+    # 'batting_viscosity',
+    # 'batting_inning',
+    # 'batting_session',
+    # 'toss',
     'venue',
     'opposition',
     'season',
@@ -131,16 +131,16 @@ if __name__ == "__main__":
     X = final_df
     X.to_csv("final_batting_2021.csv")
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
-    # train_set = 2106
-    # X_train = X.iloc[:train_set, :]
-    # X_test = X.iloc[train_set + 1:, :]
-    # y_train = y.iloc[:train_set]
-    # y_test = y.iloc[train_set + 1:]
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    train_set = 2106
+    X_train = X.iloc[:train_set, :]
+    X_test = X.iloc[train_set + 1:, :]
+    y_train = y.iloc[:train_set]
+    y_test = y.iloc[train_set + 1:]
 
     predictor = RandomForestRegressor(max_depth=1000, n_estimators=1000, random_state=1, max_features="auto",
                                       n_jobs=-1)
     predictor.fit(X_train, y_train)
-    get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 50)
+    get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 500)
     # pickle.dump(predictor, open(model_file, 'wb'))
     # batting_predict_test()

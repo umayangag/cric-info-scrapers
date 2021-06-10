@@ -7,6 +7,7 @@ from team_selection.player_combinator import *
 from final_data.match_win_predict import predict_for_team
 from itertools import combinations
 from team_selection.fill_missing_attributes import fill_missing_attributes
+import matplotlib.pyplot as plt
 
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
@@ -100,11 +101,7 @@ def get_player_pool():
     return player_df, wicket_keepers, bowlers
 
 
-if __name__ == "__main__":
-    match_id = 1193505
-    match_id = 1198487
-    players, keepers, bowlers_list = get_player_pool()
-
+def get_player_pool_with_predicted_performance(match_id, players, bowlers_list):
     batting_df = get_batting_performance(players, match_id)
     bowling_df = get_bowling_performance(bowlers_list, match_id)
 
@@ -113,10 +110,7 @@ if __name__ == "__main__":
     bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
     player_pool = pd.merge(batting_df, bowling_df, on="player_name", how="left")
     player_pool = fill_missing_attributes(player_pool)
-    player_pool.to_csv("pool.csv", index=False)
-    # player_pool = pd.read_csv("pool.csv")
-
-    calculated_team = calculate_overall_performance(player_pool, match_id)
+    calculated_team, score, target = calculate_overall_performance(player_pool, match_id)
     calculated_team_without_names = calculated_team.loc[:, calculated_team.columns != "player_name"]
     # calculated_team_without_names = calculated_team_without_names.loc[:,
     #                                 calculated_team_without_names.columns != "match_number"]
@@ -124,34 +118,97 @@ if __name__ == "__main__":
     #                                 calculated_team_without_names.columns != "season"]
     player_performance_predictions, overall_win_probability = predict_for_team(calculated_team_without_names)
     player_performance_predictions["player_name"] = calculated_team["player_name"]
+    return player_performance_predictions
 
+
+def get_optimal_team_predicted_performance(player_performance_predictions, match_id):
     predicted_team = player_performance_predictions.sort_values(
         by="winning_probability", ascending=False)[:11]
 
-    calculated_team = calculate_overall_performance(predicted_team, match_id)
+    return calculate_overall_performance(predicted_team, match_id)
 
-    print(calculated_team.sort_values(by="batting_position", ascending=True)[
-              [
-                  "player_name",
-                  "runs_scored",
-                  "runs_conceded",
-                  "economy",
-                  "wickets_taken",
-                  "winning_probability"
-              ]])
 
-    # ---------------------------------------------------------------
-
+def get_actual_team_predicted_performance(player_performance_predictions, match_id):
     actual_team = actual_team_players(player_performance_predictions, match_id)
 
-    actual_team = calculate_overall_performance(actual_team, match_id)
+    return calculate_overall_performance(actual_team, match_id)
 
-    print(actual_team.sort_values(by="batting_position", ascending=True)[
-              [
-                  "player_name",
-                  "runs_scored",
-                  "runs_conceded",
-                  "economy",
-                  "wickets_taken",
-                  "winning_probability"
-              ]])
+
+if __name__ == "__main__":
+    predicted_score_array = []
+    # match_id = 1193505
+    # match_id = 1198487
+    players, keepers, bowlers_list = get_player_pool()
+
+    db_cursor.execute(
+        f'SELECT match_details.match_id, score, wickets, balls, total_target FROM match_details '
+        f'left join (select match_id, sum(runs) as total_target from bowling_data group by match_id) as runs_conceded '
+        f'on match_details.match_id=runs_conceded.match_id WHERE season_id>19')
+    match_list = db_cursor.fetchall()
+    matches_df = pd.DataFrame(match_list, columns=["match_id", "score", "wickets", "balls", "target"])
+    for match_row in matches_df.iterrows():
+        match_id = match_row[1][0]
+
+        # player_pool.to_csv("pool.csv", index=False)
+        # player_pool = pd.read_csv("pool.csv")
+        player_pool_with_predicted_performance = get_player_pool_with_predicted_performance(match_id, players,
+                                                                                            bowlers_list)
+
+        optimal_team, optimal_score, optimal_target = get_optimal_team_predicted_performance(
+            player_pool_with_predicted_performance, match_id)
+        #
+        # print("Score:", optimal_score, "Target:", optimal_target)
+        # print(optimal_team.sort_values(by="batting_position", ascending=True)[
+        #           [
+        #               "player_name",
+        #               "runs_scored",
+        #               "runs_conceded",
+        #               "economy",
+        #               "wickets_taken",
+        #               "winning_probability"
+        #           ]])
+
+        # ---------------------------------------------------------------
+
+        actual_team, predicted_score, predicted_target = get_actual_team_predicted_performance(
+            player_pool_with_predicted_performance, match_id)
+
+        predicted_score_array.append([predicted_score, predicted_target, optimal_score, optimal_target])
+
+        print("Score:", predicted_score, "Target:", predicted_target)
+        # print(actual_team.sort_values(by="batting_position", ascending=True)[
+        #           [
+        #               "player_name",
+        #               "runs_scored",
+        #               "runs_conceded",
+        #               "economy",
+        #               "wickets_taken",
+        #               "winning_probability"
+        #           ]])
+    predicted_totals = pd.DataFrame(predicted_score_array,
+                                    columns=["predicted_score", "predicted_target", "optimal_score", "optimal_target"])
+    matches_df = pd.concat([matches_df, predicted_totals], axis=1)
+    # print(matches_df[["score", "wickets", "balls", "predicted_score"]])
+    print(matches_df[["target", "predicted_target"]])
+
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["score"], color='red', label="actual score")
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["predicted_score"], color='blue',
+             label="predicted score")
+    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_score"], color='green', label="optimal score")
+    plt.title('Actual vs Predicted')
+    plt.xlabel('Match Id')
+    plt.ylabel('Runs Scored')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["target"], color='red', label="actual target")
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["predicted_target"], color='blue',
+             label="predicted target")
+    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_target"], color='green', label="optimal target")
+    plt.title('Actual vs Predicted')
+    plt.xlabel('Match Id')
+    plt.ylabel('Runs Conceded')
+    plt.legend()
+    plt.grid()
+    plt.show()

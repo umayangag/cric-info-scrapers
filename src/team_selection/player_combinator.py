@@ -47,17 +47,17 @@ def calculate_overall_performance(input_df, match_id):
     team_df["batting_contribution"] = team_df.apply(
         lambda row: calculate_batting_contribution(row, "runs_scored"), axis=1)
 
-    print(magic_number, runs_scored.sum(), balls_faced.sum(), extras)
-    print(magic_number, runs_conceded.sum(), deliveries.sum(), wickets_taken.sum())
-    print("Total Score:", get_total_score(balls_faced, runs_scored, extras, magic_number))
-    print("Runs given:", get_total_conceded(deliveries, runs_conceded, wickets_taken))
+    # print(magic_number, runs_scored.sum(), balls_faced.sum(), extras)
+    # print(magic_number, runs_conceded.sum(), deliveries.sum(), wickets_taken.sum())
+    # print("Total Score:", get_total_score(balls_faced, runs_scored, extras, magic_number))
+    # print("Runs given:", get_total_conceded(deliveries, runs_conceded, wickets_taken))
 
     # TODO: for evaluation
     # SELECT * FROM `match_details` WHERE `wickets` < 10 AND `balls` < 300 AND `target` IS NOT NULL
     # where the team stopped batting, since they have chased the opposition target before the 50 overs
     # need to compare predicted score with score for 50 overs. because the predicted score will always be high
 
-    return team_df
+    return team_df, total_score, target
 
 
 def get_total_score(balls_faced, runs_scored, extras, magic_number):
