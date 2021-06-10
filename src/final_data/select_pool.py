@@ -6,8 +6,9 @@ from team_selection.shared.match_data import *
 from team_selection.player_combinator import *
 from final_data.match_win_predict import predict_for_team
 from itertools import combinations
-from team_selection.fill_missing_attributes import fill_missing_attributes
+from team_selection.fill_missing_attributes import *
 import matplotlib.pyplot as plt
+from itertools import permutations
 
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
@@ -109,8 +110,9 @@ def get_player_pool_with_predicted_performance(match_id, players, bowlers_list):
     bowling_df = bowling_df.loc[:, bowling_df.columns != "season"]
     bowling_df = bowling_df.loc[:, bowling_df.columns != "batting_inning"]
     player_pool = pd.merge(batting_df, bowling_df, on="player_name", how="left")
-    player_pool = fill_missing_attributes(player_pool)
+
     calculated_team, score, target = calculate_overall_performance(player_pool, match_id)
+    calculated_team = fill_missing_attributes(calculated_team)
     calculated_team_without_names = calculated_team.loc[:, calculated_team.columns != "player_name"]
     # calculated_team_without_names = calculated_team_without_names.loc[:,
     #                                 calculated_team_without_names.columns != "match_number"]
@@ -124,7 +126,15 @@ def get_player_pool_with_predicted_performance(match_id, players, bowlers_list):
 def get_optimal_team_predicted_performance(player_performance_predictions, match_id):
     predicted_team = player_performance_predictions.sort_values(
         by="winning_probability", ascending=False)[:11]
+    predicted_team = player_performance_predictions.copy()
+    batsmen_df = predicted_team.loc[predicted_team['bowling_consistency'] == 0]
+    batsmen_df = batsmen_df.sort_values(by=["winning_probability"], ascending=[False])[:6]
+    bowler_df = predicted_team.loc[predicted_team['deliveries'] > 30].sort_values(
+        by=["winning_probability"], ascending=[False])[:5]
 
+    predicted_team = pd.concat([batsmen_df, bowler_df]).drop_duplicates().reset_index(drop=True)
+    predicted_team, win_percent = predict_for_team(predicted_team)
+    print("WIN % :", win_percent)
     return calculate_overall_performance(predicted_team, match_id)
 
 
@@ -175,16 +185,16 @@ if __name__ == "__main__":
 
         predicted_score_array.append([predicted_score, predicted_target, optimal_score, optimal_target])
 
-        print("Score:", predicted_score, "Target:", predicted_target)
-        print(actual_team.sort_values(by="batting_position", ascending=True)[
-                  [
-                      "player_name",
-                      "runs_scored",
-                      "runs_conceded",
-                      "economy",
-                      "wickets_taken",
-                      "winning_probability"
-                  ]])
+        # print("Score:", predicted_score, "Target:", predicted_target)
+        # print(actual_team.sort_values(by="batting_position", ascending=True)[
+        #           [
+        #               "player_name",
+        #               "runs_scored",
+        #               "runs_conceded",
+        #               "economy",
+        #               "wickets_taken",
+        #               "winning_probability"
+        #           ]])
     predicted_totals = pd.DataFrame(predicted_score_array,
                                     columns=["predicted_score", "predicted_target", "optimal_score", "optimal_target"])
     matches_df = pd.concat([matches_df, predicted_totals], axis=1)
@@ -193,7 +203,7 @@ if __name__ == "__main__":
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["score"], color='red', label="actual score")
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["predicted_score"], color='blue',
              label="predicted score")
-    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_score"], color='green', label="optimal score")
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_score"], color='green', label="optimal score")
     plt.title('Actual vs Predicted')
     plt.xlabel('Match Id')
     plt.ylabel('Runs Scored')
@@ -204,7 +214,7 @@ if __name__ == "__main__":
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["target"], color='red', label="actual target")
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["predicted_target"], color='blue',
              label="predicted target")
-    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_target"], color='green', label="optimal target")
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_target"], color='green', label="optimal target")
     plt.title('Actual vs Predicted')
     plt.xlabel('Match Id')
     plt.ylabel('Runs Conceded')
@@ -212,16 +222,28 @@ if __name__ == "__main__":
     plt.grid()
     plt.show()
 
-    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["score"] - matches_df["target"], color='red',
-    #          label="actual margin")
-    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["predicted_score"] - matches_df["predicted_target"],
-    #          color='blue',
-    #          label="predicted margin")
-    # plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_score"] - matches_df["optimal_target"],
-    #          color='green', label="optimal margin")
-    # plt.title('Actual vs Predicted')
-    # plt.xlabel('Match Id')
-    # plt.ylabel('Winning Margin')
-    # plt.legend()
-    # plt.grid()
-    # plt.show()
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["score"] - matches_df["target"], color='red',
+             label="actual margin")
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["predicted_score"] - matches_df["predicted_target"],
+             color='blue',
+             label="predicted margin")
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_score"] - matches_df["optimal_target"],
+             color='green', label="optimal margin")
+    plt.title('Actual vs Predicted')
+    plt.xlabel('Match Id')
+    plt.ylabel('Winning Margin')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+    plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_score"], color='red',
+             label="score")
+    plt.plot(range(0, len(matches_df["match_id"])),matches_df["optimal_target"],
+             color='blue',
+             label="runs conceded")
+    plt.title('Score vs Target')
+    plt.xlabel('Match Id')
+    plt.ylabel('Runs')
+    plt.legend()
+    plt.grid()
+    plt.show()

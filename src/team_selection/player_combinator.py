@@ -10,10 +10,7 @@ def actual_team_players(pool_df, match_id):
 
 def calculate_overall_performance(input_df, match_id):
     team_df = input_df.copy()
-    # if len(team_df) > 11:
-    #     batsmen_df = team_df.sort_values(by=["runs_scored"], ascending=[False])[:8]
-    #     bowler_df = team_df.loc[team_df['bowling_consistency'] > team_df['bowling_consistency'].mean()].sort_values(by=["economy"], ascending=[True])[:8]
-    #     team_df = pd.concat([batsmen_df, bowler_df]).drop_duplicates().reset_index(drop=True)
+
     magic_number = 11 / len(team_df)  # this is to compensate players missing from actual 11
     extras = 14.26
     runs_scored = team_df["runs_scored"]
@@ -31,7 +28,7 @@ def calculate_overall_performance(input_df, match_id):
     total_balls_faced = calculate_total_balls_faced(balls_faced, magic_number)
 
     team_df["total_score"] = total_score
-    team_df["total_wickets"] = 7
+    team_df["total_wickets"] = 0
     team_df["total_balls"] = total_balls_faced
     team_df["target"] = target
     team_df["extras"] = extras

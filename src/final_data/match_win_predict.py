@@ -73,8 +73,8 @@ def predict_for_team(input_team_data):
     team_performance = loaded_scaler.transform(team_data)
     predicted = loaded_predictor.predict_proba(team_performance)
     df = pd.DataFrame(predicted, columns=["lose", "win"])
-    team_data["winning_probability"] = df["win"].to_numpy()
-    return team_data, df["win"].mean()
+    input_team_data["winning_probability"] = df["win"].to_numpy()
+    return input_team_data.copy(), df["win"].mean()
 
 
 def win_predict(predictor):
