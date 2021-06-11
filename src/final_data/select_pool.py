@@ -130,7 +130,7 @@ def get_optimal_team_predicted_performance(player_performance_predictions, match
     # COMBINATION ALGORITHM
     predicted_team = player_performance_predictions.copy()
     batsmen_df = predicted_team.loc[predicted_team['bowling_consistency'] == 0]
-    batsmen_df = batsmen_df.sort_values(by=["winning_probability", "runs_scored"], ascending=[False, False])[:6]
+    batsmen_df = batsmen_df.sort_values(by=["winning_probability", "batting_contribution"], ascending=[False, False])[:6]
     bowler_df = predicted_team.loc[predicted_team['bowling_consistency'] > 0]
     bowler_df = bowler_df.loc[bowler_df['deliveries'] > 30].sort_values(
         by=["winning_probability", "bowling_contribution"], ascending=[False, True])[:5]
