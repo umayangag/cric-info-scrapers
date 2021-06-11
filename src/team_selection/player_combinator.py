@@ -28,7 +28,7 @@ def calculate_overall_performance(input_df, match_id):
     total_balls_faced = calculate_total_balls_faced(balls_faced, magic_number)
 
     team_df["total_score"] = total_score
-    team_df["total_wickets"] = 0
+    team_df["total_wickets"] = 7
     team_df["total_balls"] = total_balls_faced
     team_df["target"] = target
     team_df["extras"] = extras
