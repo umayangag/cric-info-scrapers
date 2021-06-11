@@ -27,8 +27,13 @@ def calculate_overall_performance(input_df, match_id):
     target = get_total_conceded(deliveries, runs_conceded, wickets_taken)
     total_balls_faced = calculate_total_balls_faced(balls_faced, magic_number)
 
+    if total_balls_faced < 300:
+        wickets_fallen = 10
+    else:
+        wickets_fallen = 10 * 300 / total_balls_faced
+
     team_df["total_score"] = total_score
-    team_df["total_wickets"] = 7
+    team_df["total_wickets"] = wickets_fallen
     team_df["total_balls"] = total_balls_faced
     team_df["target"] = target
     team_df["extras"] = extras
