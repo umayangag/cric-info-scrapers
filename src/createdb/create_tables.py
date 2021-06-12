@@ -1,5 +1,5 @@
 from config.mysql import get_db_connection
-from queries import create_tables
+from createdb.queries import create_tables
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
 db_cursor.execute(create_tables.create_opposition)

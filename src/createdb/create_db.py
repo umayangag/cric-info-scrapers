@@ -1,5 +1,5 @@
 from config.mysql import get_mysql_connection
-from queries import create_db
+from createdb.queries import create_db
 
 db_connection = get_mysql_connection()
 db_cursor = db_connection.cursor()
