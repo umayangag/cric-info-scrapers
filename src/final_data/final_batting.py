@@ -11,6 +11,12 @@ dirname = os.path.dirname(__file__)
 output_file_encoded = os.path.join(dirname, "output\\batting_encoded.csv")
 
 
+def fill_batting_form(row):
+    if row["batting_form"] == 0:
+        return row["batting_consistency"]
+    return row["batting_form"]
+
+
 # def calculate_batting_performance(row):
 #     return row['runs'] * row["strike_rate"]
 
@@ -33,7 +39,7 @@ def final_batting_dataset(conn):
     data_list = db_cursor.fetchall()
     df_encoded = pd.DataFrame(data_list, columns=batting_columns)
     # df_encoded = df_encoded.loc[df_encoded['runs_scored'] > 0]
-
+    df_encoded["batting_form"] = df_encoded.apply(lambda x: fill_batting_form(x), axis=1)
     df_encoded["batting_session"] = df_encoded["batting_session"].apply(encode_session)
     df_encoded["batting_viscosity"] = df_encoded["batting_viscosity"].apply(encode_viscosity)
     # df_encoded["runs_scored"] = df_encoded["runs_scored"].apply(encode_runs)

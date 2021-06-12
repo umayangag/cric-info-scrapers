@@ -22,6 +22,10 @@ output_file_encoded = os.path.join(dirname, "output\\bowling_encoded.csv")
 #     dataset["performance"] = bowling_performance["bowling_performance"]
 #     # dataset["performance_index"] = bowling_performance["performance_index"]
 #     return dataset
+def fill_bowling_form(row):
+    if row["bowling_form"] == 0:
+        return row["bowling_consistency"]
+    return row["bowling_form"]
 
 
 def final_bowling_dataset(conn):
@@ -30,6 +34,7 @@ def final_bowling_dataset(conn):
     data_list = db_cursor.fetchall()
     df_encoded = pd.DataFrame(data_list, columns=bowling_columns)
 
+    df_encoded["bowling_form"] = df_encoded.apply(lambda x: fill_bowling_form(x), axis=1)
     df_encoded["bowling_session"] = df_encoded["bowling_session"].apply(encode_session)
     df_encoded["bowling_viscosity"] = df_encoded["bowling_viscosity"].apply(encode_viscosity)
     # df_encoded["runs_conceded"] = df_encoded["runs_conceded"].apply(encode_runs_conceded)
