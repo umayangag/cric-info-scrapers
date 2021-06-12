@@ -12,7 +12,7 @@ from final_data.encoders import encode_viscosity
 from sklearn import preprocessing
 
 find_k = True
-# find_k = False
+find_k = False
 
 if __name__ == "__main__":
     dirname = os.path.dirname(__file__)
@@ -24,6 +24,7 @@ if __name__ == "__main__":
                        columns=["id", "temp", "wind", "rain", "humidity", "cloud", "pressure", "viscosity"])
     df1["viscosity"] = df1["viscosity"].apply(encode_viscosity)
     df1 = df1.fillna(df1.mean())
+    df2 = df1.copy()
     df1 = df1.drop("id", axis=1)
     scaler = preprocessing.StandardScaler().fit(df1)
     data_scaled = scaler.transform(df1)
@@ -47,20 +48,20 @@ if __name__ == "__main__":
 
     else:
 
-        kmeanModel = KMeans(n_clusters=5)
+        kmeanModel = KMeans(n_clusters=10)
         kmeanModel.fit(df1)
         pickle.dump(kmeanModel, open("weather_cluster_model.sav", 'wb'))
         predicted = kmeanModel.predict(df1)
-        print(predicted)
         df1['weather'] = predicted
+        df1["id"] = df2["id"]
         output_file = os.path.join(dirname, 'output\\weather_clusters.csv')
 
-        # for row in df1.iterrows():
-        #     print(row)
-        # db_cursor.execute(f'UPDATE weather_data SET weather_category = {row[1][8]} '
-        #                   f'WHERE id = {row[0]}')
+        for row in df1.iterrows():
+            print(row[1])
+            db_cursor.execute(f'UPDATE weather_data SET weather_category = {row[1][7]} '
+                          f'WHERE id = {row[1][8]}')
 
-        # db_connection.commit()
+        db_connection.commit()
         df1.to_csv(output_file)
 
         # humidity, cloud, pressure
