@@ -6,28 +6,23 @@ def calculate_batting_weather(db_connection):
     db_cursor = db_connection.cursor()
     db_cursor.execute("SELECT id, player_name FROM player")
     players_list = db_cursor.fetchall()
-    db_cursor.execute("SELECT id, season_name FROM season")
-    season_list = db_cursor.fetchall()
 
-    for season in season_list:
+    for weather_class in range(1, 11):
         for player in players_list:
-            db_cursor.execute(f'SELECT id FROM player_weather_data WHERE player_id={player[0]} AND season_id={season[0]}')
+            db_cursor.execute(f'SELECT id FROM player_weather_data WHERE player_id={player[0]} AND weather_category={weather_class}')
             record_exist = len(db_cursor.fetchall())
             if record_exist == 0:
                 db_cursor.execute(
-                    f'INSERT INTO player_weather_data SET player_id={player[0]}, season_id={season[0]}, batting_weather=0, bowling_weather=0')
+                    f'INSERT INTO player_weather_data SET player_id={player[0]}, weather_category={weather_class}, batting_weather=0, bowling_weather=0')
     db_connection.commit()
 
-    for season in season_list:
+    for weather_class in range(1,11):
         for player in players_list:
-            season_id = season[0]
-            if season_id > 1:
-                season_id = season_id - 1
             db_cursor.execute(
-                f'SELECT description, runs, batting_data.balls, minutes, fours, sixes, strike_rate, '
-                f'match_details.season_id FROM batting_data left join match_details '
-                f'on batting_data.match_id=match_details.match_id where player_id = {player[0]} '
-                f'and season_id = {season_id};')
+                f'SELECT description, runs, batting_data.balls, minutes, fours, sixes, strike_rate '
+                f'weather_category FROM batting_data left join weather_data '
+                f'on batting_data.match_id=weather_data.match_id where player_id = {player[0]} '
+                f'and weather_category = {weather_class};')
             player_data = db_cursor.fetchall()
             inning_count = len(player_data)
             if inning_count > 5:
@@ -47,7 +42,7 @@ def calculate_batting_weather(db_connection):
                 weather = 0.4262 * average_score + 0.2566 * inning_count + 0.1510 * average_strike_rate + 0.0787 * centuries + 0.0556 * fifties - 0.0328 * zeros
                 print(player[1], weather)
                 db_cursor.execute(f'UPDATE player_weather_data SET batting_weather = {weather} '
-                                  f'WHERE player_id = {player[0]} AND season_id = {season[0]}')
+                                  f'WHERE player_id = {player[0]} AND weather_category={weather_class}')
     db_connection.commit()
 
 

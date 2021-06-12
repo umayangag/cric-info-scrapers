@@ -45,6 +45,7 @@ input_columns = [
     'venue',
     'opposition',
     'season',
+    'weather_category',
 ]
 
 

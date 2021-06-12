@@ -26,6 +26,7 @@ input_batting_columns = [
     "opposition",
     "season",
     "player_name",
+    "weather_category"
 ]
 
 output_batting_columns = ["runs_scored", "balls_faced", "fours_scored", "sixes_scored", "batting_position"]
