@@ -3,7 +3,7 @@ batting_dataset_query = "SELECT  runs, batting_data.balls, batting_data.fours, b
                         "weather.humidity, weather.cloud, weather.pressure, weather.viscosity, match_details.inning, " \
                         "" \
                         "match_details.batting_session, match_details.toss, player_venue_data.batting_venue, " \
-                        "player_opposition_data.batting_opposition, season.id as season_id,player.player_name, weather.weather_category FROM `batting_data` left join player on " \
+                        "player_opposition_data.batting_opposition, season.id as season_id,player.player_name, batting_weather FROM `batting_data` left join player on " \
                         "player_id=player.id left join (select * from weather_data WHERE SESSION like 'batting') " \
                         "as weather on batting_data.match_id=weather.match_id left join match_details " \
                         "on match_details.match_id=weather.match_id left join venue " \
@@ -12,6 +12,8 @@ batting_dataset_query = "SELECT  runs, batting_data.balls, batting_data.fours, b
                         "left join season on season.id=match_details.season_id " \
                         "left join player_venue_data on batting_data.player_id=player_venue_data.player_id " \
                         "and match_details.venue_id=player_venue_data.venue_id " \
+                        "left join player_weather_data on batting_data.player_id=player_weather_data.player_id " \
+                        "and weather.weather_category=player_weather_data.weather_category " \
                         "left join player_opposition_data on batting_data.player_id=player_opposition_data.player_id " \
                         "and match_details.opposition_id=player_opposition_data.opposition_id " \
                         "left join player_form_data on batting_data.player_id=player_form_data.player_id " \

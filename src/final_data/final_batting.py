@@ -44,7 +44,7 @@ def final_batting_dataset(conn):
     # df_encoded = df_encoded.loc[:, df_encoded.columns != 'runs']
     # df_encoded = df_encoded.loc[:, df_encoded.columns != 'strike_rate']
     df_encoded = df_encoded.loc[:, df_encoded.columns != 'match_id']
-
+    df_encoded=df_encoded.fillna(0)
     if os.path.exists(output_file_encoded):
         print("existing file deleted")
         os.remove(output_file_encoded)
