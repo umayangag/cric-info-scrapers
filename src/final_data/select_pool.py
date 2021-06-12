@@ -94,7 +94,8 @@ def get_batting_performance(player_list, match_id):
 
 def get_player_pool():
     db_cursor.execute(
-        f'SELECT * FROM player WHERE is_retired=0 and (batting_consistency !=0 or bowling_consistency!=0)')
+        f'SELECT id,player_name,is_wicket_keeper,is_retired,batting_consistency,bowling_consistency '
+        f'FROM player WHERE is_retired=0 and (batting_consistency !=0 or bowling_consistency!=0)')
     player_list = db_cursor.fetchall()
     player_df = pd.DataFrame(player_list, columns=player_columns)
     wicket_keepers = player_df.loc[player_df['is_wicket_keeper'] == 1]
