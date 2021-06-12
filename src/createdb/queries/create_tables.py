@@ -11,7 +11,7 @@ create_venue = "CREATE TABLE venue (id INT NOT NULL AUTO_INCREMENT, venue_name V
 create_season = "CREATE TABLE season (id INT NOT NULL AUTO_INCREMENT, season_name VARCHAR(100), PRIMARY KEY (id))"
 
 create_player = "CREATE TABLE player (id INT NOT NULL AUTO_INCREMENT, player_name VARCHAR(250), is_wicket_keeper INT, " \
-                "is_retired INT, batting_consistency FLOAT, bowling_consistency FLOAT, PRIMARY KEY (id))"
+                "is_retired INT, batting_consistency FLOAT, bowling_consistency FLOAT, fielding_consistency FLOAT, PRIMARY KEY (id))"
 
 create_weather_data = "CREATE TABLE weather_data (id INT NOT NULL AUTO_INCREMENT, match_id INT, session VARCHAR(100), temp INT, feels INT, " \
                       "wind INT, gust INT, rain INT, humidity INT, cloud INT, pressure INT, viscosity VARCHAR(100), " \

@@ -30,6 +30,28 @@ input_batting_columns = [
 
 output_batting_columns = ["runs_scored", "balls_faced", "fours_scored", "sixes_scored", "batting_position"]
 derived_batting_columns = ["batting_contribution", "strike_rate"]
+
+input_fielding_columns = [
+    "catches",
+    "run_outs",
+    "dropped_catches",
+    "missed_run_outs",
+    "fielding_consistency",
+    "fielding_temp",
+    "fielding_wind",
+    "fielding_rain",
+    "fielding_humidity",
+    "fielding_cloud",
+    "fielding_pressure",
+    "fielding_viscosity",
+    "fielding_inning",
+    "fielding_session",
+    "toss",
+    "season",
+    "player_name",
+]
+output_fielding_columns = ["success_rate"]
+
 input_bowling_columns = [
     "bowling_consistency",
     "bowling_form",
