@@ -67,6 +67,7 @@ def get_batting_performance(player_list, match_id):
         player_venue = get_player_metric(match_id, "batting", player_obj, "venue", "venue", venue_id)
         player_opposition = get_player_metric(match_id, "batting", player_obj, "opposition", "opposition",
                                               opposition_id)
+        player_fielding = player_obj[6]
 
         data_array.append([
             player[1]["batting_consistency"],
@@ -84,9 +85,10 @@ def get_batting_performance(player_list, match_id):
             player_venue,
             player_opposition,
             season_id,
-            player_name
+            player_name,
+            player_fielding
         ])
-    dataset = pd.DataFrame(data_array, columns=input_batting_columns)
+    dataset = pd.DataFrame(data_array, columns=np.concatenate((input_batting_columns, ["fielding_consistency"])))
     predicted = predict_batting(dataset.loc[:, dataset.columns != "player_name"])
     predicted["player_name"] = dataset["player_name"]
     return predicted
@@ -94,7 +96,8 @@ def get_batting_performance(player_list, match_id):
 
 def get_player_pool():
     db_cursor.execute(
-        f'SELECT * FROM player WHERE is_retired=0 and (batting_consistency !=0 or bowling_consistency!=0)')
+        f'SELECT id, player_name, is_wicket_keeper,is_retired,batting_consistency,bowling_consistency,fielding_consistency '
+        f'FROM player WHERE is_retired=0 and (batting_consistency !=0 or bowling_consistency!=0)')
     player_list = db_cursor.fetchall()
     player_df = pd.DataFrame(player_list, columns=player_columns)
     wicket_keepers = player_df.loc[player_df['is_wicket_keeper'] == 1]
@@ -130,7 +133,8 @@ def get_optimal_team_predicted_performance(player_performance_predictions, match
     # COMBINATION ALGORITHM
     predicted_team = player_performance_predictions.copy()
     batsmen_df = predicted_team.loc[predicted_team['bowling_consistency'] == 0]
-    batsmen_df = batsmen_df.sort_values(by=["winning_probability", "batting_contribution"], ascending=[False, False])[:6]
+    batsmen_df = batsmen_df.sort_values(by=["winning_probability", "batting_contribution"], ascending=[False, False])[
+                 :6]
     bowler_df = predicted_team.loc[predicted_team['bowling_consistency'] > 0]
     bowler_df = bowler_df.loc[bowler_df['deliveries'] > 30].sort_values(
         by=["winning_probability", "bowling_contribution"], ascending=[False, True])[:5]

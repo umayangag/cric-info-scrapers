@@ -28,7 +28,6 @@ def get_bowling_df(player_list, match_id):
             player_venue = get_player_metric(match_id, "bowling", player_obj, "venue", "venue", venue_id)
             player_opposition = get_player_metric(match_id, "bowling", player_obj, "opposition", "opposition",
                                                   opposition_id)
-
             runs, deliveries, wickets, econ = get_bowling_data(match_id, player_id)
             if score == 0 or score is None or runs == 0 or runs is None:
                 contribution = 0
@@ -77,6 +76,7 @@ def get_batting_df(player_list, match_id):
             player_venue = get_player_metric(match_id, "batting", player_obj, "venue", "venue", venue_id)
             player_opposition = get_player_metric(match_id, "batting", player_obj, "opposition", "opposition",
                                                   opposition_id)
+            player_fielding = player_obj[6]
             description, runs, balls, fours, sixes, strike_rate, batting_position = get_batting_data(match_id,
                                                                                                      player_id)
 
@@ -113,9 +113,10 @@ def get_batting_df(player_list, match_id):
                                target,
                                extras,
                                match_number,
-                               result
+                               result,
+                               player_fielding
                                ])
-    return pd.DataFrame(data_array, columns=np.concatenate((all_batting_columns, match_summary_columns)))
+    return pd.DataFrame(data_array, columns=np.concatenate((all_batting_columns, match_summary_columns,["fielding_consistency"])))
 
 
 def get_actual_players_who_played(match_id):

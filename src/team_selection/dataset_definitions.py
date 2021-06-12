@@ -7,6 +7,7 @@ player_columns = [
     "is_retired",
     "batting_consistency",
     "bowling_consistency",
+    "fielding_consistency",
 ]
 
 input_batting_columns = [

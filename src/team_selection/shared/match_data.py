@@ -64,7 +64,7 @@ def get_player_metric(match_id, label1, player_obj, label2, label3, id):
 def get_player_list(match_id, label):
     db_cursor.execute(
         f'SELECT player.id, player.player_name, player.is_wicket_keeper, player.is_retired, player.batting_consistency, '
-        f'player.bowling_consistency FROM {label}_data '
+        f'player.bowling_consistency, player.fielding_consistency FROM {label}_data '
         f'left join player on player.id={label}_data.player_id '
         f'WHERE match_id = "{match_id}"')
     return db_cursor.fetchall()
