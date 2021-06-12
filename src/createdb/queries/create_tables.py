@@ -14,7 +14,7 @@ create_player = "CREATE TABLE player (id INT NOT NULL AUTO_INCREMENT, player_nam
                 "is_retired INT, batting_consistency FLOAT, bowling_consistency FLOAT, fielding_consistency FLOAT, PRIMARY KEY (id))"
 
 create_weather_data = "CREATE TABLE weather_data (id INT NOT NULL AUTO_INCREMENT, match_id INT, session VARCHAR(100), temp INT, feels INT, " \
-                      "wind INT, gust INT, rain INT, humidity INT, cloud INT, pressure INT, viscosity VARCHAR(100), " \
+                      "wind INT, gust INT, rain INT, humidity INT, cloud INT, pressure INT, viscosity VARCHAR(100), weather_category INT, " \
                       "PRIMARY KEY (id))"
 
 create_batting_data = "CREATE TABLE batting_data (id INT NOT NULL AUTO_INCREMENT, match_id INT, player_id INT, " \
@@ -31,6 +31,10 @@ create_fielding_data = "CREATE TABLE fielding_data (id INT NOT NULL AUTO_INCREME
 create_player_form_data = "CREATE TABLE player_form_data (id INT NOT NULL AUTO_INCREMENT, player_id INT, " \
                           "season_id INT, batting_form FLOAT, bowling_form FLOAT, PRIMARY KEY (id), FOREIGN KEY (player_id) REFERENCES player(id)" \
                           ", FOREIGN KEY (season_id) REFERENCES season(id))"
+
+create_player_weather_data = "CREATE TABLE player_weather_data (id INT NOT NULL AUTO_INCREMENT, player_id INT, " \
+                          "season_id INT, batting_weather FLOAT, bowling_weather FLOAT, weather_category INT, PRIMARY KEY (id), FOREIGN KEY (player_id) REFERENCES player(id))"
+
 
 create_player_venue_data = "CREATE TABLE player_venue_data (id INT NOT NULL AUTO_INCREMENT, player_id INT, " \
                            "venue_id INT, batting_venue FLOAT, bowling_venue FLOAT, PRIMARY KEY (id), FOREIGN KEY (player_id) REFERENCES player(id)" \
