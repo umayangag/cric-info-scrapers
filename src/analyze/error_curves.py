@@ -13,7 +13,7 @@ def get_error_curves(X_train, y_train, X_test, y_test, output_columns,max_iters)
     iter_range = range(1, max_iters)
     for n_i in iter_range:
         print(n_i)
-        predictor = RandomForestRegressor(max_depth=1000, n_estimators=n_i, random_state=1, max_features="auto",
+        predictor = RandomForestRegressor(max_depth=n_i, n_estimators=200, random_state=1, max_features="auto",
                                           n_jobs=-1)
         predictor.fit(X_train, y_train)
         train_pred = pd.DataFrame(predictor.predict(X_train), columns=output_columns)

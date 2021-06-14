@@ -1,5 +1,6 @@
 import os
 import pickle
+from analyze.error_curves import get_error_curves
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,7 +26,7 @@ input_columns = [
     'batting_viscosity',
     'batting_inning',
     'batting_session',
-    'toss',
+    # 'toss',
     'venue',
     'opposition',
     'season',
@@ -73,11 +74,11 @@ def batting_predict_test():
     plt.show()
 
     gradient_corrected = train_predict["runs_scored"]
-    gradient_corrected = train_predict["runs_scored"]
+    gradient_corrected = train_predict["runs_scored"].apply(lambda x: x * 2-35)
 
     plt.scatter(y_train["runs_scored"], gradient_corrected, color='red', s=2)
     plt.plot(y_train["runs_scored"], y_train["runs_scored"], color='blue')
-    plt.scatter(y_test["runs_scored"], y_pred["runs_scored"], color='green', s=4)
+    plt.scatter(y_test["runs_scored"], y_pred["runs_scored"].apply(lambda x: x * 2-35), color='green', s=4)
     plt.title('Actual vs Predicted')
     plt.xlabel('Actual Runs Scored')
     plt.ylabel('Predicted Runs Scored')
@@ -129,9 +130,9 @@ if __name__ == "__main__":
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
 
-    predictor = RandomForestRegressor(max_depth=1000, n_estimators=1000, random_state=1, max_features="auto",
+    predictor = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
     predictor.fit(X_train, y_train)
-    # get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 500)
+    # get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 25)
     pickle.dump(predictor, open(model_file, 'wb'))
     batting_predict_test()

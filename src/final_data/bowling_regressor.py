@@ -1,6 +1,6 @@
 import os
 import pickle
-
+from analyze.error_curves import get_error_curves
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -25,7 +25,7 @@ input_columns = [
     "bowling_viscosity",
     "batting_inning",
     "bowling_session",
-    "toss",
+    # "toss",
     "bowling_venue",
     "bowling_opposition",
     "season",
@@ -72,9 +72,9 @@ def bowling_predict_test():
     plt.ylabel('Runs Scored')
     plt.show()
 
-    plt.scatter(y_train["runs_conceded"], train_predict["runs_conceded"], color='red')
+    plt.scatter(y_train["runs_conceded"], train_predict["runs_conceded"].apply(lambda x: x * 3-75), color='red')
     plt.plot(y_train["runs_conceded"], y_train["runs_conceded"], color='blue')
-    plt.scatter(y_test["runs_conceded"], y_pred["runs_conceded"], color='green')
+    plt.scatter(y_test["runs_conceded"], y_pred["runs_conceded"].apply(lambda x: x * 3-75), color='green')
     plt.title('Actual vs Predicted')
     plt.xlabel('Actual Runs Conceded')
     plt.ylabel('Predicted Runs Conceded')
@@ -100,7 +100,7 @@ def bowling_predict_test():
 
 
 if __name__ == "__main__":
-    RFR = RandomForestRegressor(max_depth=1000, n_estimators=1000, random_state=0, n_jobs=-1)
+    RFR = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=0, n_jobs=-1)
     predictor = RFR
 
     dirname = os.path.dirname(__file__)
@@ -129,6 +129,7 @@ if __name__ == "__main__":
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
     predictor.fit(X_train, y_train)
+    # get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 25)
     pickle.dump(predictor, open(model_file, 'wb'))
     bowling_predict_test()
     # predict_bowling("", 1, 1)

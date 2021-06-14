@@ -7,6 +7,8 @@ from team_selection.dataset_definitions import *
 from team_selection.fill_missing_attributes import *
 from team_selection.player_combinator import *
 from team_selection.shared.match_data import *
+import pandas as pd
+from final_data.encoders import *
 
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
