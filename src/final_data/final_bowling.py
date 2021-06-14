@@ -1,11 +1,10 @@
-from config.mysql import get_db_connection
-import pandas as pd
-from final_data.queries import bowling_dataset_query
 import os
-from analyze.cluster_bowling import cluster_bowling_performance
-from analyze.normalize_bowling import normalize_bowling_dataset
-from sklearn.cluster import KMeans
+
+import pandas as pd
+
+from config.mysql import get_db_connection
 from final_data.encoders import *
+from final_data.queries import bowling_dataset_query
 from team_selection.dataset_definitions import *
 
 bowling_columns = np.concatenate((output_bowling_columns, input_bowling_columns))

@@ -1,18 +1,11 @@
-import pandas as pd
 import os
-from sklearn.neural_network import MLPClassifier
-from sklearn import metrics
-from sklearn.metrics import confusion_matrix
-from imblearn.over_sampling import SMOTE
-from sklearn.model_selection import cross_val_score
-from sklearn import preprocessing
-from sklearn.ensemble import GradientBoostingClassifier
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.model_selection import train_test_split
-from final_data.encoders import *
 import pickle
-from sklearn.feature_selection import RFE
+
+import pandas as pd
+from sklearn import metrics
+from sklearn import preprocessing
+from sklearn.metrics import confusion_matrix
+from sklearn.neural_network import MLPClassifier
 
 model_file = "win_predictor.sav"
 scaler_file = "win_predictor_scaler.sav"

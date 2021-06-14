@@ -1,5 +1,9 @@
-import parse_match, match_list, match_info, batting, bowling, session, fielding
+import fielding
+import match_info
+import match_list
 import pandas as pd
+import parse_match
+import session
 
 team = "Sri Lanka"
 match_list = match_list.extract_match_list(

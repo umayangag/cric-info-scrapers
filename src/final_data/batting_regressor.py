@@ -1,30 +1,14 @@
-import pandas as pd
 import os
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import LinearRegression
-from sklearn.neural_network import MLPClassifier
-from sklearn.multioutput import MultiOutputClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.linear_model import SGDRegressor
-from sklearn import metrics
-from sklearn.metrics import confusion_matrix
-from imblearn.over_sampling import SMOTE
-from sklearn.model_selection import cross_val_score
-from sklearn import svm
-import numpy as np
-from team_selection.dataset_definitions import *
-from sklearn import preprocessing
+import pickle
+
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.ensemble import GradientBoostingClassifier
-from final_data.encoders import *
-import pickle
-from sklearn.calibration import calibration_curve
-from sklearn.linear_model import LogisticRegression
-from sklearn.feature_selection import RFE
-from analyze.error_curves import get_error_curves
+import pandas as pd
+from sklearn import metrics
+from sklearn import preprocessing
+from sklearn.ensemble import RandomForestRegressor
+
+from team_selection.dataset_definitions import *
 
 model_file = "batting_performance_predictor.sav"
 scaler_file = "batting_scaler.sav"

@@ -1,5 +1,4 @@
 import pandas as pd
-import re
 
 
 def extract_fielding_data(content, team):

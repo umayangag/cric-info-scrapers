@@ -1,6 +1,4 @@
-import csv
 import pandas as pd
-import matplotlib.pyplot as plt
 
 batting_data_df = pd.read_csv("data/batting_data.csv")
 bowling_data_df = pd.read_csv("data/bowling_data.csv")

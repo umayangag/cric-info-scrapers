@@ -1,15 +1,13 @@
-import pandas as pd
-import numpy as np
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import MinMaxScaler
-import seaborn as sns
-import matplotlib.pyplot as plt
 import os
 import pickle
+
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn import preprocessing
+from sklearn.cluster import KMeans
+
 from config.mysql import get_db_connection
 from final_data.encoders import encode_viscosity
-from sklearn import preprocessing
 
 find_k = True
 # find_k = False
