@@ -82,13 +82,21 @@ def bowling_predict_test():
 
     for attribute in output_bowling_columns:
         print(attribute)
-        print('Mean Absolute Error:', metrics.mean_absolute_error(y_test[attribute], y_pred[attribute]))
-        print('Mean Squared Error:', metrics.mean_squared_error(y_test[attribute], y_pred[attribute]))
-        print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute])))
-        print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_train[attribute], train_predict[attribute])))
-        print('R2:', metrics.r2_score(y_test[attribute], y_pred[attribute]))
+        print("Training Set")
+        print('Mean Absolute Error:', metrics.mean_absolute_error(y_train[attribute], train_predict[attribute]))
+        print('Mean Squared Error:', metrics.mean_squared_error(y_train[attribute], train_predict[attribute]))
+        print('Root Mean Squared Error:',
+              np.sqrt(metrics.mean_squared_error(y_train[attribute], train_predict[attribute])))
         print('R2:', metrics.r2_score(y_train[attribute], train_predict[attribute]))
         print("-----------------------------------------------------------------------------------")
+        print("Test Set")
+        print('Mean Absolute Error:', metrics.mean_absolute_error(y_test[attribute], y_pred[attribute]))
+        print('Mean Squared Error:', metrics.mean_squared_error(y_test[attribute], y_pred[attribute]))
+        print('Root Mean Squared Error:',
+              np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute])))
+        print('R2:', metrics.r2_score(y_test[attribute], y_pred[attribute]))
+        print("-----------------------------------------------------------------------------------")
+        exit()
 
 
 if __name__ == "__main__":
