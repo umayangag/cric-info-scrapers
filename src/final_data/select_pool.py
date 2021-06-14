@@ -145,27 +145,27 @@ def get_optimal_team_predicted_performance(player_performance_predictions, match
 
     team_df, total_score, target = calculate_overall_performance(predicted_team, match_id)
 
-    predicted_team2 = player_performance_predictions.copy()
-    batsmen_df2 = predicted_team2.loc[predicted_team2['bowling_consistency'] == 0]
-    batsmen_df2 = batsmen_df2.sort_values(by=["runs_scored", "batting_contribution"], ascending=[False, False])[
-                  :6]
-    bowler_df2 = predicted_team2.loc[predicted_team2['bowling_consistency'] > 0]
-    bowler_df2 = bowler_df2.loc[bowler_df2['deliveries'] > 30].sort_values(
-        by=["runs_conceded", "bowling_contribution"], ascending=[False, True])[:5]
+    # predicted_team2 = player_performance_predictions.copy()
+    # batsmen_df2 = predicted_team2.loc[predicted_team2['bowling_consistency'] == 0]
+    # batsmen_df2 = batsmen_df2.sort_values(by=["runs_scored", "batting_contribution"], ascending=[False, False])[
+    #               :6]
+    # bowler_df2 = predicted_team2.loc[predicted_team2['bowling_consistency'] > 0]
+    # bowler_df2 = bowler_df2.loc[bowler_df2['deliveries'] > 30].sort_values(
+    #     by=["runs_conceded", "bowling_contribution"], ascending=[False, True])[:5]
+    #
+    # predicted_team2 = pd.concat([batsmen_df2, bowler_df2]).drop_duplicates().reset_index(drop=True)
+    # predicted_team2, win_percent2 = predict_for_team(predicted_team2)
+    # print("WIN % :", win_percent2)
+    #
+    # team_df2, total_score2, target2 = calculate_overall_performance(predicted_team2, match_id)
+    #
+    # if total_score - target > total_score2 - target2:
+    #     print("Team A")
+    #     return team_df, total_score, target
+    # print("Team B")
+    # return team_df2, total_score2, target2
 
-    predicted_team2 = pd.concat([batsmen_df2, bowler_df2]).drop_duplicates().reset_index(drop=True)
-    predicted_team2, win_percent2 = predict_for_team(predicted_team2)
-    print("WIN % :", win_percent2)
-
-    team_df2, total_score2, target2 = calculate_overall_performance(predicted_team2, match_id)
-
-    if total_score - target > total_score2 - target2:
-        print("Team A")
-        return team_df, total_score, target
-    print("Team B")
-    return team_df2, total_score2, target2
-
-    # return team_df, total_score, target
+    return team_df, total_score, target
 
 
 def get_actual_team_predicted_performance(player_performance_predictions, match_id):

@@ -5,7 +5,11 @@ import pandas as pd
 from sklearn import metrics
 from sklearn import preprocessing
 from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import cross_val_score
 from sklearn.neural_network import MLPClassifier
+from sklearn.inspection import permutation_importance
+import matplotlib.pyplot as plt
+import numpy as np
 
 model_file = "win_predictor.sav"
 scaler_file = "win_predictor_scaler.sav"
@@ -21,9 +25,9 @@ all_columns = [
     'batting_pressure',
     'batting_viscosity',
     'batting_inning',
-    'batting_session',
+    # 'batting_session',
     'toss',
-    'venue',
+    # 'venue',
     'opposition',
     # 'season',
     'runs_scored',
@@ -73,6 +77,23 @@ def predict_for_team(input_team_data):
 
 def win_predict(predictor):
     y_pred = predictor.predict(X_test)
+
+    r = permutation_importance(predictor, X_test, y_test, n_repeats=30, random_state=0)
+    for i in r.importances_mean.argsort()[::-1]:
+        if r.importances_mean[i] - 2 * r.importances_std[i] > 0:
+            print(f"{all_columns[i]:<8}"
+                  f"{r.importances_mean[i]:.3f}"
+                  f" +/- {r.importances_std[i]:.3f}")
+
+    plt.figure(figsize=(6 * 1.618, 6))
+    index = np.arange(len(X.columns))
+    plt.barh(index,  r.importances_mean, color='black', alpha=0.5)
+    plt.ylabel('features')
+    plt.xlabel('importance')
+    plt.title('Feature importance')
+    plt.yticks(index, X.columns)
+    plt.tight_layout()
+    plt.show()
     # probability = predictor.predict_proba(X_test)
     # print(type(y_pred), type(y_test))
     # print(type(probability))
