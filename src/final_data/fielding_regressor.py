@@ -17,14 +17,14 @@ input_columns = [
     "fielding_consistency",
     "fielding_temp",
     "fielding_wind",
-    # "fielding_rain",
+    "fielding_rain",
     "fielding_humidity",
     "fielding_cloud",
     "fielding_pressure",
-    # "fielding_viscosity",
-    # "fielding_inning",
-    # "fielding_session",
-    # "toss",
+    "fielding_viscosity",
+    "fielding_inning",
+    "fielding_session",
+    "toss",
     "season",
 ]
 
@@ -73,15 +73,54 @@ def fielding_predict_test():
     plt.ylabel('Predicted success_rate')
     plt.show()
 
-    for attribute in output_fielding_columns:
+    # train error
+    plt.scatter(y_train["success_rate"], train_predict["success_rate"] - y_train["success_rate"], color='red', s=2)
+    plt.plot(y_train["success_rate"], y_train["success_rate"] - y_train["success_rate"], color='blue')
+    plt.scatter(y_test["success_rate"], y_pred["success_rate"] - y_test.reset_index()["success_rate"], color='green', s=4)
+    plt.title('Actual vs Predicted Residuals')
+    plt.xlabel('Actual Runs Scored')
+    plt.ylabel('Predicted Runs Scored Residuals')
+    plt.show()
+
+    train_correct = pd.DataFrame(corrector.predict(y_train), columns=["success_rate"])
+    test_correct = pd.DataFrame(corrector.predict(y_test), columns=["success_rate"])
+
+    # predict error
+    plt.scatter(y_train["success_rate"], train_predict["success_rate"] - y_train["success_rate"], color='red', s=2)
+    plt.scatter(y_train["success_rate"], train_correct["success_rate"], color='blue', s=2)
+    plt.scatter(y_test["success_rate"], test_correct["success_rate"], color='green', s=2)
+    plt.title('Actual vs Predicted Residuals')
+    plt.xlabel('Actual Runs Scored')
+    plt.ylabel('Predicted Runs Scored')
+    plt.show()
+
+    # corrected runs
+    plt.scatter(y_train["success_rate"], train_predict["success_rate"] - train_correct["success_rate"], color='red', s=2)
+    plt.plot(y_train["success_rate"], y_train["success_rate"], color='blue')
+    plt.scatter(y_test["success_rate"], y_pred["success_rate"] - test_correct["success_rate"] + 5, color='green', s=4)
+    plt.title('Actual vs Predicted')
+    plt.xlabel('Actual Runs Scored')
+    plt.ylabel('Predicted Runs Scored')
+    plt.show()
+
+    for attribute in ["success_rate"]:
         print(attribute)
-        print('Mean Absolute Error:', metrics.mean_absolute_error(y_test[attribute], y_pred[attribute]))
-        print('Mean Squared Error:', metrics.mean_squared_error(y_test[attribute], y_pred[attribute]))
-        print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute])))
+        print("Training Set")
+        print('Mean Absolute Error:',
+              metrics.mean_absolute_error(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
+        print('Mean Squared Error:',
+              metrics.mean_squared_error(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
         print('Root Mean Squared Error:',
-              np.sqrt(metrics.mean_squared_error(y_train[attribute], train_predict[attribute])))
-        print('R2:', metrics.r2_score(y_test[attribute], y_pred[attribute]))
-        print('R2:', metrics.r2_score(y_train[attribute], train_predict[attribute]))
+              np.sqrt(
+                  metrics.mean_squared_error(y_train[attribute], train_predict[attribute] - train_correct[attribute])))
+        print('R2:', metrics.r2_score(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
+        print("-----------------------------------------------------------------------------------")
+        print("Test Set")
+        print('Mean Squared Error:',
+              metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
+        print('Root Mean Squared Error:',
+              np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute] + 5)))
+        print('R2:', metrics.r2_score(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
         print("-----------------------------------------------------------------------------------")
         exit()
 
@@ -112,9 +151,15 @@ if __name__ == "__main__":
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
 
-    predictor = RandomForestRegressor(max_depth=1000, n_estimators=1000, random_state=1, max_features="auto",
+    predictor = RandomForestRegressor(max_depth=100, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
     predictor.fit(X_train, y_train["success_rate"])
+
+    train_predict = pd.DataFrame(predictor.predict(X_train), columns=["success_rate"])
+
+    corrector = RandomForestRegressor(max_depth=6, n_estimators=500, random_state=1, max_features="auto",
+                                      n_jobs=-1)
+    corrector.fit(y_train, train_predict - y_train)
     # get_error_curves(X_train, y_train, X_test, y_test, output_fielding_columns, 500)
     pickle.dump(predictor, open(model_file, 'wb'))
     fielding_predict_test()
