@@ -12,6 +12,7 @@ from sklearn.ensemble import RandomForestRegressor
 from team_selection.dataset_definitions import *
 
 model_file = "batting_performance_predictor.sav"
+corrector_file = "batting_performance_corrector.sav"
 scaler_file = "batting_scaler.sav"
 
 input_columns = [
@@ -35,9 +36,14 @@ input_columns = [
 
 def predict_batting(dataset):
     loaded_predictor = pickle.load(open(model_file, 'rb'))
+    loaded_corrector = pickle.load(open(corrector_file, 'rb'))
     loaded_scaler = pickle.load(open(scaler_file, 'rb'))
     predicted = loaded_predictor.predict(loaded_scaler.transform(dataset[input_columns]))
-    result = pd.DataFrame(predicted, columns=output_batting_columns)
+    predicted_df = pd.DataFrame(predicted, columns=output_batting_columns)
+    corrections = loaded_corrector.predict(predicted_df)
+    corrections_df = pd.DataFrame(corrections, columns=output_batting_columns)
+    result = predicted_df - corrections_df
+    result[result < 0] = 0
     for column in output_batting_columns:
         dataset[column] = result[column]
     dataset["strike_rate"] = dataset.apply(lambda row: calculate_strike_rate(row), axis=1)
@@ -64,8 +70,6 @@ def batting_predict_test():
     plt.tight_layout()
     plt.show()
 
-    train_predict = pd.DataFrame(predictor.predict(X_train), columns=output_batting_columns)
-
     plt.plot(range(0, len(y_test)), y_test["runs_scored"], color='red')
     plt.plot(range(0, len(y_pred)), y_pred["runs_scored"], color='blue')
     plt.title('Actual vs Predicted')
@@ -91,9 +95,6 @@ def batting_predict_test():
     plt.ylabel('Predicted Runs Scored Residuals')
     plt.show()
 
-    corrector = RandomForestRegressor(max_depth=100, n_estimators=200, random_state=1, max_features="auto",
-                                      n_jobs=-1)
-    corrector.fit(y_train, train_predict - y_train)
     train_correct = pd.DataFrame(corrector.predict(y_train), columns=output_batting_columns)
     test_correct = pd.DataFrame(corrector.predict(y_test), columns=output_batting_columns)
 
@@ -118,18 +119,21 @@ def batting_predict_test():
     for attribute in output_batting_columns:
         print(attribute)
         print("Training Set")
-        print('Mean Absolute Error:', metrics.mean_absolute_error(y_train[attribute], train_predict[attribute]))
-        print('Mean Squared Error:', metrics.mean_squared_error(y_train[attribute], train_predict[attribute]))
+        print('Mean Absolute Error:',
+              metrics.mean_absolute_error(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
+        print('Mean Squared Error:',
+              metrics.mean_squared_error(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
         print('Root Mean Squared Error:',
-              np.sqrt(metrics.mean_squared_error(y_train[attribute], train_predict[attribute])))
-        print('R2:', metrics.r2_score(y_train[attribute], train_predict[attribute]))
+              np.sqrt(
+                  metrics.mean_squared_error(y_train[attribute], train_predict[attribute] - train_correct[attribute])))
+        print('R2:', metrics.r2_score(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
         print("-----------------------------------------------------------------------------------")
         print("Test Set")
-        print('Mean Absolute Error:', metrics.mean_absolute_error(y_test[attribute], y_pred[attribute]))
-        print('Mean Squared Error:', metrics.mean_squared_error(y_test[attribute], y_pred[attribute]))
+        print('Mean Squared Error:',
+              metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
         print('Root Mean Squared Error:',
-              np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute])))
-        print('R2:', metrics.r2_score(y_test[attribute], y_pred[attribute]))
+              np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute])))
+        print('R2:', metrics.r2_score(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
         print("-----------------------------------------------------------------------------------")
         exit()
 
@@ -164,6 +168,14 @@ if __name__ == "__main__":
     predictor = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
     predictor.fit(X_train, y_train)
+
+    train_predict = pd.DataFrame(predictor.predict(X_train), columns=output_batting_columns)
+
+    corrector = RandomForestRegressor(max_depth=100, n_estimators=200, random_state=1, max_features="auto",
+                                      n_jobs=-1)
+    corrector.fit(y_train, train_predict - y_train)
+
     # get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 25)
     pickle.dump(predictor, open(model_file, 'wb'))
+    pickle.dump(corrector, open(corrector_file, 'wb'))
     batting_predict_test()

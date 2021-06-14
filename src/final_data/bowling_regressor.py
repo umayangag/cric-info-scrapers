@@ -11,6 +11,7 @@ from sklearn.ensemble import RandomForestRegressor
 from team_selection.dataset_definitions import *
 
 model_file = "bowling_performance_predictor.sav"
+corrector_file = "bowling_performance_corrector.sav"
 scaler_file = "bowling_scaler.sav"
 
 input_columns = [
@@ -40,9 +41,14 @@ def calculate_economy(row):
 
 def predict_bowling(dataset):
     loaded_predictor = pickle.load(open(model_file, 'rb'))
+    loaded_corrector = pickle.load(open(corrector_file, 'rb'))
     loaded_scaler = pickle.load(open(scaler_file, 'rb'))
     predicted = loaded_predictor.predict(loaded_scaler.transform(dataset[input_columns]))
-    result = pd.DataFrame(predicted, columns=output_bowling_columns)
+    predicted_df = pd.DataFrame(predicted, columns=output_bowling_columns)
+    corrections = loaded_corrector.predict(predicted_df)
+    corrections_df = pd.DataFrame(corrections, columns=output_bowling_columns)
+    result = predicted_df - corrections_df
+    result[result < 0] = 0
     for column in output_bowling_columns:
         dataset[column] = result[column]
     dataset["economy"] = dataset.apply(lambda row: calculate_economy(row), axis=1)
@@ -63,8 +69,6 @@ def bowling_predict_test():
     plt.tight_layout()
     plt.show()
 
-    train_predict = pd.DataFrame(predictor.predict(X_train), columns=output_bowling_columns)
-
     plt.plot(range(0, len(y_test)), y_test["runs_conceded"], color='red')
     plt.plot(range(0, len(y_pred)), y_pred["runs_conceded"], color='blue')
     plt.title('Actual vs Predicted')
@@ -80,21 +84,53 @@ def bowling_predict_test():
     plt.ylabel('Predicted Runs Conceded')
     plt.show()
 
+    # train error
+    plt.scatter(y_train["runs_conceded"], train_predict["runs_conceded"] - y_train["runs_conceded"], color='red', s=2)
+    plt.plot(y_train["runs_conceded"], y_train["runs_conceded"] - y_train["runs_conceded"], color='blue')
+    plt.scatter(y_test["runs_conceded"], y_pred["runs_conceded"] - y_test.reset_index()["runs_conceded"], color='green', s=4)
+    plt.title('Actual vs Predicted Residuals')
+    plt.xlabel('Actual Runs Scored')
+    plt.ylabel('Predicted Runs Scored Residuals')
+    plt.show()
+
+    corrector = RandomForestRegressor(max_depth=100, n_estimators=200, random_state=1, max_features="auto",
+                                      n_jobs=-1)
+    corrector.fit(y_train, train_predict - y_train)
+    train_correct = pd.DataFrame(corrector.predict(y_train), columns=output_bowling_columns)
+    test_correct = pd.DataFrame(corrector.predict(y_test), columns=output_bowling_columns)
+
+    # predict error
+    plt.scatter(y_train["runs_conceded"], train_predict["runs_conceded"] - y_train["runs_conceded"], color='red', s=2)
+    plt.scatter(y_train["runs_conceded"], train_correct["runs_conceded"], color='blue', s=2)
+    plt.scatter(y_test["runs_conceded"], test_correct["runs_conceded"], color='green', s=2)
+    plt.title('Actual vs Predicted Residuals')
+    plt.xlabel('Actual Runs Scored')
+    plt.ylabel('Predicted Runs Scored')
+    plt.show()
+
+    # corrected runs
+    plt.scatter(y_train["runs_conceded"], train_predict["runs_conceded"] - train_correct["runs_conceded"], color='red', s=2)
+    plt.plot(y_train["runs_conceded"], y_train["runs_conceded"], color='blue')
+    plt.scatter(y_test["runs_conceded"], y_pred["runs_conceded"] - test_correct["runs_conceded"], color='green', s=4)
+    plt.title('Actual vs Predicted')
+    plt.xlabel('Actual Runs Scored')
+    plt.ylabel('Predicted Runs Scored')
+    plt.show()
+
     for attribute in output_bowling_columns:
         print(attribute)
         print("Training Set")
-        print('Mean Absolute Error:', metrics.mean_absolute_error(y_train[attribute], train_predict[attribute]))
-        print('Mean Squared Error:', metrics.mean_squared_error(y_train[attribute], train_predict[attribute]))
+        print('Mean Absolute Error:', metrics.mean_absolute_error(y_train[attribute],  train_predict[attribute] - train_correct[attribute]))
+        print('Mean Squared Error:', metrics.mean_squared_error(y_train[attribute],  train_predict[attribute] - train_correct[attribute]))
         print('Root Mean Squared Error:',
-              np.sqrt(metrics.mean_squared_error(y_train[attribute], train_predict[attribute])))
-        print('R2:', metrics.r2_score(y_train[attribute], train_predict[attribute]))
+              np.sqrt(metrics.mean_squared_error(y_train[attribute],  train_predict[attribute] - train_correct[attribute])))
+        print('R2:', metrics.r2_score(y_train[attribute],  train_predict[attribute] - train_correct[attribute]))
         print("-----------------------------------------------------------------------------------")
         print("Test Set")
-        print('Mean Absolute Error:', metrics.mean_absolute_error(y_test[attribute], y_pred[attribute]))
-        print('Mean Squared Error:', metrics.mean_squared_error(y_test[attribute], y_pred[attribute]))
+        print('Mean Squared Error:', metrics.mean_squared_error(y_test[attribute],  y_pred[attribute] - test_correct[attribute]))
         print('Root Mean Squared Error:',
-              np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute])))
-        print('R2:', metrics.r2_score(y_test[attribute], y_pred[attribute]))
+              np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute])))
+        print('R2:', metrics.r2_score(y_test[attribute],  y_pred[attribute] - test_correct[attribute]))
         print("-----------------------------------------------------------------------------------")
         exit()
 
@@ -129,7 +165,15 @@ if __name__ == "__main__":
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
     predictor.fit(X_train, y_train)
+
+    train_predict = pd.DataFrame(predictor.predict(X_train), columns=output_bowling_columns)
+
+    corrector = RandomForestRegressor(max_depth=100, n_estimators=200, random_state=1, max_features="auto",
+                                      n_jobs=-1)
+    corrector.fit(y_train, train_predict - y_train)
+
     # get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 25)
     pickle.dump(predictor, open(model_file, 'wb'))
+    pickle.dump(corrector, open(corrector_file, 'wb'))
     bowling_predict_test()
     # predict_bowling("", 1, 1)
