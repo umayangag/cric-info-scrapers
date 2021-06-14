@@ -73,12 +73,43 @@ def batting_predict_test():
     plt.ylabel('Runs Scored')
     plt.show()
 
-    gradient_corrected = train_predict["runs_scored"]
-    gradient_corrected = train_predict["runs_scored"].apply(lambda x: x * 2-35)
-
-    plt.scatter(y_train["runs_scored"], gradient_corrected, color='red', s=2)
+    # predict runs
+    plt.scatter(y_train["runs_scored"], train_predict["runs_scored"], color='red', s=2)
     plt.plot(y_train["runs_scored"], y_train["runs_scored"], color='blue')
-    plt.scatter(y_test["runs_scored"], y_pred["runs_scored"].apply(lambda x: x * 2-35), color='green', s=4)
+    plt.scatter(y_test["runs_scored"], y_pred["runs_scored"], color='green', s=4)
+    plt.title('Actual vs Predicted')
+    plt.xlabel('Actual Runs Scored')
+    plt.ylabel('Predicted Runs Scored')
+    plt.show()
+
+    # train error
+    plt.scatter(y_train["runs_scored"], train_predict["runs_scored"] - y_train["runs_scored"], color='red', s=2)
+    plt.plot(y_train["runs_scored"], y_train["runs_scored"] - y_train["runs_scored"], color='blue')
+    plt.scatter(y_test["runs_scored"], y_pred["runs_scored"] - y_test.reset_index()["runs_scored"], color='green', s=4)
+    plt.title('Actual vs Predicted Residuals')
+    plt.xlabel('Actual Runs Scored')
+    plt.ylabel('Predicted Runs Scored Residuals')
+    plt.show()
+
+    corrector = RandomForestRegressor(max_depth=100, n_estimators=200, random_state=1, max_features="auto",
+                                      n_jobs=-1)
+    corrector.fit(y_train, train_predict - y_train)
+    train_correct = pd.DataFrame(corrector.predict(y_train), columns=output_batting_columns)
+    test_correct = pd.DataFrame(corrector.predict(y_test), columns=output_batting_columns)
+
+    # predict error
+    plt.scatter(y_train["runs_scored"], train_predict["runs_scored"] - y_train["runs_scored"], color='red', s=2)
+    plt.scatter(y_train["runs_scored"], train_correct["runs_scored"], color='blue', s=2)
+    plt.scatter(y_test["runs_scored"], test_correct["runs_scored"], color='green', s=2)
+    plt.title('Actual vs Predicted Residuals')
+    plt.xlabel('Actual Runs Scored')
+    plt.ylabel('Predicted Runs Scored')
+    plt.show()
+
+    # corrected runs
+    plt.scatter(y_train["runs_scored"], train_predict["runs_scored"] - train_correct["runs_scored"], color='red', s=2)
+    plt.plot(y_train["runs_scored"], y_train["runs_scored"], color='blue')
+    plt.scatter(y_test["runs_scored"], y_pred["runs_scored"] - test_correct["runs_scored"], color='green', s=4)
     plt.title('Actual vs Predicted')
     plt.xlabel('Actual Runs Scored')
     plt.ylabel('Predicted Runs Scored')
