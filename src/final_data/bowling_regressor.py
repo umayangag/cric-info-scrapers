@@ -76,9 +76,9 @@ def bowling_predict_test():
     plt.ylabel('Runs Scored')
     plt.show()
 
-    plt.scatter(y_train["runs_conceded"], train_predict["runs_conceded"].apply(lambda x: x * 3-75), color='red')
+    plt.scatter(y_train["runs_conceded"], train_predict["runs_conceded"].apply(lambda x: x * 3 - 75), color='red')
     plt.plot(y_train["runs_conceded"], y_train["runs_conceded"], color='blue')
-    plt.scatter(y_test["runs_conceded"], y_pred["runs_conceded"].apply(lambda x: x * 3-75), color='green')
+    plt.scatter(y_test["runs_conceded"], y_pred["runs_conceded"].apply(lambda x: x * 3 - 75), color='green')
     plt.title('Actual vs Predicted')
     plt.xlabel('Actual Runs Conceded')
     plt.ylabel('Predicted Runs Conceded')
@@ -87,7 +87,8 @@ def bowling_predict_test():
     # train error
     plt.scatter(y_train["runs_conceded"], train_predict["runs_conceded"] - y_train["runs_conceded"], color='red', s=2)
     plt.plot(y_train["runs_conceded"], y_train["runs_conceded"] - y_train["runs_conceded"], color='blue')
-    plt.scatter(y_test["runs_conceded"], y_pred["runs_conceded"] - y_test.reset_index()["runs_conceded"], color='green', s=4)
+    plt.scatter(y_test["runs_conceded"], y_pred["runs_conceded"] - y_test.reset_index()["runs_conceded"], color='green',
+                s=4)
     plt.title('Actual vs Predicted Residuals')
     plt.xlabel('Actual Runs Scored')
     plt.ylabel('Predicted Runs Scored Residuals')
@@ -109,7 +110,8 @@ def bowling_predict_test():
     plt.show()
 
     # corrected runs
-    plt.scatter(y_train["runs_conceded"], train_predict["runs_conceded"] - train_correct["runs_conceded"], color='red', s=2)
+    plt.scatter(y_train["runs_conceded"], train_predict["runs_conceded"] - train_correct["runs_conceded"], color='red',
+                s=2)
     plt.plot(y_train["runs_conceded"], y_train["runs_conceded"], color='blue')
     plt.scatter(y_test["runs_conceded"], y_pred["runs_conceded"] - test_correct["runs_conceded"], color='green', s=4)
     plt.title('Actual vs Predicted')
@@ -120,25 +122,26 @@ def bowling_predict_test():
     for attribute in output_bowling_columns:
         print(attribute)
         print("Training Set")
-        print('Mean Absolute Error:', metrics.mean_absolute_error(y_train[attribute],  train_predict[attribute] - train_correct[attribute]))
-        print('Mean Squared Error:', metrics.mean_squared_error(y_train[attribute],  train_predict[attribute] - train_correct[attribute]))
+        print('Mean Absolute Error:',
+              metrics.mean_absolute_error(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
+        print('Mean Squared Error:',
+              metrics.mean_squared_error(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
         print('Root Mean Squared Error:',
-              np.sqrt(metrics.mean_squared_error(y_train[attribute],  train_predict[attribute] - train_correct[attribute])))
-        print('R2:', metrics.r2_score(y_train[attribute],  train_predict[attribute] - train_correct[attribute]))
+              np.sqrt(
+                  metrics.mean_squared_error(y_train[attribute], train_predict[attribute] - train_correct[attribute])))
+        print('R2:', metrics.r2_score(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
         print("-----------------------------------------------------------------------------------")
         print("Test Set")
-        print('Mean Squared Error:', metrics.mean_squared_error(y_test[attribute],  y_pred[attribute] - test_correct[attribute]))
+        print('Mean Squared Error:',
+              metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
         print('Root Mean Squared Error:',
               np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute])))
-        print('R2:', metrics.r2_score(y_test[attribute],  y_pred[attribute] - test_correct[attribute]))
+        print('R2:', metrics.r2_score(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
         print("-----------------------------------------------------------------------------------")
         exit()
 
 
 if __name__ == "__main__":
-    RFR = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=0, n_jobs=-1)
-    predictor = RFR
-
     dirname = os.path.dirname(__file__)
     dataset_source = os.path.join(dirname, "output\\bowling_encoded.csv")
 
@@ -164,11 +167,15 @@ if __name__ == "__main__":
     X_test = X.iloc[train_set + 1:, :]
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
+
+    RFR = RandomForestRegressor(max_depth=3, n_estimators=200, random_state=0, n_jobs=-1)
+    predictor = RFR
+
     predictor.fit(X_train, y_train)
 
     train_predict = pd.DataFrame(predictor.predict(X_train), columns=output_bowling_columns)
 
-    corrector = RandomForestRegressor(max_depth=100, n_estimators=200, random_state=1, max_features="auto",
+    corrector = RandomForestRegressor(max_depth=6, n_estimators=500, random_state=1, max_features="auto",
                                       n_jobs=-1)
     corrector.fit(y_train, train_predict - y_train)
 

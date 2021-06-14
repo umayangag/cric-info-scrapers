@@ -42,7 +42,7 @@ def predict_batting(dataset):
     predicted_df = pd.DataFrame(predicted, columns=output_batting_columns)
     corrections = loaded_corrector.predict(predicted_df)
     corrections_df = pd.DataFrame(corrections, columns=output_batting_columns)
-    result = predicted_df - corrections_df
+    result = predicted_df - corrections_df + 5
     result[result < 0] = 0
     for column in output_batting_columns:
         dataset[column] = result[column]
@@ -110,7 +110,7 @@ def batting_predict_test():
     # corrected runs
     plt.scatter(y_train["runs_scored"], train_predict["runs_scored"] - train_correct["runs_scored"], color='red', s=2)
     plt.plot(y_train["runs_scored"], y_train["runs_scored"], color='blue')
-    plt.scatter(y_test["runs_scored"], y_pred["runs_scored"] - test_correct["runs_scored"], color='green', s=4)
+    plt.scatter(y_test["runs_scored"], y_pred["runs_scored"] - test_correct["runs_scored"] + 5, color='green', s=4)
     plt.title('Actual vs Predicted')
     plt.xlabel('Actual Runs Scored')
     plt.ylabel('Predicted Runs Scored')
@@ -132,7 +132,7 @@ def batting_predict_test():
         print('Mean Squared Error:',
               metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
         print('Root Mean Squared Error:',
-              np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute])))
+              np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute] + 5)))
         print('R2:', metrics.r2_score(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
         print("-----------------------------------------------------------------------------------")
         exit()
@@ -165,13 +165,13 @@ if __name__ == "__main__":
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
 
-    predictor = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
+    predictor = RandomForestRegressor(max_depth=3, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
     predictor.fit(X_train, y_train)
 
     train_predict = pd.DataFrame(predictor.predict(X_train), columns=output_batting_columns)
 
-    corrector = RandomForestRegressor(max_depth=100, n_estimators=200, random_state=1, max_features="auto",
+    corrector = RandomForestRegressor(max_depth=6, n_estimators=500, random_state=1, max_features="auto",
                                       n_jobs=-1)
     corrector.fit(y_train, train_predict - y_train)
 
