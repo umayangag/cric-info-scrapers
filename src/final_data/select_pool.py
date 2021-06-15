@@ -197,6 +197,7 @@ def get_actual_team_predicted_performance(player_performance_predictions, match_
     return calculate_overall_performance(actual_team, match_id)
 
 
+# actual wins from test data 14/45==31.11%
 if __name__ == "__main__":
     predicted_score_array = []
     # match_id = 1193505
