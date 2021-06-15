@@ -8,13 +8,14 @@ import pandas as pd
 from sklearn import metrics
 from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import MinMaxScaler
 
 from team_selection.dataset_definitions import *
 
 model_file = "batting_performance_predictor.sav"
 corrector_file = "batting_performance_corrector.sav"
 scaler_file = "batting_scaler.sav"
-
+offset_array = [3.3652, 3.6601, 0.3073, 0.1321, -0.5213]
 input_columns = [
     'batting_consistency',
     'batting_form',
@@ -27,7 +28,7 @@ input_columns = [
     'batting_viscosity',
     'batting_inning',
     'batting_session',
-    # 'toss',
+    'toss',
     'venue',
     'opposition',
     'season',
@@ -42,7 +43,7 @@ def predict_batting(dataset):
     predicted_df = pd.DataFrame(predicted, columns=output_batting_columns)
     corrections = loaded_corrector.predict(predicted_df)
     corrections_df = pd.DataFrame(corrections, columns=output_batting_columns)
-    result = predicted_df - corrections_df + 5
+    result = predicted_df - corrections_df
     result[result < 0] = 0
     for column in output_batting_columns:
         dataset[column] = result[column]
@@ -70,12 +71,12 @@ def batting_predict_test():
     plt.tight_layout()
     plt.show()
 
-    plt.plot(range(0, len(y_test)), y_test["runs_scored"], color='red')
-    plt.plot(range(0, len(y_pred)), y_pred["runs_scored"], color='blue')
-    plt.title('Actual vs Predicted')
-    plt.xlabel('Instance')
-    plt.ylabel('Runs Scored')
-    plt.show()
+    # plt.plot(range(0, len(y_test)), y_test["runs_scored"], color='red')
+    # plt.plot(range(0, len(y_pred)), y_pred["runs_scored"], color='blue')
+    # plt.title('Actual vs Predicted')
+    # plt.xlabel('Instance')
+    # plt.ylabel('Runs Scored')
+    # plt.show()
 
     # predict runs
     plt.scatter(y_train["runs_scored"], train_predict["runs_scored"], color='red', s=2)
@@ -86,56 +87,69 @@ def batting_predict_test():
     plt.ylabel('Predicted Runs Scored')
     plt.show()
 
-    # train error
-    plt.scatter(y_train["runs_scored"], train_predict["runs_scored"] - y_train["runs_scored"], color='red', s=2)
-    plt.plot(y_train["runs_scored"], y_train["runs_scored"] - y_train["runs_scored"], color='blue')
-    plt.scatter(y_test["runs_scored"], y_pred["runs_scored"] - y_test.reset_index()["runs_scored"], color='green', s=4)
-    plt.title('Actual vs Predicted Residuals')
-    plt.xlabel('Actual Runs Scored')
-    plt.ylabel('Predicted Runs Scored Residuals')
-    plt.show()
+    # # train error
+    # plt.scatter(y_train["runs_scored"], train_predict["runs_scored"] - y_train["runs_scored"], color='red', s=2)
+    # plt.plot(y_train["runs_scored"], y_train["runs_scored"] - y_train["runs_scored"], color='blue')
+    # plt.scatter(y_test["runs_scored"], y_pred["runs_scored"] - y_test.reset_index()["runs_scored"], color='green', s=4)
+    # plt.title('Actual vs Predicted Residuals')
+    # plt.xlabel('Actual Runs Scored')
+    # plt.ylabel('Predicted Runs Scored Residuals')
+    # plt.show()
 
-    train_correct = pd.DataFrame(corrector.predict(y_train), columns=output_batting_columns)
-    test_correct = pd.DataFrame(corrector.predict(y_test), columns=output_batting_columns)
+    train_correct = pd.DataFrame(corrector.predict(y_train), columns=output_batting_columns) - offset_array
+    test_correct = pd.DataFrame(corrector.predict(y_test), columns=output_batting_columns) - offset_array
 
-    # predict error
-    plt.scatter(y_train["runs_scored"], train_predict["runs_scored"] - y_train["runs_scored"], color='red', s=2)
-    plt.scatter(y_train["runs_scored"], train_correct["runs_scored"], color='blue', s=2)
-    plt.scatter(y_test["runs_scored"], test_correct["runs_scored"], color='green', s=2)
-    plt.title('Actual vs Predicted Residuals')
-    plt.xlabel('Actual Runs Scored')
-    plt.ylabel('Predicted Runs Scored')
-    plt.show()
-
-    # corrected runs
-    plt.scatter(y_train["runs_scored"], train_predict["runs_scored"] - train_correct["runs_scored"], color='red', s=2)
-    plt.plot(y_train["runs_scored"], y_train["runs_scored"], color='blue')
-    plt.scatter(y_test["runs_scored"], y_pred["runs_scored"] - test_correct["runs_scored"] + 5, color='green', s=4)
-    plt.title('Actual vs Predicted')
-    plt.xlabel('Actual Runs Scored')
-    plt.ylabel('Predicted Runs Scored')
-    plt.show()
+    # # predict error
+    # plt.scatter(y_train["runs_scored"], train_predict["runs_scored"] - y_train["runs_scored"], color='red', s=2)
+    # plt.scatter(y_train["runs_scored"], train_correct["runs_scored"], color='blue', s=2)
+    # plt.scatter(y_test["runs_scored"], test_correct["runs_scored"], color='green', s=2)
+    # plt.title('Actual vs Predicted Residuals')
+    # plt.xlabel('Actual Runs Scored')
+    # plt.ylabel('Predicted Runs Scored')
+    # plt.show()
 
     for attribute in output_batting_columns:
-        print(attribute)
-        print("Training Set")
-        print('Mean Absolute Error:',
-              metrics.mean_absolute_error(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
-        print('Mean Squared Error:',
-              metrics.mean_squared_error(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
-        print('Root Mean Squared Error:',
-              np.sqrt(
-                  metrics.mean_squared_error(y_train[attribute], train_predict[attribute] - train_correct[attribute])))
-        print('R2:', metrics.r2_score(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
+        # corrected runs
+        plt.scatter(y_train[attribute], train_predict[attribute] - train_correct[attribute], color='red',
+                    s=2)
+        plt.plot(y_train[attribute], y_train[attribute], color='blue')
+        plt.scatter(y_test[attribute], y_pred[attribute] - test_correct[attribute], color='green', s=4)
+        plt.title('Actual vs Predicted')
+        plt.xlabel('Actual ' + attribute)
+        plt.ylabel('Predicted ' + attribute)
+        plt.show()
+
+        # print(attribute)
+        # print("Training Set")
+        # print('Mean Absolute Error:',
+        #       metrics.mean_absolute_error(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
+        # print('Mean Squared Error:',
+        #       metrics.mean_squared_error(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
+        # print('Root Mean Squared Error:',
+        #       np.sqrt(
+        #           metrics.mean_squared_error(y_train[attribute], train_predict[attribute] - train_correct[attribute])))
+        # print('R2:', metrics.r2_score(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
+        # print("-----------------------------------------------------------------------------------")
+        # print("Test Set")
+        # print('Mean Squared Error:',
+        #       metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
+        # print('Root Mean Squared Error:',
+        #       np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute])))
+
+        # max_r2 = 0
+        # chosen_i = 0
+        # start = -2
+        # L = 0.0001
+        # for i in range(20000):
+        #     r2 = metrics.r2_score(y_test[attribute], y_pred[attribute] - test_correct[attribute] + start + L * i)
+        #     if r2 > max_r2:
+        #         max_r2 = r2
+        #         chosen_i = start + L * i
+        # print('max R2:', chosen_i, ":", max_r2)
+
+        print(attribute,'R2:', metrics.r2_score(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
         print("-----------------------------------------------------------------------------------")
-        print("Test Set")
-        print('Mean Squared Error:',
-              metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
-        print('Root Mean Squared Error:',
-              np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute] + 5)))
-        print('R2:', metrics.r2_score(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
-        print("-----------------------------------------------------------------------------------")
-        exit()
+        # exit()
 
 
 if __name__ == "__main__":
@@ -150,7 +164,8 @@ if __name__ == "__main__":
     X = input_data[input_columns]
     y = input_data[output_batting_columns].copy()  # Labels
 
-    scaler = preprocessing.StandardScaler().fit(X)
+    # scaler = preprocessing.StandardScaler().fit(X)
+    scaler = MinMaxScaler(feature_range=(0, 1)).fit(X)
     pickle.dump(scaler, open(scaler_file, 'wb'))
     data_scaled = scaler.transform(X)
     final_df = pd.DataFrame(data=data_scaled, columns=input_columns)
@@ -165,17 +180,17 @@ if __name__ == "__main__":
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
 
-    predictor = RandomForestRegressor(max_depth=3, n_estimators=200, random_state=1, max_features="auto",
+    predictor = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
     predictor.fit(X_train, y_train)
 
     train_predict = pd.DataFrame(predictor.predict(X_train), columns=output_batting_columns)
 
-    corrector = RandomForestRegressor(max_depth=6, n_estimators=500, random_state=1, max_features="auto",
+    corrector = RandomForestRegressor(max_depth=6, n_estimators=100, random_state=1, max_features="auto",
                                       n_jobs=-1)
     corrector.fit(y_train, train_predict - y_train)
 
-    # get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 25)
+    # get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 10, "runs_scored")
     pickle.dump(predictor, open(model_file, 'wb'))
     pickle.dump(corrector, open(corrector_file, 'wb'))
     batting_predict_test()
