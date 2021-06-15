@@ -43,7 +43,7 @@ def predict_batting(dataset):
     predicted_df = pd.DataFrame(predicted, columns=output_batting_columns)
     corrections = loaded_corrector.predict(predicted_df)
     corrections_df = pd.DataFrame(corrections, columns=output_batting_columns)
-    result = predicted_df - corrections_df
+    result = predicted_df - corrections_df + offset_array
     result[result < 0] = 0
     for column in output_batting_columns:
         dataset[column] = result[column]
@@ -147,7 +147,7 @@ def batting_predict_test():
         #         chosen_i = start + L * i
         # print('max R2:', chosen_i, ":", max_r2)
 
-        print(attribute,'R2:', metrics.r2_score(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
+        print(attribute, 'R2:', metrics.r2_score(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
         print("-----------------------------------------------------------------------------------")
         # exit()
 
