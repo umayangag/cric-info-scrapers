@@ -3,11 +3,24 @@ from config.mysql import get_db_connection
 db_connection = get_db_connection()
 db_cursor = db_connection.cursor()
 
+
 def get_match_ids():
     db_cursor.execute(
         f'SELECT match_id FROM match_details')
     results = db_cursor.fetchall()
     return results
+
+
+def get_fielding_data(match_id, player_id):
+    db_cursor.execute(
+        f'SELECT catches, run_outs, dropped_catches, missed_run_outs '
+        f'FROM fielding_data WHERE match_id={match_id} and player_id={player_id}')
+    results = db_cursor.fetchall()
+    if len(results) == 1:
+        return results[0]
+    else:
+        return 0, 0, 0, 0
+
 
 def get_batting_data(match_id, player_id):
     db_cursor.execute(

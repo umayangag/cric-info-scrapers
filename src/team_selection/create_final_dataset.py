@@ -4,6 +4,7 @@ from team_selection.shared.match_data import *
 from team_selection.dataset_definitions import *
 from config.mysql import get_db_connection
 from team_selection.fill_missing_attributes import *
+from final_data.encoders import *
 
 dirname = os.path.dirname(__file__)
 output_file_encoded = os.path.join(dirname, "output\\final_dataset.csv")
@@ -76,7 +77,12 @@ def get_batting_df(player_list, match_id):
             player_venue = get_player_metric(match_id, "batting", player_obj, "venue", "venue", venue_id)
             player_opposition = get_player_metric(match_id, "batting", player_obj, "opposition", "opposition",
                                                   opposition_id)
+            catches, run_outs, dropped_catches, missed_run_outs = get_fielding_data(match_id, player_id)
             player_fielding = player_obj[6]
+            if (catches + run_outs + missed_run_outs + dropped_catches) > 0:
+                fielding_performance = (catches + run_outs) / (catches + run_outs + missed_run_outs + dropped_catches)
+            else:
+                fielding_performance = 0
             description, runs, balls, fours, sixes, strike_rate, batting_position = get_batting_data(match_id,
                                                                                                      player_id)
 
@@ -114,9 +120,12 @@ def get_batting_df(player_list, match_id):
                                extras,
                                match_number,
                                result,
-                               player_fielding
+                               player_fielding,
+                               fielding_performance
                                ])
-    return pd.DataFrame(data_array, columns=np.concatenate((all_batting_columns, match_summary_columns,["fielding_consistency"])))
+    return pd.DataFrame(data_array,
+                        columns=np.concatenate(
+                            (all_batting_columns, match_summary_columns, ["fielding_consistency", "success_rate"])))
 
 
 def get_actual_players_who_played(match_id):
