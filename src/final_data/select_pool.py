@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 
 from final_data.batting_regressor import predict_batting
 from final_data.bowling_regressor import predict_bowling
+from final_data.fielding_regressor import predict_fielding
 from final_data.match_win_predict import predict_for_team
 from team_selection.dataset_definitions import *
 from team_selection.fill_missing_attributes import *
@@ -55,9 +56,13 @@ def get_batting_performance(player_list, match_id):
     inning, session, toss, venue_id, opposition_id, season_id, score, wickets, all_balls, target, extras, match_number, result = get_match_data(
         match_id,
         "batting")
+    inning2, session2, toss2, venue_id2, opposition_id2, season_id2, score2, total_wickets2, balls2, target2, extras2, match_number2, result2 = get_match_data(
+        match_id, "bowling")
     temp, wind, rain, humidity, cloud, pressure, viscosity = get_weather_data(match_id, "batting")
+    temp2, wind2, rain2, humidity2, cloud2, pressure2, viscosity2 = get_weather_data(match_id, "bowling")
 
     data_array = []
+    fielding_array = []
 
     for player in player_list.iterrows():
         player_obj = player[1]
@@ -68,6 +73,21 @@ def get_batting_performance(player_list, match_id):
         player_opposition = get_player_metric(match_id, "batting", player_obj, "opposition", "opposition",
                                               opposition_id)
         player_fielding = player_obj[6]
+
+        fielding_array.append([
+            player_fielding,
+            temp2,
+            wind2,
+            rain2,
+            humidity2,
+            cloud2,
+            pressure2,
+            encode_viscosity(viscosity2),
+            inning,
+            encode_session(session2),
+            toss,
+            season_id,
+        ])
 
         data_array.append([
             player[1]["batting_consistency"],
@@ -86,11 +106,14 @@ def get_batting_performance(player_list, match_id):
             player_opposition,
             season_id,
             player_name,
-            player_fielding
+            player_fielding,
         ])
     dataset = pd.DataFrame(data_array, columns=np.concatenate((input_batting_columns, ["fielding_consistency"])))
+    fielding_df = pd.DataFrame(fielding_array, columns=input_fielding_columns)
     predicted = predict_batting(dataset.loc[:, dataset.columns != "player_name"])
+    success_rate = predict_fielding(fielding_df.loc[:, fielding_df.columns != "player_name"])
     predicted["player_name"] = dataset["player_name"]
+    predicted["success_rate"] = success_rate["success_rate"]
     return predicted
 
 
@@ -174,6 +197,7 @@ def get_actual_team_predicted_performance(player_performance_predictions, match_
     return calculate_overall_performance(actual_team, match_id)
 
 
+# actual wins from test data 14/45==31.11%
 if __name__ == "__main__":
     predicted_score_array = []
     # match_id = 1193505

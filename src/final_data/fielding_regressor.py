@@ -11,6 +11,7 @@ from sklearn.ensemble import RandomForestRegressor
 from team_selection.dataset_definitions import *
 
 model_file = "fielding_performance_predictor.sav"
+corrector_file = "fielding_performance_corrector.sav"
 scaler_file = "fielding_scaler.sav"
 
 input_columns = [
@@ -31,9 +32,14 @@ input_columns = [
 
 def predict_fielding(dataset):
     loaded_predictor = pickle.load(open(model_file, 'rb'))
+    loaded_corrector = pickle.load(open(corrector_file, 'rb'))
     loaded_scaler = pickle.load(open(scaler_file, 'rb'))
     predicted = loaded_predictor.predict(loaded_scaler.transform(dataset[input_columns]))
-    result = pd.DataFrame(predicted, columns=output_fielding_columns)
+    predicted_df = pd.DataFrame(predicted, columns=output_fielding_columns)
+    corrections = loaded_corrector.predict(predicted_df)
+    corrections_df = pd.DataFrame(corrections, columns=output_fielding_columns)
+    result = predicted_df - corrections_df
+    result[result < 0] = 0
     for column in output_fielding_columns:
         dataset[column] = result[column]
     return dataset
@@ -97,7 +103,7 @@ def fielding_predict_test():
     # corrected runs
     plt.scatter(y_train["success_rate"], train_predict["success_rate"] - train_correct["success_rate"], color='red', s=2)
     plt.plot(y_train["success_rate"], y_train["success_rate"], color='blue')
-    plt.scatter(y_test["success_rate"], y_pred["success_rate"] - test_correct["success_rate"] + 5, color='green', s=4)
+    plt.scatter(y_test["success_rate"], y_pred["success_rate"] - test_correct["success_rate"], color='green', s=4)
     plt.title('Actual vs Predicted')
     plt.xlabel('Actual Runs Scored')
     plt.ylabel('Predicted Runs Scored')
@@ -151,7 +157,7 @@ if __name__ == "__main__":
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
 
-    predictor = RandomForestRegressor(max_depth=100, n_estimators=200, random_state=1, max_features="auto",
+    predictor = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
     predictor.fit(X_train, y_train["success_rate"])
 
@@ -159,7 +165,8 @@ if __name__ == "__main__":
 
     corrector = RandomForestRegressor(max_depth=6, n_estimators=500, random_state=1, max_features="auto",
                                       n_jobs=-1)
-    corrector.fit(y_train, train_predict - y_train)
+    corrector.fit(y_train, train_predict["success_rate"] - y_train["success_rate"])
     # get_error_curves(X_train, y_train, X_test, y_test, output_fielding_columns, 500)
     pickle.dump(predictor, open(model_file, 'wb'))
+    pickle.dump(corrector, open(corrector_file, 'wb'))
     fielding_predict_test()

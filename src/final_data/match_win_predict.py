@@ -60,7 +60,8 @@ all_columns = [
     'wickets_taken',
     'bowling_contribution',
     "economy",
-    "fielding_consistency"
+    "fielding_consistency",
+    # "success_rate"
 ]
 
 
