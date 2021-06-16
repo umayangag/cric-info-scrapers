@@ -302,5 +302,8 @@ if __name__ == "__main__":
     plt.grid()
     plt.show()
 
-    print("Matches Lost:")
+    print("Optimal Matches Lost:")
     print(matches_df.loc[matches_df["optimal_score"] < matches_df["optimal_target"]])
+
+    print("Predicted Matches Lost:")
+    print(matches_df.loc[matches_df["predicted_score"] < matches_df["predicted_target"]])

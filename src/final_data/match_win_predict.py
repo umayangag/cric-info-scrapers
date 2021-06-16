@@ -80,15 +80,10 @@ def win_predict(predictor):
     y_pred = predictor.predict(X_test)
 
     r = permutation_importance(predictor, X_test, y_test, n_repeats=30, random_state=0)
-    for i in r.importances_mean.argsort()[::-1]:
-        if r.importances_mean[i] - 2 * r.importances_std[i] > 0:
-            print(f"{all_columns[i]:<8}"
-                  f"{r.importances_mean[i]:.3f}"
-                  f" +/- {r.importances_std[i]:.3f}")
 
     plt.figure(figsize=(6 * 1.618, 6))
     index = np.arange(len(X.columns))
-    plt.barh(index,  r.importances_mean, color='black', alpha=0.5)
+    plt.barh(index, r.importances_mean, color='black', alpha=0.5)
     plt.ylabel('features')
     plt.xlabel('importance')
     plt.title('Feature importance')
@@ -111,11 +106,40 @@ def win_predict(predictor):
 
     # for classifiers
     # print("Score:", predictor.score(X_test, y_test))
-    accuracy = metrics.accuracy_score(y_test, y_pred)
+
+    confusion = confusion_matrix(y_test, y_pred, labels=[0, 1])
+    print(confusion)
+
+    TP = confusion[1, 1]
+    TN = confusion[0, 0]
+    FP = confusion[0, 1]
+    FN = confusion[1, 0]
+    print((TP + TN) / float(TP + TN + FP + FN))
     # cvs = cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean()
+    accuracy = metrics.accuracy_score(y_test, y_pred)
     print("Accuracy:", accuracy)
+
+    classification_error = (FP + FN) / float(TP + TN + FP + FN)
+
+    print("classification_error:", classification_error)
+
+    sensitivity = TP / float(FN + TP)
+
+    print("sensitivity:",sensitivity)
+
+    specificity = TN / (TN + FP)
+
+    print("specificity:",specificity)
+
+    false_positive_rate = FP / float(TN + FP)
+
+    print("false_positive_rate:",false_positive_rate)
+
+    precision = TP / float(TP + FP)
+
+    print("precision:",precision)
+
     # print("Cross Validation Score:", cvs)
-    print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
 
     # plt.bar(range(X_train.shape[1]), gb.feature_importances_)
     # plt.xticks(range(X_train.shape[1]), X.columns)
