@@ -25,9 +25,9 @@ all_columns = [
     'batting_pressure',
     'batting_viscosity',
     'batting_inning',
-    # 'batting_session',
+    'batting_session',
     'toss',
-    # 'venue',
+    'venue',
     'opposition',
     # 'season',
     'runs_scored',
@@ -61,7 +61,7 @@ all_columns = [
     'bowling_contribution',
     "economy",
     "fielding_consistency",
-    # "success_rate"
+    "success_rate"
 ]
 
 
@@ -115,7 +115,8 @@ def win_predict(predictor):
     FP = confusion[0, 1]
     FN = confusion[1, 0]
     print((TP + TN) / float(TP + TN + FP + FN))
-    # cvs = cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean()
+    cvs = cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean()
+    print("Cross Validation Score:", cvs)
     accuracy = metrics.accuracy_score(y_test, y_pred)
     print("Accuracy:", accuracy)
 
@@ -138,8 +139,6 @@ def win_predict(predictor):
     precision = TP / float(TP + FP)
 
     print("precision:",precision)
-
-    # print("Cross Validation Score:", cvs)
 
     # plt.bar(range(X_train.shape[1]), gb.feature_importances_)
     # plt.xticks(range(X_train.shape[1]), X.columns)

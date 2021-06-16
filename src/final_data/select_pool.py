@@ -307,3 +307,6 @@ if __name__ == "__main__":
 
     print("Predicted Matches Lost:")
     print(matches_df.loc[matches_df["predicted_score"] < matches_df["predicted_target"]])
+
+    print("Predicted Matches Won:")
+    print(matches_df.loc[matches_df["predicted_score"] >= matches_df["predicted_target"]])
