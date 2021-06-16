@@ -66,6 +66,7 @@ def get_batting_performance(player_list, match_id):
 
     for player in player_list.iterrows():
         player_obj = player[1]
+        is_keeper = player_obj[2]
         player_id = player_obj[0]
         player_name = player_obj[1]
         player_form = get_player_metric(match_id, "batting", player_obj, "form", "season", season_id - 1)
@@ -107,8 +108,10 @@ def get_batting_performance(player_list, match_id):
             season_id,
             player_name,
             player_fielding,
+            is_keeper
         ])
-    dataset = pd.DataFrame(data_array, columns=np.concatenate((input_batting_columns, ["fielding_consistency"])))
+    dataset = pd.DataFrame(data_array, columns=np.concatenate(
+        (input_batting_columns, ["fielding_consistency", "is_wicket_keeper"])))
     fielding_df = pd.DataFrame(fielding_array, columns=input_fielding_columns)
     predicted = predict_batting(dataset.loc[:, dataset.columns != "player_name"])
     success_rate = predict_fielding(fielding_df.loc[:, fielding_df.columns != "player_name"])
@@ -146,6 +149,7 @@ def get_player_pool_with_predicted_performance(match_id, players, bowlers_list):
     #                                 calculated_team_without_names.columns != "season"]
     player_performance_predictions, overall_win_probability = predict_for_team(calculated_team_without_names)
     player_performance_predictions["player_name"] = calculated_team["player_name"]
+    player_performance_predictions["is_wicket_keeper"] = calculated_team["is_wicket_keeper"]
     return player_performance_predictions
 
 
@@ -155,14 +159,18 @@ def get_optimal_team_predicted_performance(player_performance_predictions, match
 
     # COMBINATION ALGORITHM
     predicted_team = player_performance_predictions.copy()
-    batsmen_df = predicted_team.loc[predicted_team['bowling_consistency'] == 0]
+    wicket_keeper = predicted_team.copy().loc[predicted_team["is_wicket_keeper"] == 1].sort_values(
+        by=["winning_probability", "batting_contribution"], ascending=[False, False])[:1]
+    wicket_keeper_name = wicket_keeper.iloc[0]["player_name"]
+    batsmen_df = predicted_team.loc[
+        (predicted_team['bowling_consistency'] == 0) & (predicted_team['is_wicket_keeper'] != wicket_keeper_name)]
     batsmen_df = batsmen_df.sort_values(by=["winning_probability", "batting_contribution"], ascending=[False, False])[
-                 :6]
+                 :5]
     bowler_df = predicted_team.loc[predicted_team['bowling_consistency'] > 0]
-    bowler_df = bowler_df.loc[bowler_df['deliveries'] > 30].sort_values(
+    bowler_df = bowler_df.loc[bowler_df['deliveries'] > 0].sort_values(
         by=["winning_probability", "bowling_contribution"], ascending=[False, True])[:5]
 
-    predicted_team = pd.concat([batsmen_df, bowler_df]).drop_duplicates().reset_index(drop=True)
+    predicted_team = pd.concat([batsmen_df,wicket_keeper, bowler_df]).drop_duplicates().reset_index(drop=True)
     predicted_team, win_percent = predict_for_team(predicted_team)
     print("WIN % :", win_percent)
 
