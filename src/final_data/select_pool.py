@@ -163,14 +163,14 @@ def get_optimal_team_predicted_performance(player_performance_predictions, match
         by=["winning_probability", "batting_contribution"], ascending=[False, False])[:1]
     wicket_keeper_name = wicket_keeper.iloc[0]["player_name"]
     batsmen_df = predicted_team.loc[
-        (predicted_team['bowling_consistency'] == 0) & (predicted_team['is_wicket_keeper'] != wicket_keeper_name)]
+        (predicted_team['bowling_consistency'] == 0) & (predicted_team['player_name'] != wicket_keeper_name)]
     batsmen_df = batsmen_df.sort_values(by=["winning_probability", "batting_contribution"], ascending=[False, False])[
                  :5]
     bowler_df = predicted_team.loc[predicted_team['bowling_consistency'] > 0]
     bowler_df = bowler_df.loc[bowler_df['deliveries'] > 0].sort_values(
         by=["winning_probability", "bowling_contribution"], ascending=[False, True])[:5]
 
-    predicted_team = pd.concat([batsmen_df,wicket_keeper, bowler_df]).drop_duplicates().reset_index(drop=True)
+    predicted_team = pd.concat([batsmen_df, wicket_keeper, bowler_df]).reset_index(drop=True)
     predicted_team, win_percent = predict_for_team(predicted_team)
     print("WIN % :", win_percent)
 
@@ -213,11 +213,11 @@ if __name__ == "__main__":
     players, keepers, bowlers_list = get_player_pool()
 
     db_cursor.execute(
-        f'SELECT match_details.match_id, score, wickets, balls, total_target FROM match_details '
+        f'SELECT match_details.match_id, result, score, wickets, balls, total_target FROM match_details '
         f'left join (select match_id, sum(runs) as total_target from bowling_data group by match_id) as runs_conceded '
         f'on match_details.match_id=runs_conceded.match_id WHERE season_id>16 and result !=-1')
     match_list = db_cursor.fetchall()
-    matches_df = pd.DataFrame(match_list, columns=["match_id", "score", "wickets", "balls", "target"])
+    matches_df = pd.DataFrame(match_list, columns=["match_id", "result", "score", "wickets", "balls", "target"])
     for match_row in matches_df.iterrows():
         match_id = match_row[1][0]
 
@@ -318,3 +318,16 @@ if __name__ == "__main__":
 
     print("Predicted Matches Won:")
     print(matches_df.loc[matches_df["predicted_score"] >= matches_df["predicted_target"]])
+
+
+    def predict_result(row):
+        return row["predicted_score"] >= row["predicted_target"]
+
+
+    def optimal_result(row):
+        return row["optimal_score"] >= row["optimal_target"]
+
+
+    matches_df["predicted_result"] = matches_df.apply(lambda row: predict_result(row), axis=1)
+    matches_df["optimal_result"] = matches_df.apply(lambda row: optimal_result(row), axis=1)
+    print(matches_df[["match_id", "result", "predicted_result", "optimal_result"]])

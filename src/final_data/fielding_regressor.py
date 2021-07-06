@@ -138,7 +138,7 @@ if __name__ == "__main__":
     input_data = pd.read_csv(dataset_source)
     # input_data = input_data.sample(frac=1).reset_index(drop=True)
     training_input_columns = input_fielding_columns.copy()
-    training_input_columns.remove("player_name")
+    # training_input_columns.remove("player_name")
 
     X = input_data[input_columns]
     y = input_data[output_fielding_columns].copy()  # Labels
