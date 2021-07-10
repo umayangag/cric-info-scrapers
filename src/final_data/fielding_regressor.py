@@ -9,6 +9,10 @@ from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
 
 from team_selection.dataset_definitions import *
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn import svm
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
 
 model_file = "fielding_performance_predictor.sav"
 corrector_file = "fielding_performance_corrector.sav"
@@ -49,15 +53,15 @@ def fielding_predict_test():
     y_pred = predictor.predict(X_test)
     y_pred = pd.DataFrame(y_pred, columns=output_fielding_columns)
 
-    plt.figure(figsize=(6 * 1.618, 6))
-    index = np.arange(len(X.columns))
-    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    plt.ylabel('features')
-    plt.xlabel('importance')
-    plt.title('Feature importance')
-    plt.yticks(index, X.columns)
-    plt.tight_layout()
-    plt.show()
+    # plt.figure(figsize=(6 * 1.618, 6))
+    # index = np.arange(len(X.columns))
+    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    # plt.ylabel('features')
+    # plt.xlabel('importance')
+    # plt.title('Feature importance')
+    # plt.yticks(index, X.columns)
+    # plt.tight_layout()
+    # plt.show()
 
     train_predict = pd.DataFrame(predictor.predict(X_train), columns=output_fielding_columns)
 
@@ -126,7 +130,7 @@ def fielding_predict_test():
               metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
         print('Root Mean Squared Error:',
               np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute] + 5)))
-        print('R2:', metrics.r2_score(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
+        print('R2:', metrics.r2_score(y_test[attribute], y_pred[attribute]))
         print("-----------------------------------------------------------------------------------")
         exit()
 
@@ -159,6 +163,10 @@ if __name__ == "__main__":
 
     predictor = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
+    predictor = svm.SVR()
+    predictor = LinearRegression()
+    predictor = DecisionTreeRegressor(random_state=0)
+
     predictor.fit(X_train, y_train["success_rate"])
 
     train_predict = pd.DataFrame(predictor.predict(X_train), columns=["success_rate"])

@@ -10,6 +10,11 @@ from sklearn.ensemble import RandomForestRegressor
 
 from team_selection.dataset_definitions import *
 
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn import svm
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+
 model_file = "bowling_performance_predictor.sav"
 corrector_file = "bowling_performance_corrector.sav"
 wicket_corrector_file = "wicket_corrector.sav"
@@ -64,15 +69,15 @@ def bowling_predict_test():
     y_pred = predictor.predict(X_test)
     y_pred = pd.DataFrame(y_pred, columns=output_bowling_columns)
 
-    plt.figure(figsize=(6 * 1.618, 6))
-    index = np.arange(len(X.columns))
-    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    plt.ylabel('features')
-    plt.xlabel('importance')
-    plt.title('Feature importance')
-    plt.yticks(index, X.columns)
-    plt.tight_layout()
-    plt.show()
+    # plt.figure(figsize=(6 * 1.618, 6))
+    # index = np.arange(len(X.columns))
+    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    # plt.ylabel('features')
+    # plt.xlabel('importance')
+    # plt.title('Feature importance')
+    # plt.yticks(index, X.columns)
+    # plt.tight_layout()
+    # plt.show()
 
     # plt.plot(range(0, len(y_test)), y_test["runs_conceded"], color='red')
     # plt.plot(range(0, len(y_pred)), y_pred["runs_conceded"], color='blue')
@@ -136,7 +141,7 @@ def bowling_predict_test():
             plt.xlabel('Actual ' + attribute)
             plt.ylabel('Predicted ' + attribute)
             plt.show()
-            print(attribute, 'R2:', metrics.r2_score(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
+            print(attribute, 'R2:', metrics.r2_score(y_test[attribute], y_pred[attribute]))
         else:
             plt.scatter(y_train[attribute], train_predict[attribute] - train_wicket_correct[attribute], color='red',
                         s=2)
@@ -210,6 +215,10 @@ if __name__ == "__main__":
 
     RFR = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=0, n_jobs=-1)
     predictor = RFR
+
+    predictor = MultiOutputRegressor(svm.SVR())
+    predictor = MultiOutputRegressor(LinearRegression())
+    predictor = MultiOutputRegressor(DecisionTreeRegressor(random_state=0))
 
     predictor.fit(X_train, y_train)
 

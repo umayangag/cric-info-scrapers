@@ -13,7 +13,9 @@ from sklearn.preprocessing import MinMaxScaler
 from team_selection.dataset_definitions import *
 
 from sklearn.multioutput import MultiOutputRegressor
-from sklearn.linear_model import Ridge
+from sklearn import svm
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
 
 model_file = "batting_performance_predictor.sav"
 corrector_file = "batting_performance_corrector.sav"
@@ -185,7 +187,9 @@ if __name__ == "__main__":
 
     predictor = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
-    predictor = MultiOutputRegressor(Ridge(random_state=123))
+    predictor = MultiOutputRegressor(svm.SVR())
+    predictor = MultiOutputRegressor(LinearRegression())
+    predictor = MultiOutputRegressor(DecisionTreeRegressor(random_state = 0))
     predictor.fit(X_train, y_train)
 
     train_predict = pd.DataFrame(predictor.predict(X_train), columns=output_batting_columns)
