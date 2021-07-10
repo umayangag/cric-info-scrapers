@@ -9,7 +9,6 @@ from preprocessing.calculate_batting_venue import calculate_batting_venue
 from preprocessing.calculate_batting_opposition import calculate_batting_opposition
 from preprocessing.calculate_batting_consistency import calculate_batting_consistency
 from preprocessing.calculate_fielding_consistency import calculate_fielding_consistency
-from preprocessing.calculate_weather_category import calculate_weather_category
 
 
 db_connection = get_db_connection()
@@ -24,4 +23,3 @@ calculate_batting_opposition(db_connection)
 calculate_batting_form(db_connection)
 calculate_batting_consistency(db_connection)
 calculate_fielding_consistency(db_connection)
-calculate_weather_category(db_connection)
