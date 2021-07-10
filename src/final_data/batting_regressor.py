@@ -12,6 +12,9 @@ from sklearn.preprocessing import MinMaxScaler
 
 from team_selection.dataset_definitions import *
 
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.linear_model import Ridge
+
 model_file = "batting_performance_predictor.sav"
 corrector_file = "batting_performance_corrector.sav"
 scaler_file = "batting_scaler.sav"
@@ -61,15 +64,15 @@ def batting_predict_test():
     y_pred = predictor.predict(X_test)
     y_pred = pd.DataFrame(y_pred, columns=output_batting_columns)
 
-    plt.figure(figsize=(6 * 1.618, 6))
-    index = np.arange(len(X.columns))
-    plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
-    plt.ylabel('features')
-    plt.xlabel('importance')
-    plt.title('Feature importance')
-    plt.yticks(index, X.columns)
-    plt.tight_layout()
-    plt.show()
+    # plt.figure(figsize=(6 * 1.618, 6))
+    # index = np.arange(len(X.columns))
+    # plt.barh(index, predictor.feature_importances_, color='black', alpha=0.5)
+    # plt.ylabel('features')
+    # plt.xlabel('importance')
+    # plt.title('Feature importance')
+    # plt.yticks(index, X.columns)
+    # plt.tight_layout()
+    # plt.show()
 
     # plt.plot(range(0, len(y_test)), y_test["runs_scored"], color='red')
     # plt.plot(range(0, len(y_pred)), y_pred["runs_scored"], color='blue')
@@ -147,7 +150,7 @@ def batting_predict_test():
         #         chosen_i = start + L * i
         # print('max R2:', chosen_i, ":", max_r2)
 
-        print(attribute, 'R2:', metrics.r2_score(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
+        print(attribute, 'R2:', metrics.r2_score(y_test[attribute], y_pred[attribute]))
         print("-----------------------------------------------------------------------------------")
         # exit()
 
@@ -182,6 +185,7 @@ if __name__ == "__main__":
 
     predictor = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
+    predictor = MultiOutputRegressor(Ridge(random_state=123))
     predictor.fit(X_train, y_train)
 
     train_predict = pd.DataFrame(predictor.predict(X_train), columns=output_batting_columns)
