@@ -79,12 +79,13 @@ def batting_predict_test():
     # plt.show()
 
     # predict runs
-    plt.scatter(y_train["runs_scored"], train_predict["runs_scored"], color='red', s=2)
+    plt.scatter(y_train["runs_scored"], train_predict["runs_scored"], color='red', s=2, label="training data")
     plt.plot(y_train["runs_scored"], y_train["runs_scored"], color='blue')
-    plt.scatter(y_test["runs_scored"], y_pred["runs_scored"], color='green', s=4)
+    plt.scatter(y_test["runs_scored"], y_pred["runs_scored"], color='green', s=4, label="test data")
     plt.title('Actual vs Predicted')
     plt.xlabel('Actual Runs Scored')
     plt.ylabel('Predicted Runs Scored')
+    plt.legend()
     plt.show()
 
     # # train error
@@ -111,12 +112,14 @@ def batting_predict_test():
     for attribute in output_batting_columns:
         # corrected runs
         plt.scatter(y_train[attribute], train_predict[attribute] - train_correct[attribute], color='red',
-                    s=2)
+                    s=2, label="training data")
         plt.plot(y_train[attribute], y_train[attribute], color='blue')
-        plt.scatter(y_test[attribute], y_pred[attribute] - test_correct[attribute], color='green', s=4)
+        plt.scatter(y_test[attribute], y_pred[attribute] - test_correct[attribute], color='green', s=4,
+                    label="test data")
         plt.title('Actual vs Predicted')
         plt.xlabel('Actual ' + attribute)
         plt.ylabel('Predicted ' + attribute)
+        plt.legend()
         plt.show()
 
         # print(attribute)
@@ -133,8 +136,8 @@ def batting_predict_test():
         # print("Test Set")
         # print('Mean Squared Error:',
         #       metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
-        # print('Root Mean Squared Error:',
-        #       np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute])))
+        print('Root Mean Squared Error:',
+              np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute])))
 
         # max_r2 = 0
         # chosen_i = 0
