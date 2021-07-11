@@ -82,7 +82,8 @@ def fielding_predict_test():
     # train error
     plt.scatter(y_train["success_rate"], train_predict["success_rate"] - y_train["success_rate"], color='red', s=2)
     plt.plot(y_train["success_rate"], y_train["success_rate"] - y_train["success_rate"], color='blue')
-    plt.scatter(y_test["success_rate"], y_pred["success_rate"] - y_test.reset_index()["success_rate"], color='green', s=4)
+    plt.scatter(y_test["success_rate"], y_pred["success_rate"] - y_test.reset_index()["success_rate"], color='green',
+                s=4)
     plt.title('Actual vs Predicted Residuals')
     plt.xlabel('Actual Runs Scored')
     plt.ylabel('Predicted Runs Scored Residuals')
@@ -92,21 +93,25 @@ def fielding_predict_test():
     test_correct = pd.DataFrame(corrector.predict(y_test), columns=["success_rate"])
 
     # predict error
-    plt.scatter(y_train["success_rate"], train_predict["success_rate"] - y_train["success_rate"], color='red', s=2)
+    plt.scatter(y_train["success_rate"], train_predict["success_rate"] - y_train["success_rate"], color='red', s=2,
+                label="training data")
     plt.scatter(y_train["success_rate"], train_correct["success_rate"], color='blue', s=2)
-    plt.scatter(y_test["success_rate"], test_correct["success_rate"], color='green', s=2)
+    plt.scatter(y_test["success_rate"], test_correct["success_rate"], color='green', s=2, label="test data")
     plt.title('Actual vs Predicted Residuals')
     plt.xlabel('Actual Runs Scored')
     plt.ylabel('Predicted Runs Scored')
     plt.show()
 
     # corrected runs
-    plt.scatter(y_train["success_rate"], train_predict["success_rate"] - train_correct["success_rate"], color='red', s=2)
+    plt.scatter(y_train["success_rate"], train_predict["success_rate"] - train_correct["success_rate"], color='red',
+                s=2, label="training data")
     plt.plot(y_train["success_rate"], y_train["success_rate"], color='blue')
-    plt.scatter(y_test["success_rate"], y_pred["success_rate"] - test_correct["success_rate"], color='green', s=4)
+    plt.scatter(y_test["success_rate"], y_pred["success_rate"] - test_correct["success_rate"], color='green', s=4,
+                label="test data")
     plt.title('Actual vs Predicted')
-    plt.xlabel('Actual Runs Scored')
-    plt.ylabel('Predicted Runs Scored')
+    plt.xlabel('Actual Success Rate')
+    plt.ylabel('Predicted Success Rate')
+    plt.legend()
     plt.show()
 
     for attribute in ["success_rate"]:

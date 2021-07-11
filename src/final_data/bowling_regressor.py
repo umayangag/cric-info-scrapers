@@ -129,23 +129,29 @@ def bowling_predict_test():
     for attribute in output_bowling_columns:
         if attribute != "wickets_taken":
             plt.scatter(y_train[attribute], train_predict[attribute] - train_correct[attribute], color='red',
-                        s=2)
+                        s=2, label="training data")
             plt.plot(y_train[attribute], y_train[attribute], color='blue')
-            plt.scatter(y_test[attribute], y_pred[attribute] - test_correct[attribute], color='green', s=4)
+            plt.scatter(y_test[attribute], y_pred[attribute] - test_correct[attribute], color='green', s=4,label="test data")
             plt.title('Actual vs Predicted')
             plt.xlabel('Actual ' + attribute)
             plt.ylabel('Predicted ' + attribute)
+            plt.legend()
             plt.show()
+            print('Root Mean Squared Error:',
+                  np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute])))
             print(attribute, 'R2:', metrics.r2_score(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
         else:
             plt.scatter(y_train[attribute], train_predict[attribute] - train_wicket_correct[attribute], color='red',
-                        s=2)
+                        s=2, label="training data")
             plt.plot(y_train[attribute], y_train[attribute], color='blue')
-            plt.scatter(y_test[attribute], y_pred[attribute] - test_wicket_correct[attribute], color='green', s=4)
+            plt.scatter(y_test[attribute], y_pred[attribute] - test_wicket_correct[attribute], color='green', s=4,label="test data")
             plt.title('Actual vs Predicted')
             plt.xlabel('Actual ' + attribute)
             plt.ylabel('Predicted ' + attribute)
+            plt.legend()
             plt.show()
+            print('Root Mean Squared Error:',
+                  np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute])))
             print(attribute, 'R2:',
                   metrics.r2_score(y_test[attribute], y_pred[attribute] - test_wicket_correct[attribute]))
 
