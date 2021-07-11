@@ -105,12 +105,13 @@ def fielding_predict_test():
     plt.show()
 
     # corrected runs
-    plt.scatter(y_train["success_rate"], train_predict["success_rate"] - train_correct["success_rate"], color='red', s=2)
+    plt.scatter(y_train["success_rate"], train_predict["success_rate"] , color='red', s=2, label="train_data")
     plt.plot(y_train["success_rate"], y_train["success_rate"], color='blue')
-    plt.scatter(y_test["success_rate"], y_pred["success_rate"] - test_correct["success_rate"], color='green', s=4)
+    plt.scatter(y_test["success_rate"], y_pred["success_rate"] , color='green', s=4, label="test_data")
     plt.title('Actual vs Predicted')
-    plt.xlabel('Actual Runs Scored')
-    plt.ylabel('Predicted Runs Scored')
+    plt.xlabel('Actual Fielding Success Rate')
+    plt.ylabel('Predicted Fielding Success Rate')
+    plt.legend()
     plt.show()
 
     for attribute in ["success_rate"]:
@@ -122,14 +123,14 @@ def fielding_predict_test():
               metrics.mean_squared_error(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
         print('Root Mean Squared Error:',
               np.sqrt(
-                  metrics.mean_squared_error(y_train[attribute], train_predict[attribute] - train_correct[attribute])))
-        print('R2:', metrics.r2_score(y_train[attribute], train_predict[attribute] - train_correct[attribute]))
+                  metrics.mean_squared_error(y_train[attribute], train_predict[attribute])))
+        print('R2:', metrics.r2_score(y_train[attribute], train_predict[attribute] ))
         print("-----------------------------------------------------------------------------------")
         print("Test Set")
         print('Mean Squared Error:',
               metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
         print('Root Mean Squared Error:',
-              np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute] + 5)))
+              np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute])))
         print('R2:', metrics.r2_score(y_test[attribute], y_pred[attribute]))
         print("-----------------------------------------------------------------------------------")
         exit()
@@ -163,9 +164,9 @@ if __name__ == "__main__":
 
     predictor = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
-    predictor = svm.SVR()
-    predictor = LinearRegression()
-    predictor = DecisionTreeRegressor(random_state=0)
+    # predictor = svm.SVR()
+    # predictor = LinearRegression()
+    # predictor = DecisionTreeRegressor(random_state=0)
 
     predictor.fit(X_train, y_train["success_rate"])
 

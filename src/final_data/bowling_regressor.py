@@ -133,26 +133,32 @@ def bowling_predict_test():
 
     for attribute in output_bowling_columns:
         if attribute != "wickets_taken":
-            plt.scatter(y_train[attribute], train_predict[attribute] - train_correct[attribute], color='red',
-                        s=2)
+            plt.scatter(y_train[attribute], train_predict[attribute], color='red',
+                        s=2, label="train_data")
             plt.plot(y_train[attribute], y_train[attribute], color='blue')
-            plt.scatter(y_test[attribute], y_pred[attribute] - test_correct[attribute], color='green', s=4)
+            plt.scatter(y_test[attribute], y_pred[attribute] , color='green', s=4, label="test_data")
             plt.title('Actual vs Predicted')
             plt.xlabel('Actual ' + attribute)
             plt.ylabel('Predicted ' + attribute)
+            plt.legend()
             plt.show()
+            print('Root Mean Squared Error:',
+                  np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute])))
             print(attribute, 'R2:', metrics.r2_score(y_test[attribute], y_pred[attribute]))
         else:
             plt.scatter(y_train[attribute], train_predict[attribute] - train_wicket_correct[attribute], color='red',
-                        s=2)
+                        s=2, label="train_data")
             plt.plot(y_train[attribute], y_train[attribute], color='blue')
-            plt.scatter(y_test[attribute], y_pred[attribute] - test_wicket_correct[attribute], color='green', s=4)
+            plt.scatter(y_test[attribute], y_pred[attribute], color='green', s=4, label="test_data")
             plt.title('Actual vs Predicted')
             plt.xlabel('Actual ' + attribute)
             plt.ylabel('Predicted ' + attribute)
+            plt.legend()
             plt.show()
+            print('Root Mean Squared Error:',
+                  np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute])))
             print(attribute, 'R2:',
-                  metrics.r2_score(y_test[attribute], y_pred[attribute] - test_wicket_correct[attribute]))
+                  metrics.r2_score(y_test[attribute], y_pred[attribute]))
 
         # print(attribute)
         # print("Training Set")
@@ -216,9 +222,9 @@ if __name__ == "__main__":
     RFR = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=0, n_jobs=-1)
     predictor = RFR
 
-    predictor = MultiOutputRegressor(svm.SVR())
-    predictor = MultiOutputRegressor(LinearRegression())
-    predictor = MultiOutputRegressor(DecisionTreeRegressor(random_state=0))
+    # predictor = MultiOutputRegressor(svm.SVR())
+    # predictor = MultiOutputRegressor(LinearRegression())
+    # predictor = MultiOutputRegressor(DecisionTreeRegressor(random_state=0))
 
     predictor.fit(X_train, y_train)
 

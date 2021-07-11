@@ -115,13 +115,14 @@ def batting_predict_test():
 
     for attribute in output_batting_columns:
         # corrected runs
-        plt.scatter(y_train[attribute], train_predict[attribute] - train_correct[attribute], color='red',
-                    s=2)
+        plt.scatter(y_train[attribute], train_predict[attribute], color='red',
+                    s=2, label="train_data")
         plt.plot(y_train[attribute], y_train[attribute], color='blue')
-        plt.scatter(y_test[attribute], y_pred[attribute] - test_correct[attribute], color='green', s=4)
+        plt.scatter(y_test[attribute], y_pred[attribute], color='green', s=4, label="test_data")
         plt.title('Actual vs Predicted')
         plt.xlabel('Actual ' + attribute)
         plt.ylabel('Predicted ' + attribute)
+        plt.legend()
         plt.show()
 
         # print(attribute)
@@ -138,8 +139,8 @@ def batting_predict_test():
         # print("Test Set")
         # print('Mean Squared Error:',
         #       metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
-        # print('Root Mean Squared Error:',
-        #       np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute])))
+        print('Root Mean Squared Error:',
+              np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute])))
 
         # max_r2 = 0
         # chosen_i = 0
@@ -187,9 +188,9 @@ if __name__ == "__main__":
 
     predictor = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
-    predictor = MultiOutputRegressor(svm.SVR())
-    predictor = MultiOutputRegressor(LinearRegression())
-    predictor = MultiOutputRegressor(DecisionTreeRegressor(random_state = 0))
+    # predictor = MultiOutputRegressor(svm.SVR())
+    # predictor = MultiOutputRegressor(LinearRegression())
+    # predictor = MultiOutputRegressor(DecisionTreeRegressor(random_state = 0))
     predictor.fit(X_train, y_train)
 
     train_predict = pd.DataFrame(predictor.predict(X_train), columns=output_batting_columns)
