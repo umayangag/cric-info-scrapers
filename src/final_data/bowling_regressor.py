@@ -52,7 +52,7 @@ def predict_bowling(dataset):
     corrected_wickets = loaded_wicket_corrector.predict(predicted_df)
     corrections_df = pd.DataFrame(corrections, columns=output_bowling_columns)
     result = predicted_df - corrections_df + offset_array
-    result["wickets_taken"] = result["wickets_taken"] - corrected_wickets
+    result["wickets_taken"] = predicted_df["wickets_taken"] - corrected_wickets + offset_array[2]
     result[result < 0] = 0
     for column in output_bowling_columns:
         dataset[column] = result[column]
@@ -103,9 +103,9 @@ def bowling_predict_test():
     #                                   n_jobs=-1)
     # corrector.fit(y_train, train_predict - y_train)
     train_correct = pd.DataFrame(corrector.predict(y_train), columns=output_bowling_columns) - offset_array
-    train_wicket_correct = pd.DataFrame(wicket_corrector.predict(y_train), columns=["wickets_taken"])
+    train_wicket_correct = pd.DataFrame(wicket_corrector.predict(y_train), columns=["wickets_taken"]) - offset_array[2]
     test_correct = pd.DataFrame(corrector.predict(y_test), columns=output_bowling_columns) - offset_array
-    test_wicket_correct = pd.DataFrame(wicket_corrector.predict(y_test), columns=["wickets_taken"])
+    test_wicket_correct = pd.DataFrame(wicket_corrector.predict(y_test), columns=["wickets_taken"]) - offset_array[2]
     #
     # # predict error
     # plt.scatter(y_train["runs_conceded"], train_predict["runs_conceded"] - y_train["runs_conceded"], color='red', s=2)
@@ -131,7 +131,8 @@ def bowling_predict_test():
             plt.scatter(y_train[attribute], train_predict[attribute] - train_correct[attribute], color='red',
                         s=2, label="training data")
             plt.plot(y_train[attribute], y_train[attribute], color='blue')
-            plt.scatter(y_test[attribute], y_pred[attribute] - test_correct[attribute], color='green', s=4,label="test data")
+            plt.scatter(y_test[attribute], y_pred[attribute] - test_correct[attribute], color='green', s=4,
+                        label="test data")
             plt.title('Actual vs Predicted')
             plt.xlabel('Actual ' + attribute)
             plt.ylabel('Predicted ' + attribute)
@@ -144,7 +145,8 @@ def bowling_predict_test():
             plt.scatter(y_train[attribute], train_predict[attribute] - train_wicket_correct[attribute], color='red',
                         s=2, label="training data")
             plt.plot(y_train[attribute], y_train[attribute], color='blue')
-            plt.scatter(y_test[attribute], y_pred[attribute] - test_wicket_correct[attribute], color='green', s=4,label="test data")
+            plt.scatter(y_test[attribute], y_pred[attribute] - test_wicket_correct[attribute], color='green', s=4,
+                        label="test data")
             plt.title('Actual vs Predicted')
             plt.xlabel('Actual ' + attribute)
             plt.ylabel('Predicted ' + attribute)

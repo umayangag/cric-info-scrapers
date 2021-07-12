@@ -42,12 +42,21 @@ input_columns = [
 def predict_batting(dataset):
     loaded_predictor = pickle.load(open(model_file, 'rb'))
     loaded_corrector = pickle.load(open(corrector_file, 'rb'))
+    loaded_four_corrector = pickle.load(open(four_corrector_file, 'rb'))
+    loaded_six_corrector = pickle.load(open(six_corrector_file, 'rb'))
+    loaded_batting_position_corrector = pickle.load(open(batting_position_corrector_file, 'rb'))
     loaded_scaler = pickle.load(open(scaler_file, 'rb'))
     predicted = loaded_predictor.predict(loaded_scaler.transform(dataset[input_columns]))
     predicted_df = pd.DataFrame(predicted, columns=output_batting_columns)
     corrections = loaded_corrector.predict(predicted_df)
+    corrected_fours = loaded_four_corrector.predict(predicted_df)
+    corrected_sixes = loaded_six_corrector.predict(predicted_df)
+    corrected_batting_position = loaded_batting_position_corrector.predict(predicted_df)
     corrections_df = pd.DataFrame(corrections, columns=output_batting_columns)
     result = predicted_df - corrections_df + offset_array
+    result["fours_scored"] = predicted_df["fours_scored"] - corrected_fours + offset_array[2]
+    result["sixes_scored"] = predicted_df["sixes_scored"] - corrected_sixes + offset_array[3]
+    result["batting_position"] = predicted_df["batting_position"] - corrected_batting_position + offset_array[4]
     result[result < 0] = 0
     for column in output_batting_columns:
         dataset[column] = result[column]
