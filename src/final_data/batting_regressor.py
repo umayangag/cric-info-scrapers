@@ -268,20 +268,20 @@ if __name__ == "__main__":
 
     train_predict = pd.DataFrame(predictor.predict(X_train), columns=output_batting_columns)
 
-    corrector = RandomForestRegressor(max_depth=6, n_estimators=100, random_state=1, max_features="auto",
+    corrector = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
-    six_corrector = RandomForestRegressor(max_depth=6, n_estimators=100, random_state=1, max_features="auto",
+    six_corrector = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                           n_jobs=-1)
-    four_corrector = RandomForestRegressor(max_depth=6, n_estimators=100, random_state=1, max_features="auto",
+    four_corrector = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                            n_jobs=-1)
-    batting_position_corrector = RandomForestRegressor(max_depth=6, n_estimators=100, random_state=1, max_features="auto",
+    batting_position_corrector = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                            n_jobs=-1)
     corrector.fit(y_train, train_predict - y_train)
     six_corrector.fit(y_train, train_predict["sixes_scored"] - y_train["sixes_scored"])
     four_corrector.fit(y_train, train_predict["fours_scored"] - y_train["fours_scored"])
     batting_position_corrector.fit(y_train, train_predict["batting_position"] - y_train["batting_position"])
 
-    # get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 10, "runs_scored")
+    # get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 500, "runs_scored")
     pickle.dump(predictor, open(model_file, 'wb'))
     pickle.dump(corrector, open(corrector_file, 'wb'))
     pickle.dump(six_corrector, open(six_corrector_file, 'wb'))

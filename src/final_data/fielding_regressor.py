@@ -168,7 +168,7 @@ if __name__ == "__main__":
 
     train_predict = pd.DataFrame(predictor.predict(X_train), columns=["success_rate"])
 
-    corrector = RandomForestRegressor(max_depth=6, n_estimators=500, random_state=1, max_features="auto",
+    corrector = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
     corrector.fit(y_train, train_predict["success_rate"] - y_train["success_rate"])
     # get_error_curves(X_train, y_train, X_test, y_test, output_fielding_columns, 500)

@@ -223,9 +223,9 @@ if __name__ == "__main__":
 
     train_predict = pd.DataFrame(predictor.predict(X_train), columns=output_bowling_columns)
 
-    corrector = RandomForestRegressor(max_depth=6, n_estimators=500, random_state=1, max_features="auto",
+    corrector = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
-    wicket_corrector = RandomForestRegressor(max_depth=6, n_estimators=500, random_state=1, max_features="auto",
+    wicket_corrector = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                              n_jobs=-1)
     corrector.fit(y_train, train_predict - y_train)
     wicket_corrector.fit(y_train, train_predict["wickets_taken"] - y_train["wickets_taken"])
