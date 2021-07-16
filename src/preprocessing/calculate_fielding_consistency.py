@@ -9,7 +9,7 @@ def calculate_fielding_consistency(db_connection):
 
     for player in players_list:
         db_cursor.execute(
-            f'SELECT catches, run_outs, dropped_catches,missed_run_outs FROM fielding_data where player_id={player[0]}')
+            f'SELECT catches, run_outs, dropped_catches,missed_run_outs FROM fielding_data where player_id={player[0]}  and match_id<1120286')
         player_data = db_cursor.fetchall()
         inning_count = len(player_data)
         if inning_count > 5:

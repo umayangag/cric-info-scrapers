@@ -24,7 +24,7 @@ def calculate_batting_opposition(db_connection):
                 f'SELECT description, runs, batting_data.balls, minutes, fours, sixes, strike_rate, '
                 f'match_details.season_id FROM batting_data left join match_details '
                 f'on batting_data.match_id=match_details.match_id where player_id = {player[0]} '
-                f'and opposition_id = {opposition[0]};')
+                f'and opposition_id = {opposition[0]} and batting_data.match_id<1120286;')
             player_data = db_cursor.fetchall()
             inning_count = len(player_data)
             if inning_count > 5:

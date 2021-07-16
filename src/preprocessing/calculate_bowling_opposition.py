@@ -24,7 +24,7 @@ def calculate_bowling_opposition(db_connection):
                 f'SELECT bowling_data.balls, runs, bowling_data.wickets, econ, '
                 f'match_details.opposition_id FROM bowling_data left join match_details '
                 f'on bowling_data.match_id=match_details.match_id where player_id = {player[0]} '
-                f'and opposition_id = {opposition[0]};')
+                f'and opposition_id = {opposition[0]} and bowling_data.match_id<1120286;')
             player_data = db_cursor.fetchall()
             inning_count = len(player_data)
             if inning_count > 5:
