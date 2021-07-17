@@ -110,14 +110,15 @@ def batting_predict_test():
     # plt.ylabel('Predicted Runs Scored Residuals')
     # plt.show()
 
-    train_correct = pd.DataFrame(corrector.predict(y_train), columns=output_batting_columns) - offset_array
-    train_six_correct = pd.DataFrame(six_corrector.predict(y_train), columns=["sixes_scored"])- offset_array[3]
-    train_four_correct = pd.DataFrame(four_corrector.predict(y_train), columns=["fours_scored"]) - offset_array[2]
-    train_batting_position_correct = pd.DataFrame(batting_position_corrector.predict(y_train), columns=["batting_position"]) - offset_array[4]
-    test_correct = pd.DataFrame(corrector.predict(y_test), columns=output_batting_columns) - offset_array
-    test_six_correct = pd.DataFrame(six_corrector.predict(y_test), columns=["sixes_scored"])- offset_array[3]
-    test_four_correct = pd.DataFrame(four_corrector.predict(y_test), columns=["fours_scored"]) - offset_array[2]
-    test_batting_position_correct = pd.DataFrame(batting_position_corrector.predict(y_test), columns=["batting_position"]) - offset_array[4]
+    train_correct = pd.DataFrame(corrector.predict(train_predict), columns=output_batting_columns) - offset_array
+    train_six_correct = pd.DataFrame(six_corrector.predict(train_predict), columns=["sixes_scored"])- offset_array[3]
+    train_four_correct = pd.DataFrame(four_corrector.predict(train_predict), columns=["fours_scored"]) - offset_array[2]
+    train_batting_position_correct = pd.DataFrame(batting_position_corrector.predict(train_predict), columns=["batting_position"]) - offset_array[4]
+
+    test_correct = pd.DataFrame(corrector.predict(y_pred), columns=output_batting_columns) - offset_array
+    test_six_correct = pd.DataFrame(six_corrector.predict(y_pred), columns=["sixes_scored"])- offset_array[3]
+    test_four_correct = pd.DataFrame(four_corrector.predict(y_pred), columns=["fours_scored"]) - offset_array[2]
+    test_batting_position_correct = pd.DataFrame(batting_position_corrector.predict(y_pred), columns=["batting_position"]) - offset_array[4]
 
     # # predict error
     # plt.scatter(y_train["runs_scored"], train_predict["runs_scored"] - y_train["runs_scored"], color='red', s=2)

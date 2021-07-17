@@ -102,10 +102,10 @@ def bowling_predict_test():
     # corrector = RandomForestRegressor(max_depth=100, n_estimators=200, random_state=1, max_features="auto",
     #                                   n_jobs=-1)
     # corrector.fit(y_train, train_predict - y_train)
-    train_correct = pd.DataFrame(corrector.predict(y_train), columns=output_bowling_columns) - offset_array
-    train_wicket_correct = pd.DataFrame(wicket_corrector.predict(y_train), columns=["wickets_taken"]) - offset_array[2]
-    test_correct = pd.DataFrame(corrector.predict(y_test), columns=output_bowling_columns) - offset_array
-    test_wicket_correct = pd.DataFrame(wicket_corrector.predict(y_test), columns=["wickets_taken"]) - offset_array[2]
+    train_correct = pd.DataFrame(corrector.predict(train_predict), columns=output_bowling_columns) - offset_array
+    train_wicket_correct = pd.DataFrame(wicket_corrector.predict(train_predict), columns=["wickets_taken"]) - offset_array[2]
+    test_correct = pd.DataFrame(corrector.predict(y_pred), columns=output_bowling_columns) - offset_array
+    test_wicket_correct = pd.DataFrame(wicket_corrector.predict(y_pred), columns=["wickets_taken"]) - offset_array[2]
     #
     # # predict error
     # plt.scatter(y_train["runs_conceded"], train_predict["runs_conceded"] - y_train["runs_conceded"], color='red', s=2)

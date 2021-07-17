@@ -89,8 +89,8 @@ def fielding_predict_test():
     plt.ylabel('Predicted Runs Scored Residuals')
     plt.show()
 
-    train_correct = pd.DataFrame(corrector.predict(y_train), columns=["success_rate"])
-    test_correct = pd.DataFrame(corrector.predict(y_test), columns=["success_rate"])
+    train_correct = pd.DataFrame(corrector.predict(train_predict), columns=["success_rate"])
+    test_correct = pd.DataFrame(corrector.predict(y_pred), columns=["success_rate"])
 
     # predict error
     plt.scatter(y_train["success_rate"], train_predict["success_rate"] - y_train["success_rate"], color='red', s=2,

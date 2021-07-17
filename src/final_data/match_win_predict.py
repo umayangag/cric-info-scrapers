@@ -57,11 +57,11 @@ all_columns = [
     'bowling_opposition',
     'runs_conceded',
     'deliveries',
-    'wickets_taken',
+    # 'wickets_taken',
     'bowling_contribution',
     "economy",
     "fielding_consistency",
-    "success_rate"
+    # "success_rate"
 ]
 
 
