@@ -10,6 +10,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.inspection import permutation_importance
 import matplotlib.pyplot as plt
 import numpy as np
+from final_data.feature_select import select_features
 
 model_file = "win_predictor.sav"
 scaler_file = "win_predictor_scaler.sav"
@@ -29,7 +30,7 @@ all_columns = [
     'toss',
     'venue',
     'opposition',
-    # 'season',
+    'season',
     'runs_scored',
     'balls_faced',
     'fours_scored',
@@ -42,7 +43,7 @@ all_columns = [
     'total_balls',
     'target',
     'extras',
-    # 'match_number',
+    'match_number',
     'bowling_consistency',
     'bowling_form',
     'bowling_temp',
@@ -57,12 +58,17 @@ all_columns = [
     'bowling_opposition',
     'runs_conceded',
     'deliveries',
-    # 'wickets_taken',
+    'wickets_taken',
     'bowling_contribution',
     "economy",
     "fielding_consistency",
-    # "success_rate"
+    "success_rate"
 ]
+all_columns = ['batting_temp', 'batting_wind', 'batting_rain', 'batting_humidity', 'batting_pressure',
+               'batting_viscosity', 'batting_inning', 'runs_scored', 'strike_rate', 'total_score', 'total_wickets',
+               'total_balls', 'target', 'extras', 'match_number', 'bowling_consistency', 'bowling_temp',
+               'bowling_humidity', 'bowling_cloud', 'bowling_pressure', 'bowling_opposition', 'runs_conceded',
+               'deliveries', 'wickets_taken', 'bowling_contribution']
 
 
 def predict_for_team(input_team_data):
@@ -126,19 +132,19 @@ def win_predict(predictor):
 
     sensitivity = TP / float(FN + TP)
 
-    print("sensitivity:",sensitivity)
+    print("sensitivity:", sensitivity)
 
     specificity = TN / (TN + FP)
 
-    print("specificity:",specificity)
+    print("specificity:", specificity)
 
     false_positive_rate = FP / float(TN + FP)
 
-    print("false_positive_rate:",false_positive_rate)
+    print("false_positive_rate:", false_positive_rate)
 
     precision = TP / float(TP + FP)
 
-    print("precision:",precision)
+    print("precision:", precision)
 
     # plt.bar(range(X_train.shape[1]), gb.feature_importances_)
     # plt.xticks(range(X_train.shape[1]), X.columns)
@@ -193,6 +199,8 @@ if __name__ == "__main__":
     X_test = X.iloc[train_set + 1:, :]
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
+
+    select_features(X_train, y_train)
 
     predictor.fit(X_train, y_train)
     pickle.dump(predictor, open(model_file, 'wb'))

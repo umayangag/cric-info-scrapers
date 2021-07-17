@@ -10,6 +10,7 @@ from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
+from final_data.feature_select import select_features
 
 from team_selection.dataset_definitions import *
 
@@ -37,6 +38,8 @@ input_columns = [
     'opposition',
     'season',
 ]
+
+input_columns=['batting_consistency', 'batting_form', 'batting_inning', 'venue', 'opposition', 'season']
 
 
 def predict_batting(dataset):
@@ -262,6 +265,8 @@ if __name__ == "__main__":
     X_test = X.iloc[train_set + 1:, :]
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
+
+    select_features(X_train,y_train["batting_position"])
 
     predictor = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
