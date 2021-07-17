@@ -13,8 +13,8 @@ def get_error_curves(X_train, y_train, X_test, y_test, output_columns, max_iters
     iter_range = range(1, max_iters)
     for n_i in iter_range:
         print(n_i)
-        depth = 6
-        estimators = n_i
+        depth = n_i
+        estimators = 500
         predictor = RandomForestRegressor(max_depth=depth, n_estimators=estimators, random_state=1, max_features="auto",
                                           n_jobs=-1)
         predictor.fit(X_train, y_train)

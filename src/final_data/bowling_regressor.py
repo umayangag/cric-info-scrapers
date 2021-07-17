@@ -48,11 +48,12 @@ def predict_bowling(dataset):
     loaded_scaler = pickle.load(open(scaler_file, 'rb'))
     predicted = loaded_predictor.predict(loaded_scaler.transform(dataset[input_columns]))
     predicted_df = pd.DataFrame(predicted, columns=output_bowling_columns)
-    corrections = loaded_corrector.predict(predicted_df)
-    corrected_wickets = loaded_wicket_corrector.predict(predicted_df)
-    corrections_df = pd.DataFrame(corrections, columns=output_bowling_columns)
-    result = predicted_df - corrections_df + offset_array
-    result["wickets_taken"] = predicted_df["wickets_taken"] - corrected_wickets + offset_array[2]
+    # corrections = loaded_corrector.predict(predicted_df)
+    # corrected_wickets = loaded_wicket_corrector.predict(predicted_df)
+    # corrections_df = pd.DataFrame(corrections, columns=output_bowling_columns)
+    # result = predicted_df - corrections_df + offset_array
+    # result["wickets_taken"] = predicted_df["wickets_taken"] - corrected_wickets + offset_array[2]
+    result = predicted_df
     result[result < 0] = 0
     for column in output_bowling_columns:
         dataset[column] = result[column]

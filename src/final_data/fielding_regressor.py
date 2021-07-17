@@ -36,9 +36,9 @@ def predict_fielding(dataset):
     loaded_scaler = pickle.load(open(scaler_file, 'rb'))
     predicted = loaded_predictor.predict(loaded_scaler.transform(dataset[input_columns]))
     predicted_df = pd.DataFrame(predicted, columns=output_fielding_columns)
-    corrections = loaded_corrector.predict(predicted_df)
-    corrections_df = pd.DataFrame(corrections, columns=output_fielding_columns)
-    result = predicted_df - corrections_df
+    # corrections = loaded_corrector.predict(predicted_df)
+    # corrections_df = pd.DataFrame(corrections, columns=output_fielding_columns)
+    result = predicted_df
     result[result < 0] = 0
     for column in output_fielding_columns:
         dataset[column] = result[column]
@@ -170,7 +170,7 @@ if __name__ == "__main__":
 
     corrector = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
-    corrector.fit(y_train, train_predict["success_rate"] - y_train["success_rate"])
+    corrector.fit(train_predict, train_predict["success_rate"] - y_train["success_rate"])
     # get_error_curves(X_train, y_train, X_test, y_test, output_fielding_columns, 500)
     pickle.dump(predictor, open(model_file, 'wb'))
     pickle.dump(corrector, open(corrector_file, 'wb'))

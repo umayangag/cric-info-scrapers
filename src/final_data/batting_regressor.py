@@ -10,33 +10,42 @@ from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+import statsmodels.api as sm
 
 from team_selection.dataset_definitions import *
 
 model_file = "batting_performance_predictor.sav"
 corrector_file = "batting_performance_corrector.sav"
+balls_corrector_file = "balls_corrector.sav"
 six_corrector_file = "six_corrector.sav"
 four_corrector_file = "four_corrector.sav"
 batting_position_corrector_file = "batting_position_corrector.sav"
 scaler_file = "batting_scaler.sav"
 offset_array = [3.3652, 3.6601, 0.3073, 0.1321, -0.5213]
 input_columns = [
-    'batting_consistency',
-    'batting_form',
-    'batting_temp',
-    'batting_wind',
-    'batting_rain',
+    # 'batting_consistency',
+    # 'batting_form',
+    # 'batting_temp',
+    # 'batting_wind',
+    # 'batting_rain',
     'batting_humidity',
-    'batting_cloud',
-    'batting_pressure',
-    'batting_viscosity',
-    'batting_inning',
-    'batting_session',
-    'toss',
+    # 'batting_cloud',
+    # 'batting_pressure',
+    # 'batting_viscosity',
+    # 'batting_inning',
+    # 'batting_session',
+    # 'toss',
     'venue',
     'opposition',
     'season',
 ]
+
+
+def saturate_at_zero(df):
+    df = df.copy()
+    df[df < 0] = 0
+    return df
 
 
 def predict_batting(dataset):
@@ -48,15 +57,16 @@ def predict_batting(dataset):
     loaded_scaler = pickle.load(open(scaler_file, 'rb'))
     predicted = loaded_predictor.predict(loaded_scaler.transform(dataset[input_columns]))
     predicted_df = pd.DataFrame(predicted, columns=output_batting_columns)
-    corrections = loaded_corrector.predict(predicted_df)
-    corrected_fours = loaded_four_corrector.predict(predicted_df)
-    corrected_sixes = loaded_six_corrector.predict(predicted_df)
-    corrected_batting_position = loaded_batting_position_corrector.predict(predicted_df)
-    corrections_df = pd.DataFrame(corrections, columns=output_batting_columns)
-    result = predicted_df - corrections_df + offset_array
-    result["fours_scored"] = predicted_df["fours_scored"] - corrected_fours + offset_array[2]
-    result["sixes_scored"] = predicted_df["sixes_scored"] - corrected_sixes + offset_array[3]
-    result["batting_position"] = predicted_df["batting_position"] - corrected_batting_position + offset_array[4]
+    # corrections = loaded_corrector.predict(predicted_df)
+    # corrected_fours = loaded_four_corrector.predict(predicted_df)
+    # corrected_sixes = loaded_six_corrector.predict(predicted_df)
+    # corrected_batting_position = loaded_batting_position_corrector.predict(predicted_df)
+    # corrections_df = pd.DataFrame(corrections, columns=["runs_scored"])
+    # result = predicted_df - corrections_df
+    # result["fours_scored"] = predicted_df["fours_scored"] - corrected_fours + offset_array[2]
+    # result["sixes_scored"] = predicted_df["sixes_scored"] - corrected_sixes + offset_array[3]
+    # result["batting_position"] = predicted_df["batting_position"] - corrected_batting_position + offset_array[4]
+    result = predicted_df
     result[result < 0] = 0
     for column in output_batting_columns:
         dataset[column] = result[column]
@@ -110,14 +120,21 @@ def batting_predict_test():
     # plt.ylabel('Predicted Runs Scored Residuals')
     # plt.show()
 
-    train_correct = pd.DataFrame(corrector.predict(y_train), columns=output_batting_columns) - offset_array
-    train_six_correct = pd.DataFrame(six_corrector.predict(y_train), columns=["sixes_scored"])- offset_array[3]
-    train_four_correct = pd.DataFrame(four_corrector.predict(y_train), columns=["fours_scored"]) - offset_array[2]
-    train_batting_position_correct = pd.DataFrame(batting_position_corrector.predict(y_train), columns=["batting_position"]) - offset_array[4]
-    test_correct = pd.DataFrame(corrector.predict(y_test), columns=output_batting_columns) - offset_array
-    test_six_correct = pd.DataFrame(six_corrector.predict(y_test), columns=["sixes_scored"])- offset_array[3]
-    test_four_correct = pd.DataFrame(four_corrector.predict(y_test), columns=["fours_scored"]) - offset_array[2]
-    test_batting_position_correct = pd.DataFrame(batting_position_corrector.predict(y_test), columns=["batting_position"]) - offset_array[4]
+    train_correct = pd.DataFrame(corrector.predict(train_predict["runs_scored"].values.reshape(-1, 1)),
+                                 columns=["runs_scored"])
+    train_balls_correct = pd.DataFrame(balls_corrector.predict(train_predict["balls_faced"].values.reshape(-1, 1)),
+                                       columns=["balls_faced"])
+    train_six_correct = pd.DataFrame(six_corrector.predict(y_train), columns=["sixes_scored"])
+    train_four_correct = pd.DataFrame(four_corrector.predict(y_train), columns=["fours_scored"])
+    train_batting_position_correct = pd.DataFrame(batting_position_corrector.predict(y_train),
+                                                  columns=["batting_position"])
+    test_correct = pd.DataFrame(corrector.predict(y_pred["runs_scored"].values.reshape(-1, 1)), columns=["runs_scored"])
+    test_six_correct = pd.DataFrame(six_corrector.predict(y_pred), columns=["sixes_scored"])
+    test_balls_correct = pd.DataFrame(balls_corrector.predict(y_pred["balls_faced"].values.reshape(-1, 1)),
+                                      columns=["balls_faced"])
+    test_four_correct = pd.DataFrame(four_corrector.predict(y_pred), columns=["fours_scored"])
+    test_batting_position_correct = pd.DataFrame(batting_position_corrector.predict(y_pred),
+                                                 columns=["batting_position"])
 
     # # predict error
     # plt.scatter(y_train["runs_scored"], train_predict["runs_scored"] - y_train["runs_scored"], color='red', s=2)
@@ -129,12 +146,14 @@ def batting_predict_test():
     # plt.show()
 
     for attribute in output_batting_columns:
-        if attribute == "batting_position":
+        if attribute == "balls_faced":
             # corrected runs
-            plt.scatter(y_train[attribute], train_predict[attribute] - train_batting_position_correct[attribute], color='red',
+            plt.scatter(y_train[attribute], train_predict[attribute] - train_balls_correct[attribute],
+                        color='red',
                         s=2, label="training data")
             plt.plot(y_train[attribute], y_train[attribute], color='blue')
-            plt.scatter(y_test[attribute], y_pred[attribute] - test_batting_position_correct[attribute], color='green', s=4,
+            plt.scatter(y_test[attribute], y_pred[attribute] - test_balls_correct[attribute], color='green',
+                        s=4,
                         label="test data")
             plt.title('Actual vs Predicted')
             plt.xlabel('Actual ' + attribute)
@@ -144,7 +163,31 @@ def batting_predict_test():
 
             print('Root Mean Squared Error:',
                   np.sqrt(
-                      metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_batting_position_correct[attribute])))
+                      metrics.mean_squared_error(y_test[attribute],
+                                                 y_pred[attribute] - test_balls_correct[attribute])))
+
+            print(attribute, 'R2:',
+                  metrics.r2_score(y_test[attribute], y_pred[attribute] - test_balls_correct[attribute]))
+            print("-----------------------------------------------------------------------------------")
+        elif attribute == "batting_position":
+            # corrected runs
+            plt.scatter(y_train[attribute], train_predict[attribute] - train_batting_position_correct[attribute],
+                        color='red',
+                        s=2, label="training data")
+            plt.plot(y_train[attribute], y_train[attribute], color='blue')
+            plt.scatter(y_test[attribute], y_pred[attribute] - test_batting_position_correct[attribute], color='green',
+                        s=4,
+                        label="test data")
+            plt.title('Actual vs Predicted')
+            plt.xlabel('Actual ' + attribute)
+            plt.ylabel('Predicted ' + attribute)
+            plt.legend()
+            plt.show()
+
+            print('Root Mean Squared Error:',
+                  np.sqrt(
+                      metrics.mean_squared_error(y_test[attribute],
+                                                 y_pred[attribute] - test_batting_position_correct[attribute])))
 
             print(attribute, 'R2:',
                   metrics.r2_score(y_test[attribute], y_pred[attribute] - test_batting_position_correct[attribute]))
@@ -191,10 +234,12 @@ def batting_predict_test():
             print("-----------------------------------------------------------------------------------")
         else:
             # corrected runs
-            plt.scatter(y_train[attribute], train_predict[attribute] - train_correct[attribute], color='red',
+            plt.scatter(y_train[attribute], saturate_at_zero(train_predict[attribute] + train_correct[attribute]),
+                        color='red',
                         s=2, label="training data")
             plt.plot(y_train[attribute], y_train[attribute], color='blue')
-            plt.scatter(y_test[attribute], y_pred[attribute] - test_correct[attribute], color='green', s=4,
+            plt.scatter(y_test[attribute], saturate_at_zero(y_pred[attribute] + test_correct[attribute]), color='green',
+                        s=4,
                         label="test data")
             plt.title('Actual vs Predicted')
             plt.xlabel('Actual ' + attribute)
@@ -217,7 +262,9 @@ def batting_predict_test():
             # print('Mean Squared Error:',
             #       metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
             print('Root Mean Squared Error:',
-                  np.sqrt(metrics.mean_squared_error(y_test[attribute], y_pred[attribute] - test_correct[attribute])))
+                  np.sqrt(
+                      metrics.mean_squared_error(y_test[attribute],
+                                                 saturate_at_zero(y_pred[attribute] + test_correct[attribute]))))
 
             # max_r2 = 0
             # chosen_i = 0
@@ -230,7 +277,8 @@ def batting_predict_test():
             #         chosen_i = start + L * i
             # print('max R2:', chosen_i, ":", max_r2)
 
-            print(attribute, 'R2:', metrics.r2_score(y_test[attribute], y_pred[attribute] - test_correct[attribute]))
+            print(attribute, 'R2:',
+                  metrics.r2_score(y_test[attribute], saturate_at_zero(y_pred[attribute] + test_correct[attribute])))
             print("-----------------------------------------------------------------------------------")
             # exit()
 
@@ -262,28 +310,56 @@ if __name__ == "__main__":
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
 
-    predictor = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
+    X1 = sm.add_constant(X_train)
+    ols = sm.OLS(y_train.runs_scored, X1)
+    lr = ols.fit()
+
+    selected_features = list(X.columns)
+    pmax = 1
+    while len(selected_features) > 0:
+        p = []
+        X_1 = X[selected_features]
+        X_1 = sm.add_constant(X_1)
+        model = sm.OLS(y.runs_scored, X_1).fit()
+        p = pd.Series(model.pvalues.values[1:], index=selected_features)
+        pmax = max(p)
+        feature_with_p_max = p.idxmax()
+        if pmax > 0.05:
+            selected_features.remove(feature_with_p_max)
+        else:
+            break
+
+    print(selected_features)
+
+    predictor = RandomForestRegressor(max_depth=7, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
     predictor.fit(X_train, y_train)
 
     train_predict = pd.DataFrame(predictor.predict(X_train), columns=output_batting_columns)
 
-    corrector = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
+    corrector = RandomForestRegressor(max_depth=1, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
+    balls_corrector = RandomForestRegressor(max_depth=1, n_estimators=200, random_state=1, max_features="auto",
+                                            n_jobs=-1)
     six_corrector = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                           n_jobs=-1)
     four_corrector = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                            n_jobs=-1)
-    batting_position_corrector = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
-                                           n_jobs=-1)
-    corrector.fit(y_train, train_predict - y_train)
+    batting_position_corrector = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1,
+                                                       max_features="auto",
+                                                       n_jobs=-1)
+    corrector.fit(train_predict["runs_scored"].values.reshape(-1, 1),
+                  y_train["runs_scored"] - train_predict["runs_scored"])
+    balls_corrector.fit(y_train["balls_faced"].values.reshape(-1, 1),
+                        train_predict["balls_faced"] - y_train["balls_faced"])
     six_corrector.fit(y_train, train_predict["sixes_scored"] - y_train["sixes_scored"])
     four_corrector.fit(y_train, train_predict["fours_scored"] - y_train["fours_scored"])
     batting_position_corrector.fit(y_train, train_predict["batting_position"] - y_train["batting_position"])
 
-    # get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 500, "runs_scored")
+    # get_error_curves(X_train, y_train, X_test, y_test, output_batting_columns, 10, "runs_scored")
     pickle.dump(predictor, open(model_file, 'wb'))
     pickle.dump(corrector, open(corrector_file, 'wb'))
+    pickle.dump(balls_corrector, open(balls_corrector_file, 'wb'))
     pickle.dump(six_corrector, open(six_corrector_file, 'wb'))
     pickle.dump(four_corrector, open(four_corrector_file, 'wb'))
     pickle.dump(batting_position_corrector, open(batting_position_corrector_file, 'wb'))
