@@ -7,6 +7,7 @@ import pandas as pd
 from sklearn import metrics
 from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
+from final_data.feature_select import select_features
 
 from team_selection.dataset_definitions import *
 
@@ -33,6 +34,8 @@ input_columns = [
     "bowling_opposition",
     "season",
 ]
+# input_columns = ['bowling_consistency', 'bowling_temp', 'bowling_humidity', 'batting_inning', 'bowling_venue',
+#                  'bowling_opposition', 'season']
 
 
 def calculate_economy(row):
@@ -76,7 +79,7 @@ def bowling_predict_test():
 
     # plt.plot(range(0, len(y_test)), y_test["runs_conceded"], color='red')
     # plt.plot(range(0, len(y_pred)), y_pred["runs_conceded"], color='blue')
-    # plt.title('Actual vs Predicted')
+    # plt.title('Predicted vs Actual')
     # plt.xlabel('Instance')
     # plt.ylabel('Runs Scored')
     # plt.show()
@@ -84,7 +87,7 @@ def bowling_predict_test():
     # plt.scatter(y_train["runs_conceded"], train_predict["runs_conceded"].apply(lambda x: x * 3 - 75), color='red')
     # plt.plot(y_train["runs_conceded"], y_train["runs_conceded"], color='blue')
     # plt.scatter(y_test["runs_conceded"], y_pred["runs_conceded"].apply(lambda x: x * 3 - 75), color='green')
-    # plt.title('Actual vs Predicted')
+    # plt.title('Predicted vs Actual')
     # plt.xlabel('Actual Runs Conceded')
     # plt.ylabel('Predicted Runs Conceded')
     # plt.show()
@@ -94,7 +97,7 @@ def bowling_predict_test():
     # plt.plot(y_train["runs_conceded"], y_train["runs_conceded"] - y_train["runs_conceded"], color='blue')
     # plt.scatter(y_test["runs_conceded"], y_pred["runs_conceded"] - y_test.reset_index()["runs_conceded"], color='green',
     #             s=4)
-    # plt.title('Actual vs Predicted Residuals')
+    # plt.title('Predicted vs Actual Residuals')
     # plt.xlabel('Actual Runs Scored')
     # plt.ylabel('Predicted Runs Scored Residuals')
     # plt.show()
@@ -103,7 +106,8 @@ def bowling_predict_test():
     #                                   n_jobs=-1)
     # corrector.fit(y_train, train_predict - y_train)
     train_correct = pd.DataFrame(corrector.predict(train_predict), columns=output_bowling_columns) - offset_array
-    train_wicket_correct = pd.DataFrame(wicket_corrector.predict(train_predict), columns=["wickets_taken"]) - offset_array[2]
+    train_wicket_correct = pd.DataFrame(wicket_corrector.predict(train_predict), columns=["wickets_taken"]) - \
+                           offset_array[2]
     test_correct = pd.DataFrame(corrector.predict(y_pred), columns=output_bowling_columns) - offset_array
     test_wicket_correct = pd.DataFrame(wicket_corrector.predict(y_pred), columns=["wickets_taken"]) - offset_array[2]
     #
@@ -111,7 +115,7 @@ def bowling_predict_test():
     # plt.scatter(y_train["runs_conceded"], train_predict["runs_conceded"] - y_train["runs_conceded"], color='red', s=2)
     # plt.scatter(y_train["runs_conceded"], train_correct["runs_conceded"], color='blue', s=2)
     # plt.scatter(y_test["runs_conceded"], test_correct["runs_conceded"], color='green', s=2)
-    # plt.title('Actual vs Predicted Residuals')
+    # plt.title('Predicted vs Actual Residuals')
     # plt.xlabel('Actual Runs Scored')
     # plt.ylabel('Predicted Runs Scored')
     # plt.show()
@@ -121,7 +125,7 @@ def bowling_predict_test():
     #             s=2)
     # plt.plot(y_train["runs_conceded"], y_train["runs_conceded"], color='blue')
     # plt.scatter(y_test["runs_conceded"], y_pred["runs_conceded"] - test_correct["runs_conceded"], color='green', s=4)
-    # plt.title('Actual vs Predicted')
+    # plt.title('Predicted vs Actual')
     # plt.xlabel('Actual Runs Scored')
     # plt.ylabel('Predicted Runs Scored')
     # plt.show()
@@ -133,7 +137,7 @@ def bowling_predict_test():
             plt.plot(y_train[attribute], y_train[attribute], color='blue')
             plt.scatter(y_test[attribute], y_pred[attribute] - test_correct[attribute], color='green', s=4,
                         label="test data")
-            plt.title('Actual vs Predicted')
+            plt.title('Predicted vs Actual')
             plt.xlabel('Actual ' + attribute)
             plt.ylabel('Predicted ' + attribute)
             plt.legend()
@@ -147,7 +151,7 @@ def bowling_predict_test():
             plt.plot(y_train[attribute], y_train[attribute], color='blue')
             plt.scatter(y_test[attribute], y_pred[attribute] - test_wicket_correct[attribute], color='green', s=4,
                         label="test data")
-            plt.title('Actual vs Predicted')
+            plt.title('Predicted vs Actual')
             plt.xlabel('Actual ' + attribute)
             plt.ylabel('Predicted ' + attribute)
             plt.legend()
@@ -215,6 +219,10 @@ if __name__ == "__main__":
     X_test = X.iloc[train_set + 1:, :]
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
+
+    select_features(X_train, y_train["runs_conceded"])
+    select_features(X_train, y_train["deliveries"])
+    select_features(X_train, y_train["wickets_taken"])
 
     RFR = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=0, n_jobs=-1)
     predictor = RFR

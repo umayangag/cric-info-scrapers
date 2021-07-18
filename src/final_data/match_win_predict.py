@@ -121,8 +121,9 @@ def win_predict(predictor):
     FP = confusion[0, 1]
     FN = confusion[1, 0]
     print((TP + TN) / float(TP + TN + FP + FN))
-    cvs = cross_val_score(predictor, X, y, scoring='accuracy', cv=10).mean()
+    cvs = cross_val_score(predictor, X, y, scoring='accuracy', cv=10)
     print("Cross Validation Score:", cvs)
+    print("Cross Validation Score:", cvs.mean())
     accuracy = metrics.accuracy_score(y_test, y_pred)
     print("Accuracy:", accuracy)
 

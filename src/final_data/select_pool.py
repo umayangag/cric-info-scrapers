@@ -266,7 +266,7 @@ if __name__ == "__main__":
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["predicted_score"], color='blue',
              label="predicted score")
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_score"], color='green', label="optimal score")
-    plt.title('Actual vs Predicted')
+    plt.title('Predicted vs Actual')
     plt.xlabel('Match Id')
     plt.ylabel('Runs Scored')
     plt.legend()
@@ -277,7 +277,7 @@ if __name__ == "__main__":
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["predicted_target"], color='blue',
              label="predicted target")
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_target"], color='green', label="optimal target")
-    plt.title('Actual vs Predicted')
+    plt.title('Predicted vs Actual')
     plt.xlabel('Match Id')
     plt.ylabel('Runs Conceded')
     plt.legend()
@@ -291,7 +291,7 @@ if __name__ == "__main__":
              label="predicted margin")
     plt.plot(range(0, len(matches_df["match_id"])), matches_df["optimal_score"] - matches_df["optimal_target"],
              color='green', label="optimal margin")
-    plt.title('Actual vs Predicted')
+    plt.title('Predicted vs Actual')
     plt.xlabel('Match Id')
     plt.ylabel('Winning Margin')
     plt.legend()
@@ -310,13 +310,16 @@ if __name__ == "__main__":
     plt.grid()
     plt.show()
 
-    print("Optimal Matches Lost:")
+    print("Optimal Matches Won:", len(matches_df.loc[matches_df["optimal_score"] >= matches_df["optimal_target"]]))
+    print(matches_df.loc[matches_df["optimal_score"] >= matches_df["optimal_target"]])
+
+    print("Optimal Matches Lost:",len(matches_df.loc[matches_df["optimal_score"] < matches_df["optimal_target"]]))
     print(matches_df.loc[matches_df["optimal_score"] < matches_df["optimal_target"]])
 
-    print("Predicted Matches Lost:")
+    print("Predicted Matches Lost:",len(matches_df.loc[matches_df["predicted_score"] < matches_df["predicted_target"]]))
     print(matches_df.loc[matches_df["predicted_score"] < matches_df["predicted_target"]])
 
-    print("Predicted Matches Won:")
+    print("Predicted Matches Won:",len(matches_df.loc[matches_df["predicted_score"] >= matches_df["predicted_target"]]))
     print(matches_df.loc[matches_df["predicted_score"] >= matches_df["predicted_target"]])
 
 

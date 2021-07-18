@@ -11,6 +11,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from final_data.feature_select import select_features
+from sklearn.feature_selection import SelectKBest, chi2
 
 from team_selection.dataset_definitions import *
 
@@ -39,7 +40,7 @@ input_columns = [
     'season',
 ]
 
-input_columns=['batting_consistency', 'batting_form', 'batting_inning', 'venue', 'opposition', 'season']
+# input_columns=['batting_consistency', 'batting_form', 'batting_inning', 'venue', 'opposition', 'season']
 
 
 def predict_batting(dataset):
@@ -89,7 +90,7 @@ def batting_predict_test():
 
     # plt.plot(range(0, len(y_test)), y_test["runs_scored"], color='red')
     # plt.plot(range(0, len(y_pred)), y_pred["runs_scored"], color='blue')
-    # plt.title('Actual vs Predicted')
+    # plt.title('Predicted vs Actual')
     # plt.xlabel('Instance')
     # plt.ylabel('Runs Scored')
     # plt.show()
@@ -98,7 +99,7 @@ def batting_predict_test():
     plt.scatter(y_train["runs_scored"], train_predict["runs_scored"], color='red', s=2, label="training data")
     plt.plot(y_train["runs_scored"], y_train["runs_scored"], color='blue')
     plt.scatter(y_test["runs_scored"], y_pred["runs_scored"], color='green', s=4, label="test data")
-    plt.title('Actual vs Predicted')
+    plt.title('Predicted vs Actual')
     plt.xlabel('Actual Runs Scored')
     plt.ylabel('Predicted Runs Scored')
     plt.legend()
@@ -108,7 +109,7 @@ def batting_predict_test():
     # plt.scatter(y_train["runs_scored"], train_predict["runs_scored"] - y_train["runs_scored"], color='red', s=2)
     # plt.plot(y_train["runs_scored"], y_train["runs_scored"] - y_train["runs_scored"], color='blue')
     # plt.scatter(y_test["runs_scored"], y_pred["runs_scored"] - y_test.reset_index()["runs_scored"], color='green', s=4)
-    # plt.title('Actual vs Predicted Residuals')
+    # plt.title('Predicted vs Actual Residuals')
     # plt.xlabel('Actual Runs Scored')
     # plt.ylabel('Predicted Runs Scored Residuals')
     # plt.show()
@@ -127,7 +128,7 @@ def batting_predict_test():
     # plt.scatter(y_train["runs_scored"], train_predict["runs_scored"] - y_train["runs_scored"], color='red', s=2)
     # plt.scatter(y_train["runs_scored"], train_correct["runs_scored"], color='blue', s=2)
     # plt.scatter(y_test["runs_scored"], test_correct["runs_scored"], color='green', s=2)
-    # plt.title('Actual vs Predicted Residuals')
+    # plt.title('Predicted vs Actual Residuals')
     # plt.xlabel('Actual Runs Scored')
     # plt.ylabel('Predicted Runs Scored')
     # plt.show()
@@ -140,7 +141,7 @@ def batting_predict_test():
             plt.plot(y_train[attribute], y_train[attribute], color='blue')
             plt.scatter(y_test[attribute], y_pred[attribute] - test_batting_position_correct[attribute], color='green', s=4,
                         label="test data")
-            plt.title('Actual vs Predicted')
+            plt.title('Predicted vs Actual')
             plt.xlabel('Actual ' + attribute)
             plt.ylabel('Predicted ' + attribute)
             plt.legend()
@@ -160,7 +161,7 @@ def batting_predict_test():
             plt.plot(y_train[attribute], y_train[attribute], color='blue')
             plt.scatter(y_test[attribute], y_pred[attribute] - test_four_correct[attribute], color='green', s=4,
                         label="test data")
-            plt.title('Actual vs Predicted')
+            plt.title('Predicted vs Actual')
             plt.xlabel('Actual ' + attribute)
             plt.ylabel('Predicted ' + attribute)
             plt.legend()
@@ -180,7 +181,7 @@ def batting_predict_test():
             plt.plot(y_train[attribute], y_train[attribute], color='blue')
             plt.scatter(y_test[attribute], y_pred[attribute] - test_six_correct[attribute], color='green', s=4,
                         label="test data")
-            plt.title('Actual vs Predicted')
+            plt.title('Predicted vs Actual')
             plt.xlabel('Actual ' + attribute)
             plt.ylabel('Predicted ' + attribute)
             plt.legend()
@@ -200,7 +201,7 @@ def batting_predict_test():
             plt.plot(y_train[attribute], y_train[attribute], color='blue')
             plt.scatter(y_test[attribute], y_pred[attribute] - test_correct[attribute], color='green', s=4,
                         label="test data")
-            plt.title('Actual vs Predicted')
+            plt.title('Predicted vs Actual')
             plt.xlabel('Actual ' + attribute)
             plt.ylabel('Predicted ' + attribute)
             plt.legend()
@@ -266,6 +267,10 @@ if __name__ == "__main__":
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
 
+    select_features(X_train,y_train["runs_scored"])
+    select_features(X_train,y_train["balls_faced"])
+    select_features(X_train,y_train["fours_scored"])
+    select_features(X_train,y_train["sixes_scored"])
     select_features(X_train,y_train["batting_position"])
 
     predictor = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",

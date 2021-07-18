@@ -9,6 +9,7 @@ from sklearn import preprocessing
 from sklearn.ensemble import RandomForestRegressor
 
 from team_selection.dataset_definitions import *
+from final_data.feature_select import select_features
 
 model_file = "fielding_performance_predictor.sav"
 corrector_file = "fielding_performance_corrector.sav"
@@ -16,17 +17,17 @@ scaler_file = "fielding_scaler.sav"
 
 input_columns = [
     "fielding_consistency",
-    "fielding_temp",
-    "fielding_wind",
-    "fielding_rain",
-    "fielding_humidity",
-    "fielding_cloud",
-    "fielding_pressure",
-    "fielding_viscosity",
-    "fielding_inning",
-    "fielding_session",
-    "toss",
-    "season",
+    # "fielding_temp",
+    # "fielding_wind",
+    # "fielding_rain",
+    # "fielding_humidity",
+    # "fielding_cloud",
+    # "fielding_pressure",
+    # "fielding_viscosity",
+    # "fielding_inning",
+    # "fielding_session",
+    # "toss",
+    # "season",
 ]
 
 
@@ -63,7 +64,7 @@ def fielding_predict_test():
 
     plt.plot(range(0, len(y_test)), y_test["success_rate"], color='red')
     plt.plot(range(0, len(y_pred)), y_pred["success_rate"], color='blue')
-    plt.title('Actual vs Predicted')
+    plt.title('Predicted vs Actual')
     plt.xlabel('Instance')
     plt.ylabel('success_rate')
     plt.show()
@@ -74,7 +75,7 @@ def fielding_predict_test():
     plt.scatter(y_train["success_rate"], gradient_corrected, color='red', s=2)
     plt.plot(y_train["success_rate"], y_train["success_rate"], color='blue')
     plt.scatter(y_test["success_rate"], y_pred["success_rate"], color='green', s=4)
-    plt.title('Actual vs Predicted')
+    plt.title('Predicted vs Actual')
     plt.xlabel('Actual success_rate')
     plt.ylabel('Predicted success_rate')
     plt.show()
@@ -84,7 +85,7 @@ def fielding_predict_test():
     plt.plot(y_train["success_rate"], y_train["success_rate"] - y_train["success_rate"], color='blue')
     plt.scatter(y_test["success_rate"], y_pred["success_rate"] - y_test.reset_index()["success_rate"], color='green',
                 s=4)
-    plt.title('Actual vs Predicted Residuals')
+    plt.title('Predicted vs Actual Residuals')
     plt.xlabel('Actual Runs Scored')
     plt.ylabel('Predicted Runs Scored Residuals')
     plt.show()
@@ -97,7 +98,7 @@ def fielding_predict_test():
                 label="training data")
     plt.scatter(y_train["success_rate"], train_correct["success_rate"], color='blue', s=2)
     plt.scatter(y_test["success_rate"], test_correct["success_rate"], color='green', s=2, label="test data")
-    plt.title('Actual vs Predicted Residuals')
+    plt.title('Predicted vs Actual Residuals')
     plt.xlabel('Actual Runs Scored')
     plt.ylabel('Predicted Runs Scored')
     plt.show()
@@ -108,7 +109,7 @@ def fielding_predict_test():
     plt.plot(y_train["success_rate"], y_train["success_rate"], color='blue')
     plt.scatter(y_test["success_rate"], y_pred["success_rate"] - test_correct["success_rate"], color='green', s=4,
                 label="test data")
-    plt.title('Actual vs Predicted')
+    plt.title('Predicted vs Actual')
     plt.xlabel('Actual Success Rate')
     plt.ylabel('Predicted Success Rate')
     plt.legend()
@@ -161,6 +162,8 @@ if __name__ == "__main__":
     X_test = X.iloc[train_set + 1:, :]
     y_train = y.iloc[:train_set]
     y_test = y.iloc[train_set + 1:]
+
+    select_features(X_train, y_train["success_rate"])
 
     predictor = RandomForestRegressor(max_depth=6, n_estimators=200, random_state=1, max_features="auto",
                                       n_jobs=-1)
